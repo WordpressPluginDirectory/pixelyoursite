@@ -28,14 +28,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Additional Pixel IDs -->
 <div class="card card-static">
     <div class="card-header">
-        Additional Pixel IDs <?php renderSpBadge(); ?>
+        Advanced Pixel Options <?php renderSpBadge(); ?>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col">
-                <p>Add additional Facebook, Google Analytics and Pinterest pixel IDs on the same site.</p>
+                <p>Add support for multiple pixels (Meta, Google, TikTok), enable pixel display conditions, and add extra controls for automated events for each pixel.</p>
                 <?php renderDummySwitcher(); ?>
-                <h4 class="switcher-label">Enable additional pixel IDs</h4>
+                <h4 class="switcher-label">Enable advanced pixel options</h4>
             </div>
         </div>
     </div>

@@ -540,7 +540,7 @@ abstract class Settings {
                                                value="<?php esc_attr_e( $attr_value ); ?>"
                                                placeholder="<?php esc_attr_e( $placeholder ); ?>"
 											   min="<?=$min?>" class="form-control"
-												<?php if($max != null) : ?> max="<?=$max?>" <?php endif;?>
+												<?php if($max != null) : ?> max="<?=$max?>" <?php endif; ?>
 		>
 		
 		<?php

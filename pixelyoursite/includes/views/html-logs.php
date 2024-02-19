@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="card card-static">
     <div class="card-header ">
-        <?php PYS()->render_switcher_input('pys_logs_enable');?> Meta API Logs
+        <?php PYS()->render_switcher_input('pys_logs_enable'); ?> Meta API Logs
         <div style="float: right;margin-top: 10px;">
             <a style="margin-right: 30px"
                href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite', 'logs' ) ); ?>&clear_plugin_logs=true">Clear

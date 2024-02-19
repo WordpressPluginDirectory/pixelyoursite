@@ -27,6 +27,20 @@ use PixelYourSite\Facebook\Helpers;
                 <h4 class="switcher-label">Google Analytics Advanced Purchase Tracking</h4><?php renderProBadge(); ?>
             </div>
         </div>
+        <div  class="row">
+            <div class="col">
+                <?php renderDummySwitcher( false ); ?>
+                <h4 class="switcher-label">TikTok Advanced Purchase Tracking</h4><?php renderProBadge(); ?>
+            </div>
+        </div>
+		<?php if ( Pinterest()->enabled() ) : ?>
+            <div  class="row">
+                <div class="col">
+					<?php renderDummySwitcher( false ); ?>
+                    <h4 class="switcher-label">Pinterest Advanced Purchase Tracking</h4><?php renderProBadge(); ?>
+                </div>
+            </div>
+		<?php endif; ?>
         <p class="small">
             If the default Purchase event doesn't fire when an order is placed by the client, a Purchase event will be sent to Meta and Google using API when the order status is changed to "Completed". Meta Conversion API token and GA4 Measurement Protocol secret are required.
         </p>
@@ -88,7 +102,7 @@ use PixelYourSite\Facebook\Helpers;
         <div class="row mt-2">
             <div class="col">
                 <label class="mb-2">If the Purchase event doesn't work correctly, add your Checkout page(s) ID(s) here: <?php renderProBadge(); ?></label>
-                <?php PYS()->render_tags_select_input("woo_checkout_page_ids", true);?>
+                <?php PYS()->render_tags_select_input("woo_checkout_page_ids", true); ?>
                 <small class="form-check">Don't add the Checkout page IDs if you use Stripe or Klarna because conflicts are possible.</small>
             </div>
         </div>
@@ -115,7 +129,7 @@ use PixelYourSite\Facebook\Helpers;
             <div class="col">
                 <p>WooCommerce AddToCart Event FIX (4:46 min) - <a href="https://www.youtube.com/watch?v=oZoAu8a0PNg" target="_blank">watch now</a></p>
 								<p>Analyse your WooCommerce data with ChatGPT (12:06) - <a href="https://www.youtube.com/watch?v=FjGJYAdZEKc" target="_blank">watch video</a></p>
-                <p>Enhanced Conversions for Google Ads with PixelYourSite (9:14) - <a href="https://www.youtube.com/watch?v=0uuTiOnVw80" target="_blank">watch now</a></p>
+                <p>Enhanced Conversions for Google Ads with PixelYourSite (9:14) - <a href="https://www.youtube.com/watch?v=-bN5D_HJyuA" target="_blank">watch now</a></p>
                 <p>Google Analytic 4 (GA4) & WooCommerce: Transaction Reports (6:51) - <a href="https://www.youtube.com/watch?v=zLtXHbp_DDU" target="_blank">watch now</a></p>
                 <p>Google Analytics 4 (GA4) FUNNELS for WooCommerce (6:13)  - <a href="https://www.youtube.com/watch?v=c6L1XMYzuMM" target="_blank">watch now</a></p>
                 <p>Same Facebook (Meta) pixel or Google tag on multiple WooCommerce websites? (4:43) - <a href="https://www.youtube.com/watch?v=3Ugwlq1EVO4" target="_blank">watch now</a></p>
@@ -151,7 +165,7 @@ use PixelYourSite\Facebook\Helpers;
     <div class="card-body">
         <div class="row">
             <div class="col-5 form-inline">
-                <label>Prefix: </label><?php renderDummyTextInput("Prefix");?>
+                <label>Prefix: </label><?php renderDummyTextInput("Prefix"); ?>
             </div>
         </div>
         <div class="row mt-3">
@@ -230,7 +244,7 @@ use PixelYourSite\Facebook\Helpers;
 <?php if ( Facebook()->enabled() ) : ?>
 
     <?php $facebook_id_visibility = Helpers\isDefaultWooContentIdLogic() ? 'block' : 'none'; ?>
-    <?php $isShowFbID = Helpers\isFacebookForWooCommerceActive();?>
+    <?php $isShowFbID = Helpers\isFacebookForWooCommerceActive(); ?>
 
     <div class="card" id="pys-section-facebook-id" style="display: <?php esc_attr_e( $facebook_id_visibility ); ?>;">
         <div class="card-header">
@@ -505,7 +519,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- Purchase -->
 <div class="card">
     <div class="card-header has_switch ">
-        <?php PYS()->render_switcher_input('woo_purchase_enabled');?>Track Purchases <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('woo_purchase_enabled'); ?>Track Purchases <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
         <div class="row mb-1">
@@ -616,12 +630,6 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the purchase event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row mb-2">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'woo_purchase_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
         <?php endif; ?>
 
         <div class="row">
@@ -647,7 +655,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- InitiateCheckout -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('woo_initiate_checkout_enabled');?>Track the Checkout Page <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('woo_initiate_checkout_enabled'); ?>Track the Checkout Page <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -726,12 +734,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the begin_checkout event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'woo_initiate_checkout_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
+
         <?php endif; ?>
 
         <div class="row">
@@ -749,7 +752,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- RemoveFromCart -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('woo_remove_from_cart_enabled');?>Track remove from cart <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('woo_remove_from_cart_enabled'); ?>Track remove from cart <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -769,12 +772,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the remove_from_cart event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row mb-2">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'woo_remove_from_cart_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
+
         <?php endif; ?>
 
         <div class="row">
@@ -811,7 +809,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- AddToCart -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('woo_add_to_cart_enabled');?>Track add to cart <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('woo_add_to_cart_enabled'); ?>Track add to cart <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -890,12 +888,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the add_to_cart event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'woo_add_to_cart_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
+
         <?php endif; ?>
 
         <div class="row">
@@ -913,7 +906,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- ViewContent -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('woo_view_content_enabled');?>Track product pages <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('woo_view_content_enabled'); ?>Track product pages <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -999,12 +992,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the view_item event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'woo_view_content_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
+
         <?php endif; ?>
 
         <div class="row">
@@ -1022,7 +1010,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- ViewCategory -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('woo_view_category_enabled');?>Track product category pages <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('woo_view_category_enabled'); ?>Track product category pages <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -1101,11 +1089,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the view_item_list event on Google Analytics(categories, related products, search, shortcodes)</h4>
                 </div>
             </div>
-            <div class="row mb-2">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'woo_view_category_non_interactive_tmp', 'Non-interactive event',true ); ?>
-                </div>
-            </div>
+
             <div class="row mb-1">
                 <div class="col">
                     <?php GA()->render_switcher_input( 'woo_select_content_enabled_tmp',false,true ); ?>
@@ -1118,7 +1102,7 @@ e&utm_campaign=pro-feature' ); ?>
 
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('woo_complete_registration_enabled');?> CompleteRegistration for the Meta Pixel (formerly Facebook Pixel)<?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('woo_complete_registration_enabled'); ?> CompleteRegistration for the Meta Pixel (formerly Facebook Pixel)<?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
         <?php if ( Facebook()->enabled() ) : ?>
@@ -1197,11 +1181,7 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row mb-2">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
+
 
         <div class="row">
             <div class="col">
@@ -1221,6 +1201,13 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">Enable on Bing</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable on TikTok</h4>
             </div>
         </div>
 
@@ -1254,11 +1241,7 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row mb-2">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
+
 
         <div class="row">
             <div class="col">
@@ -1278,6 +1261,13 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">Enable on Bing</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable on TikTok</h4>
             </div>
         </div>
 
@@ -1312,11 +1302,7 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row mb-2">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
+
 
         <div class="row">
             <div class="col">
@@ -1336,6 +1322,13 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">Enable on Bing</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable on TikTok</h4>
             </div>
         </div>
 
@@ -1366,11 +1359,7 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row mb-2">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
+
 
         <div class="row">
             <div class="col">
@@ -1393,6 +1382,13 @@ e&utm_campaign=pro-feature' ); ?>
             </div>
         </div>
 
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable on TikTok</h4>
+            </div>
+        </div>
+
         <div class="row mt-3">
             <div class="col col-offset-left form-inline">
                 <label>Fire this event when the client has at least </label>
@@ -1405,41 +1401,6 @@ e&utm_campaign=pro-feature' ); ?>
 <div class="card card-disabled">
     <div class="card-header has_switch">
         FirstTimeBuyer Event <?php renderProBadge(); ?><?php cardCollapseBtn(); ?>
-    </div>
-    <div class="card-body">
-
-            <div class="row">
-                <div class="col">
-                    <?php renderDummySwitcher(); ?>
-                    <h4 class="switcher-label">Send the event to Facebook</h4>
-                </div>
-            </div>
-
-            <div class="row mb-1">
-                <div class="col">
-                    <?php renderDummySwitcher(); ?>
-                    <h4 class="switcher-label">Send the event to Google Analytics</h4>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    <?php renderDummySwitcher(); ?>
-                    <h4 class="switcher-label">Send the event to Pinterest</h4>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    <?php renderDummySwitcher(); ?>
-                    <h4 class="switcher-label">Send the event to Bing</h4>
-                </div>
-            </div>
-    </div>
-</div>
-<div class="card card-disabled">
-    <div class="card-header has_switch">
-        ReturingCustomer Event <?php renderProBadge(); ?><?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -1468,6 +1429,55 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">Send the event to Bing</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Send the event to TikTok</h4>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card card-disabled">
+    <div class="card-header has_switch">
+        ReturningCustomer Event <?php renderProBadge(); ?><?php cardCollapseBtn(); ?>
+    </div>
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Send the event to Facebook</h4>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Send the event to Google Analytics</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Send the event to Pinterest</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Send the event to Bing</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Send the event to TikTok</h4>
             </div>
         </div>
     </div>
@@ -1539,11 +1549,7 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
+
 
         <div class="row">
             <div class="col">
@@ -1620,11 +1626,7 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
+
 
         <div class="row">
             <div class="col">

@@ -1,10 +1,10 @@
 ===PixelYourSite - Your smart PIXEL (TAG) Manager===
 Contributors: PixelYourSite
-Tags: Meta Pixel, Facebook Pixel, Facebook Conversion API, CAPI, Facebook Pixel Events, Facebook Dynamic Product Ads, Facebook Conversion Value, WooCommerce Facebook Pixel, Easy Digital Downloads Facebook Pixel, Google Analytics, Google Analytics Enhanced Ecommerce, GA4, WooCommerce Google Analytics, Easy Digital Downloads Google Analytics, head & footer scripts, Pinterest tag
+Tags: Meta Pixel, Facebook Pixel, Facebook Conversion API, CAPI, Facebook Pixel Events, Facebook Dynamic Product Ads, Facebook Conversion Value, WooCommerce Facebook Pixel, Easy Digital Downloads Facebook Pixel, Google Analytics, Google Analytics Enhanced Ecommerce, GA4, WooCommerce Google Analytics, Easy Digital Downloads Google Analytics, Google Consent Mode, head & footer scripts, Pinterest tag
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.3
-Stable tag: 9.4.7.1
+Stable tag: 9.5.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -16,6 +16,8 @@ Meta Pixel (Facebook Pixel) & Conversion API (CAPI), Google Analytics 4 (GA4) or
 PixelYourSite's Automatic Events will track important actions and send them to all your configured pixels (searches, form submit, comments, downloads). Use these events to understand your visitors' behaviour inside Google Analytics, or to create audiences and conversions for Meta (Facebook), or Google.
 
 You can fire your own events with zero coding.
+
+Google Consent Mode V2 support: [check this dedicated page for more details](https://www.pixelyoursite.com/google-consent-mode-v2-wordpress)
 
 **WooCommerce** and **Easy Digital Downloads** are fully supported, with Facebook Dynamic Ads pixel setup and Google Analytics Enhanced Ecommerce.
 
@@ -39,7 +41,7 @@ TRACK EVERYTHING WITH A SINGLE PLUGIN:
 
 * Facebook Conversion API: add a token and we send all events using CAPI
 
-* Google Analytics: one click install
+* Google Consent Mode V2
 
 * Google Analytics 4: for details, watch [this video](https://www.youtube.com/watch?v=fwegcsO-yrc)
 
@@ -53,7 +55,7 @@ TRACK EVERYTHING WITH A SINGLE PLUGIN:
 
 * Learn how to track both UA and GA4 properties at the same time (paid feature): [watch video](https://www.youtube.com/watch?v=JUuss5sewxg)
 
-* Learn how to fire multiple Facebook Pixels with CAPI support (paid feature): [watch video](https://www.youtube.com/watch?v=HM98mGZshvc)
+* Learn how to fire multiple Facebook Pixels with CAPI support (paid feature): [watch video](https://www.youtube.com/watch?v=oTYnsu99By8)
 
 
 
@@ -114,6 +116,8 @@ And it works with some of the most popular “cookie consent” plugins.
 
 Additionally we offer filters that developers can use to create their own custom integrations. These filters can control the way each pixel works.
 
+Google Consent Mode V2 support.
+
 
 
 FACEBOOK FOR WOOCOMMERCE INTEGRATION:
@@ -130,13 +134,11 @@ OTHER USEFUL FEATURES:
 
 * Facebook Manual Advanced Matching.
 
-* Remove Facebook default events.
-
 * Google Analytics cross-domain measurement.
 
-* Google Analytics Enhanced Link Attribution.
+* Disable noscript.
 
-* Google Analytics Anonymize IPs.
+* Track key actions with the automatic events.
 
 
 **EVEN MORE FEATURES WITH THE PRO VERSION:**
@@ -181,7 +183,7 @@ These parameters can be used for [Custom Audiences or Custom Conversions](https:
 
 EVEN MORE GOOGLE ANALYTICS FEATURES:
 
-Support for Google Optimize (free A/B testing service by Google).
+More triggers for Google Events.
 
 On top of the free version data, [the pro version](https://www.pixelyoursite.com/google-analytics) will track a number of useful Custom Dimensions.
 
@@ -467,6 +469,20 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.5.0 =
+
+* Google Consent Mode V2 option that will configure the Google Analytics tag with consent granted. Recommended for websites that use a consent plugin that blocks/unblocks the tags based on users' preferences, or websites that don't need to block Google tags (non EU traffic).
+
+* Google Consent Mode V2 support via dedicated filters. Recommended for consent plugin developers. 
+
+* Google Consent Mode V2 full integration with the ConsentMagic plugin. [Details here)[https://www.pixelyoursite.com/google-consent-mode-v2-wordpress]
+
+* New video links (new features, or updated videos).
+
+* New option: disable noscript. 
+
+* Fixing various bugs and code improvements. 
 
 
 = PixelYourSite 9.4.7.1 =

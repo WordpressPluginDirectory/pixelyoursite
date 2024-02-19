@@ -75,59 +75,103 @@ class EventsManager {
 
 		}
 
+		$pys_analytics_storage_mode = has_filter( 'pys_analytics_storage_mode' );
+		$pys_ad_storage_mode = has_filter( 'pys_ad_storage_mode' );
+		$pys_ad_user_data_mode = has_filter( 'pys_ad_user_data_mode' );
+		$pys_ad_personalization_mode = has_filter( 'pys_ad_personalization_mode' );
+		$google_consent_mode = ( has_filter( 'cm_google_consent_mode' ) || $pys_analytics_storage_mode || $pys_ad_storage_mode || $pys_ad_user_data_mode || $pys_ad_personalization_mode ) ? true : PYS()->getOption( 'google_consent_mode' );
+
 		$options = array(
-			'debug'                             => PYS()->getOption( 'debug_enabled' ),
-			'siteUrl'                           => site_url(),
-			'ajaxUrl'                           => admin_url( 'admin-ajax.php' ),
-            'ajax_event'                        => wp_create_nonce('ajax-event-nonce'),
-            'enable_remove_download_url_param'  => PYS()->getOption( 'enable_remove_download_url_param' ),
-            'cookie_duration'                   => PYS()->getOption( 'cookie_duration' ),
-            'last_visit_duration'               => PYS()->getOption('last_visit_duration'),
-            'enable_success_send_form'          => PYS()->getOption( 'enable_success_send_form' ),
-			'ajaxForServerEvent'                => PYS()->getOption( 'server_event_use_ajax'),
-            "send_external_id" => PYS()->getOption( 'send_external_id'),
-            "external_id_expire"=> PYS()->getOption( 'external_id_expire')
+			'debug'                            => PYS()->getOption( 'debug_enabled' ),
+			'siteUrl'                          => site_url(),
+			'ajaxUrl'                          => admin_url( 'admin-ajax.php' ),
+			'ajax_event'                       => wp_create_nonce( 'ajax-event-nonce' ),
+			'enable_remove_download_url_param' => PYS()->getOption( 'enable_remove_download_url_param' ),
+			'cookie_duration'                  => PYS()->getOption( 'cookie_duration' ),
+			'last_visit_duration'              => PYS()->getOption( 'last_visit_duration' ),
+			'enable_success_send_form'         => PYS()->getOption( 'enable_success_send_form' ),
+			'ajaxForServerEvent'               => PYS()->getOption( 'server_event_use_ajax' ),
+			"send_external_id"                 => PYS()->getOption( 'send_external_id' ),
+			"external_id_expire"               => PYS()->getOption( 'external_id_expire' ),
+			"google_consent_mode"              => $google_consent_mode
 		);
 
-		$options['gdpr'] = array(
-			'ajax_enabled'              => PYS()->getOption( 'gdpr_ajax_enabled' ),
-			'all_disabled_by_api'       => apply_filters( 'pys_disable_by_gdpr', false ),
-			'facebook_disabled_by_api'  => apply_filters( 'pys_disable_facebook_by_gdpr', false ),
-			'analytics_disabled_by_api' => apply_filters( 'pys_disable_analytics_by_gdpr', false ),
-            'google_ads_disabled_by_api' => apply_filters( 'pys_disable_google_ads_by_gdpr', false ),
-			'pinterest_disabled_by_api' => apply_filters( 'pys_disable_pinterest_by_gdpr', false ),
-            'bing_disabled_by_api' => apply_filters( 'pys_disable_bing_by_gdpr', false ),
+		$options[ 'gdpr' ] = array(
+			'ajax_enabled'               => PYS()->getOption( 'gdpr_ajax_enabled' ),
+			'all_disabled_by_api'        => apply_filters( 'pys_disable_by_gdpr', false ),
+			'facebook_disabled_by_api'   => apply_filters( 'pys_disable_facebook_by_gdpr', false ),
+			'analytics_disabled_by_api'  => apply_filters( 'pys_disable_analytics_by_gdpr', false ),
+			'google_ads_disabled_by_api' => apply_filters( 'pys_disable_google_ads_by_gdpr', false ),
+			'pinterest_disabled_by_api'  => apply_filters( 'pys_disable_pinterest_by_gdpr', false ),
+			'bing_disabled_by_api'       => apply_filters( 'pys_disable_bing_by_gdpr', false ),
 
-            'externalID_disabled_by_api' => apply_filters( 'pys_disable_externalID_by_gdpr', false ),
+			'externalID_disabled_by_api' => apply_filters( 'pys_disable_externalID_by_gdpr', false ),
 
 			'facebook_prior_consent_enabled'   => PYS()->getOption( 'gdpr_facebook_prior_consent_enabled' ),
 			'analytics_prior_consent_enabled'  => PYS()->getOption( 'gdpr_analytics_prior_consent_enabled' ),
 			'google_ads_prior_consent_enabled' => PYS()->getOption( 'gdpr_google_ads_prior_consent_enabled' ),
 			'pinterest_prior_consent_enabled'  => PYS()->getOption( 'gdpr_pinterest_prior_consent_enabled' ),
-            'bing_prior_consent_enabled' => PYS()->getOption( 'gdpr_bing_prior_consent_enabled' ),
+			'bing_prior_consent_enabled'       => PYS()->getOption( 'gdpr_bing_prior_consent_enabled' ),
 
 
-			'cookiebot_integration_enabled'         => isCookiebotPluginActivated() && PYS()->getOption( 'gdpr_cookiebot_integration_enabled' ),
-			'cookiebot_facebook_consent_category'   => PYS()->getOption( 'gdpr_cookiebot_facebook_consent_category' ),
-			'cookiebot_analytics_consent_category'  => PYS()->getOption( 'gdpr_cookiebot_analytics_consent_category' ),
-            'cookiebot_tiktok_consent_category'   => PYS()->getOption( 'gdpr_cookiebot_tiktok_consent_category' ),
-            'cookiebot_google_ads_consent_category' => PYS()->getOption( 'gdpr_cookiebot_google_ads_consent_category' ),
-			'cookiebot_pinterest_consent_category'  => PYS()->getOption( 'gdpr_cookiebot_pinterest_consent_category' ),
-            'cookiebot_bing_consent_category' => PYS()->getOption( 'gdpr_cookiebot_bing_consent_category' ),
-            'consent_magic_integration_enabled' => isConsentMagicPluginActivated() && PYS()->getOption( 'consent_magic_integration_enabled' ),
+			'cookiebot_integration_enabled'          => isCookiebotPluginActivated() && PYS()->getOption( 'gdpr_cookiebot_integration_enabled' ),
+			'cookiebot_facebook_consent_category'    => PYS()->getOption( 'gdpr_cookiebot_facebook_consent_category' ),
+			'cookiebot_analytics_consent_category'   => PYS()->getOption( 'gdpr_cookiebot_analytics_consent_category' ),
+			'cookiebot_tiktok_consent_category'      => PYS()->getOption( 'gdpr_cookiebot_tiktok_consent_category' ),
+			'cookiebot_google_ads_consent_category'  => PYS()->getOption( 'gdpr_cookiebot_google_ads_consent_category' ),
+			'cookiebot_pinterest_consent_category'   => PYS()->getOption( 'gdpr_cookiebot_pinterest_consent_category' ),
+			'cookiebot_bing_consent_category'        => PYS()->getOption( 'gdpr_cookiebot_bing_consent_category' ),
+			'consent_magic_integration_enabled'      => isConsentMagicPluginActivated() && PYS()->getOption( 'consent_magic_integration_enabled' ),
 			'real_cookie_banner_integration_enabled' => isRealCookieBannerPluginActivated() && PYS()->getOption( 'gdpr_real_cookie_banner_integration_enabled' ),
-            'cookie_notice_integration_enabled' => isCookieNoticePluginActivated() && PYS()->getOption( 'gdpr_cookie_notice_integration_enabled' ),
-			'cookie_law_info_integration_enabled' => isCookieLawInfoPluginActivated() && PYS()->getOption( 'gdpr_cookie_law_info_integration_enabled' ),
+			'cookie_notice_integration_enabled'      => isCookieNoticePluginActivated() && PYS()->getOption( 'gdpr_cookie_notice_integration_enabled' ),
+			'cookie_law_info_integration_enabled'    => isCookieLawInfoPluginActivated() && PYS()->getOption( 'gdpr_cookie_law_info_integration_enabled' ),
 		);
-        $options['cookie'] = array(
-            'disabled_all_cookie'       => apply_filters( 'pys_disable_all_cookie', false ),
-            'disabled_advanced_form_data_cookie' => apply_filters( 'pys_disable_advanced_form_data_cookie', false ),
-            'disabled_landing_page_cookie'  => apply_filters( 'pys_disable_landing_page_cookie', false ),
-            'disabled_first_visit_cookie'  => apply_filters( 'pys_disable_first_visit_cookie', false ),
-            'disabled_trafficsource_cookie' => apply_filters( 'pys_disable_trafficsource_cookie', false ),
-            'disabled_utmTerms_cookie' => apply_filters( 'pys_disable_utmTerms_cookie', false ),
-            'disabled_utmId_cookie' => apply_filters( 'pys_disable_utmId_cookie', false ),
-        );
+
+		$options[ 'gdpr' ] = array_merge( $options[ 'gdpr' ], apply_filters( 'cm_google_consent_mode', array(
+			'analytics_storage'  => array(
+				'enabled' => $google_consent_mode,
+				'value'   => 'granted',
+			),
+			'ad_storage'         => array(
+				'enabled' => $google_consent_mode,
+				'value'   => 'granted',
+			),
+			'ad_user_data'       => array(
+				'enabled' => $google_consent_mode,
+				'value'   => 'granted',
+			),
+			'ad_personalization' => array(
+				'enabled' => $google_consent_mode,
+				'value'   => 'granted',
+			),
+		) ) );
+
+		$options[ 'gdpr' ][ 'analytics_storage' ][ 'filter' ] = $pys_analytics_storage_mode;
+		$options[ 'gdpr' ][ 'ad_storage' ][ 'filter' ] = $pys_ad_storage_mode;
+		$options[ 'gdpr' ][ 'ad_user_data' ][ 'filter' ] = $pys_ad_user_data_mode;
+		$options[ 'gdpr' ][ 'ad_personalization' ][ 'filter' ] = $pys_ad_personalization_mode;
+		$options[ 'gdpr' ][ 'analytics_storage' ][ 'value' ] = $pys_analytics_storage_mode ? ( apply_filters( 'pys_analytics_storage_mode', true ) ? 'granted' : 'denied' ) : $options[ 'gdpr' ][ 'analytics_storage' ][ 'value' ];
+		$options[ 'gdpr' ][ 'ad_storage' ][ 'value' ] = $pys_ad_storage_mode ? ( apply_filters( 'pys_ad_storage_mode', true ) ? 'granted' : 'denied' ) : $options[ 'gdpr' ][ 'ad_storage' ][ 'value' ];
+		$options[ 'gdpr' ][ 'ad_user_data' ][ 'value' ] = $pys_ad_user_data_mode ? ( apply_filters( 'pys_ad_user_data_mode', true ) ? 'granted' : 'denied' ) : $options[ 'gdpr' ][ 'ad_user_data' ][ 'value' ];
+		$options[ 'gdpr' ][ 'ad_personalization' ][ 'value' ] = $pys_ad_personalization_mode ? ( apply_filters( 'pys_ad_personalization_mode', true ) ? 'granted' : 'denied' ) : $options[ 'gdpr' ][ 'ad_personalization' ][ 'value' ];
+
+		$options[ 'cookie' ] = array(
+			'disabled_all_cookie'                => apply_filters( 'pys_disable_all_cookie', false ),
+			'disabled_start_session_cookie'      => apply_filters( 'pys_disabled_start_session_cookie', false ),
+			'disabled_advanced_form_data_cookie' => apply_filters( 'pys_disable_advanced_form_data_cookie', false ),
+			'disabled_landing_page_cookie'       => apply_filters( 'pys_disable_landing_page_cookie', false ),
+			'disabled_first_visit_cookie'        => apply_filters( 'pys_disable_first_visit_cookie', false ),
+			'disabled_trafficsource_cookie'      => apply_filters( 'pys_disable_trafficsource_cookie', false ),
+			'disabled_utmTerms_cookie'           => apply_filters( 'pys_disable_utmTerms_cookie', false ),
+			'disabled_utmId_cookie'              => apply_filters( 'pys_disable_utmId_cookie', false ),
+		);
+
+		$options[ 'tracking_analytics' ] = array(
+			"TrafficSource"  => getTrafficSource(),
+			"TrafficLanding" => $_COOKIE[ 'pys_landing_page' ] ?? $_SESSION[ 'LandingPage' ],
+			"TrafficUtms"    => getUtms(),
+			"TrafficUtmsId"  => getUtmsId(),
+		);
         /**
          * @var EventsFactory[] $eventsFactory
          */

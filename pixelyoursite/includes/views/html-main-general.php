@@ -99,7 +99,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                             </small>
                         </div>
                     </div>
-
                     <?php if(isWPMLActive()) : ?>
                         <div class="row mb-3">
                             <div class="col-12">
@@ -129,6 +128,40 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
             </div>
 
+                    <?php
+                    $noticeRenderNotSupportUA = false;
+                    $noticeOnlyUA = true;
+                    if(GA()->enabled() && !empty(GA()->getOption( 'tracking_id' )))
+                    {
+                        $trackingId = GA()->getOption('tracking_id');
+                        if (!isGaV4($trackingId)) {
+                            $noticeRenderNotSupportUA = true;
+                        }
+                        else{
+                            $noticeOnlyUA = false;
+                        }
+                    }
+                    if($noticeRenderNotSupportUA){
+                        ?>
+                        <div class="row align-items-center mb-3 py-2 not-supported">
+                        <div class="col-12">
+                        <?php
+                        if($noticeOnlyUA){
+                            ?>
+                            <p>The old Universal Analytics properties are not supported by Google Analytics anymore. You must use the new GA4 properties instead. <a href="https://www.youtube.com/watch?v=KkiGbfl1q48" target="_blank">Watch this video to find how to get your GA4 tag</a>.</p>
+                            <?php
+                        }
+                        else{
+                            ?>
+                            <p>Your old Universal Analytics property does't send data anymore, consider removing it. Google Analytics supports only GA4 properties. <a href="https://www.youtube.com/watch?v=KkiGbfl1q48" target="_blank">Watch this video to find how to get your GA4 tag</a>.</p>
+                            <?php
+                        }
+                        ?>
+                        </div>
+                        </div>
+                        <?php
+                    }?>
+
         <input type="checkbox" id="gan_settings_switch" style="display: none">
         <div class="settings_content">
             <div class="plate pt-3 pb-3">
@@ -143,6 +176,19 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <div class="col-12">
                         <h4 class="label mb-3 mt-3">Google Analytics tracking ID:</h4>
                         <?php GA()->render_pixel_id( 'tracking_id', 'Google Analytics tracking ID' ); ?>
+                        <p class="ga_pixel_info small">
+                            <?php
+                            $pixels = GA()->getPixelIDs();
+                            if (count($pixels)) {
+                                if (strpos($pixels[0], 'G') === 0) {
+                                    echo 'We identified this tag as a GA4 property.';
+                                } else {
+                                    echo '<span class="not-support-tag">We identified this tag as a Google Analytics Universal property.</span>';
+                                }
+                            }
+
+                            ?>
+                        </p>
                         <small class="form-text" mb-2>
                             <a href="https://www.pixelyoursite.com/pixelyoursite-free-version/add-your-google-analytics-code?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                                target="_blank">How to get it?</a>
@@ -162,8 +208,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </div>
                         <div class ="mt-2">
                             <input type="checkbox" class="custom-control-input" name="pys[ga][is_enable_debug_mode][-1]" value="0" checked />
-                            <?php GA()->render_checkbox_input_array("is_enable_debug_mode","Enable Analytics Debug mode for this property");?>
+                            <?php GA()->render_checkbox_input_array("is_enable_debug_mode","Enable Analytics Debug mode for this property"); ?>
                         </div>
+                        <p class="mt-1">
+                            <strong>How to enable Google Consent Mode V2:</strong>
+                            <a href="https://www.pixelyoursite.com/google-consent-mode-v2-wordpress?utm_source=plugin&utm_medium=free&utm_campaign=google-consent" target="_blank">click here</a>
+                        </p>
                         <p>
                             Learn how to get the Google Analytics 4 tag ID and how to test it:
                             <a href="https://www.youtube.com/watch?v=KkiGbfl1q48" target="_blank">watch video</a>
@@ -203,16 +253,20 @@ if ( ! defined( 'ABSPATH' ) ) {
                         href="https://www.pixelyoursite.com/google-ads-tag?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-ids"
                         target="_blank">pro version</a>.
                 <div class="mt-3">
+                    <strong>How to enable Google Consent Mode V2:</strong>
+                    <a href="https://www.pixelyoursite.com/google-consent-mode-v2-wordpress?utm_source=plugin&utm_medium=free&utm_campaign=google-consent" target="_blank">click here</a>
+                </div>
+                <div class="mt-3">
                     Learn how to install the Google Ads Tag:
-                    <a href="https://www.youtube.com/watch?v=plkv_v4nz8I" target="_blank">watch video</a>
+                    <a href="https://www.youtube.com/watch?v=dft-TRigkj0" target="_blank">watch video</a>
                 </div>
                 <div class="mt-3">
                     How to configure Google Ads Conversions:
-                    <a href="https://www.youtube.com/watch?v=x1VvVDa5L7c" target="_blank">watch video</a>
+                    <a href="https://www.youtube.com/watch?v=5kb-jQe-Psg" target="_blank">watch video</a>
                 </div>
                 <div class="mt-3">
                     Lear how to use Enhanced Conversions:
-                    <a href="https://www.youtube.com/watch?v=0uuTiOnVw80" target="_blank">watch video</a>
+                    <a href="https://www.youtube.com/watch?v=-bN5D_HJyuA" target="_blank">watch video</a>
                 </div>
             </div>
         </div>
@@ -317,7 +371,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php
                 $eventsFormFactory = apply_filters("pys_form_event_factory",[]);
                 foreach ($eventsFormFactory as $activeFormPlugin) : ?>
-                    <p><strong><?php echo $activeFormPlugin->getName();?> detected</strong> - we will fire the Form event for each successfully submited form.</p>
+                    <p><strong><?php echo $activeFormPlugin->getName(); ?> detected</strong> - we will fire the Form event for each successfully submited form.</p>
 
                 <?php
                 endforeach;
@@ -328,9 +382,9 @@ if ( ! defined( 'ABSPATH' ) ) {
                             'Fire the event only for the supported plugins, when the form is succesfully submited.' ); ?>
                     </div>
                     <br>
-                    <p>Configure Lead or other events using our <a href="<?php echo buildAdminUrl( 'pixelyoursite', 'events' );?>">events triggers</a>. Learn how from <a href="https://www.youtube.com/watch?v=c4Hrb8WK5bw" target="_blank">this video</a></p>
+                    <p>Configure Lead or other events using our <a href="<?php echo buildAdminUrl( 'pixelyoursite', 'events' ); ?>">events triggers</a>. Learn how from <a href="https://www.youtube.com/watch?v=c4Hrb8WK5bw" target="_blank">this video</a></p>
                     <br>
-                <?php endif;?>
+                <?php endif; ?>
                 <p><strong>Event name: </strong>Form</p>
                 <p><strong>Event name on TikTok: </strong>FormSubmit</p>
                 <p><strong>Specific parameters: </strong><i>text, from_class, form_id</i></p>
@@ -372,12 +426,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                             <h4 class="switcher-label">Enable on Google Analytics</h4>
                         </div>
                     </div>
-                    <div class="row mt-2">
-                        <div class="col col-offset-left">
-                            <?php GA()->render_checkbox_input("automatic_event_signup_non_interactive_enabled",
-                                'Non-interactive event'); ?>
-                        </div>
-                    </div>
+
                 <?php endif; ?>
 
                 <?php if ( Bing()->enabled()) : ?>
@@ -568,7 +617,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- Dynamic Ads for Blog Setup -->
 <div class="card" >
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('fdp_enabled');?>Dynamic Ads for Blog Setup <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('fdp_enabled'); ?>Dynamic Ads for Blog Setup <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
         <div class="row mt-3">
@@ -762,14 +811,14 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="row mt-3">
             <div class="col-12">
                 <hr>
-                <?php PYS()->render_switcher_input("enable_page_title_param");?>
+                <?php PYS()->render_switcher_input("enable_page_title_param"); ?>
                 <h4 class="switcher-label">page_title</h4>
                 <hr>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col-12">
-                <?php PYS()->render_switcher_input("enable_post_type_param");?>
+                <?php PYS()->render_switcher_input("enable_post_type_param"); ?>
                 <h4 class="switcher-label">post_type</h4>
                 <hr>
             </div>
@@ -783,7 +832,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
         <div class="row mt-3">
             <div class="col-12">
-                <?php PYS()->render_switcher_input("enable_post_id_param");?>
+                <?php PYS()->render_switcher_input("enable_post_id_param"); ?>
                 <h4 class="switcher-label">post_id</h4>
                 <hr>
             </div>
@@ -1080,13 +1129,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <h4 class="switcher-label">Enable on Google Analytics</h4>
         </div>
     </div>
-    <div class="row mt-2">
-        <?php $interactive = str_replace("_enabled","_non_interactive_enabled",$event)?>
-        <div class="col col-offset-left">
-            <?php GA()->render_checkbox_input($interactive,
-                'Non-interactive event'); ?>
-        </div>
-    </div>
+
 <?php endif; ?>
 
 

@@ -36,7 +36,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string ga_event_category
  * @property string ga_event_label
  * @property string ga_event_value
- * @property bool   ga_non_interactive
  *
  * @property bool   bing_enabled
  * @property string bing_event_action
@@ -157,7 +156,6 @@ class CustomEvent {
 		'ga_event_category'      => null,
 		'ga_event_label'         => null,
 		'ga_event_value'         => null,
-		'ga_non_interactive'     => true,
 
         //ver 4
         'ga_params'             => array(),
@@ -572,7 +570,6 @@ class CustomEvent {
         $this->data['ga_custom_params'] = array();
         $this->data['ga_event_action'] = 'CustomEvent';
         $this->data['ga_custom_event_action']=null;
-        $this->data['ga_non_interactive'] =  false;
         // old
         $this->data['ga_event_category'] = null;
         $this->data['ga_event_label'] = null;
@@ -640,8 +637,6 @@ class CustomEvent {
                         }
 
                     }
-                    $this->data['ga_non_interactive'] = isset( $args['ga_non_interactive'] ) && $args['ga_non_interactive'] ? true : false;
-
 
 
             } else {
@@ -682,7 +677,6 @@ class CustomEvent {
                 $this->data['ga_event_category']  = ! empty( $args['ga_event_category'] ) ? sanitize_text_field( $args['ga_event_category'] ) : null;
                 $this->data['ga_event_label']     = ! empty( $args['ga_event_label'] ) ? sanitize_text_field( $args['ga_event_label'] ) : null;
                 $this->data['ga_event_value']     = ! empty( $args['ga_event_value'] ) ? sanitize_text_field( $args['ga_event_value'] ) : null;
-                $this->data['ga_non_interactive'] = isset( $args['ga_non_interactive'] ) && $args['ga_non_interactive'] ? true : false;
             }
         }
 

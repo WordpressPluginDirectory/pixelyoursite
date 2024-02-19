@@ -101,7 +101,7 @@ include "html-popovers.php";
                                 include PYS_FREE_PATH . '/modules/facebook/views/html-settings.php';
                                 break;
 
-                            case 'ga_settings':
+                            case 'google_tags_settings':
                                 /** @noinspection PhpIncludeInspection */
                                 include PYS_FREE_PATH . '/modules/google_analytics/views/html-settings.php';
                                 break;

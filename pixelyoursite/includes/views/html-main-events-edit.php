@@ -255,10 +255,10 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
         </div>
         <?php $eventsFormFactory = apply_filters("pys_form_event_factory",[]);
         foreach ($eventsFormFactory as $activeFormPlugin) : ?>
-            <div id="<?php echo $activeFormPlugin->getSlug();?>_panel" class="event_triggers_panel" data-trigger_type="<?php echo $activeFormPlugin->getSlug();?>" style="display: none;">
+            <div id="<?php echo $activeFormPlugin->getSlug(); ?>_panel" class="event_triggers_panel" data-trigger_type="<?php echo $activeFormPlugin->getSlug(); ?>" style="display: none;">
                 <div class="row mt-3 event_trigger" data-trigger_id="0">
                     <div class="col">
-                        <?php renderDummySelectInput('Forms');?>
+                        <?php renderDummySelectInput('Forms'); ?>
                     </div>
 
                 </div>
@@ -514,7 +514,7 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
                                         <?php Events\renderGAParamInput( $key, $val ); ?>
                                     </div>
                                 </div>
-                            <?php endforeach;?>
+                            <?php endforeach; ?>
                         </div>
                         <div class="ga-custom-param-list">
                             <?php
@@ -550,12 +550,6 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
                             <div class="col-4">
                                 <button class="btn btn-sm btn-block btn-primary add-ga-custom-parameter" type="button">Add
                                     Custom Parameter</button>
-                            </div>
-                        </div>
-                        <div class="row mb">
-                            <label class="col-5 control-label">Non-interactive</label>
-                            <div class="col-4">
-                                <?php Events\renderSwitcherInput( $event, 'ga_non_interactive' ); ?>
                             </div>
                         </div>
                         <div class="row mt-3">
@@ -599,12 +593,6 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
                             <?php Events\renderTextInput( $event, 'ga_event_value' ); ?>
                         </div>
                     </div>
-                        <div class="row mb">
-                            <label class="col-5 control-label">Non-interactive</label>
-                            <div class="col-4">
-                                <?php Events\renderSwitcherInput( $event, 'ga_non_interactive' ); ?>
-                            </div>
-                        </div>
                     <?php endif?>
                     </div>
                 </div>
@@ -676,6 +664,40 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
                         <button class="btn btn-sm btn-block btn-secondary" type="button" disabled>Add Custom Parameter
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-static">
+    <div class="card-header">
+        TikTok <?php renderProBadge('https://www.pixelyoursite.com/google-ads-tag/?utm_source=pys-free-plugin&utm_medium=pro-badge&utm_campaign=pro-feature'); ?><?php cardCollapseBtn(); ?>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable on TikTok</h4>
+            </div>
+        </div>
+        <div id="tiktok_panel">
+            <div class="row mt-3">
+                <label class="col-5 control-label">Fire for:</label>
+                <div class="col-4">
+                    <?php renderDummySelectInput( 'All pixels', true ); ?>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <label class="col-5 control-label">Event type:</label>
+                <div class="col-4">
+                    <?php renderDummyTextInput( 'Select Event type:' ); ?>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col col-offset-left">
+                    <?php renderDummySwitcher(); ?>
+                    <h4 class="indicator-label">Add Parameters</h4>
                 </div>
             </div>
         </div>

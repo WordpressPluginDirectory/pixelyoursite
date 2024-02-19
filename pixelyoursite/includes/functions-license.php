@@ -82,6 +82,23 @@ function renderLicenseControls( $plugin ) {
 
 	endif;
 
+	if ( $notice = get_transient( "pys_{$slug}_license_notice_403" ) ) :
+		?>
+
+        <div class="row mt-3">
+            <div class="col">
+                <div class="alert alert-<?php esc_attr_e( $notice['class'] ); ?> mb-0" role="alert">
+					<?php echo $notice['msg']; ?>
+                </div>
+            </div>
+        </div>
+
+		<?php
+
+		delete_transient(  "pys_{$slug}_license_notice_403" );
+
+	endif;
+
 	if ( $license_expires_soon ) :
 		?>
 
@@ -124,11 +141,10 @@ function renderLicenseControls( $plugin ) {
 function checkLicense()
 {
     $plugins = PYS()->getRegisteredPlugins();
-    if(!get_option(PYS()->getSlug().'_last_check_license') || get_option(PYS()->getSlug().'_last_check_license')['time'] == '' || get_option(PYS()->getSlug().'_last_check_license')['time'] < time() && PYS()->getOption('license_key') && !empty(PYS()->getOption('license_key')))
+    if((!get_option(PYS()->getSlug().'_last_check_license') || get_option(PYS()->getSlug().'_last_check_license')['time'] == '' || get_option(PYS()->getSlug().'_last_check_license')['time'] < time()) && PYS()->getOption('license_key') && !empty(PYS()->getOption('license_key')))
     {
         $license_data = singleCheckLicense(PYS()->getOption('license_key'), PYS());
-        update_option(PYS()->getSlug().'_last_check_license', array('name'=>PYS()->getPluginName(), 'time'=>time()));
-        if(!empty($license_data_single)) {
+        if(!empty($license_data)) {
             set_data_license(PYS(), $license_data);
         }
     }
@@ -137,9 +153,8 @@ function checkLicense()
     foreach ($plugins as $plugin)
     {
         if ( $plugin->getSlug() == 'head_footer' ) { continue; }
-        if(!get_option($plugin->getSlug().'_last_check_license') || get_option($plugin->getSlug().'_last_check_license')['time'] == '' || get_option($plugin->getSlug().'_last_check_license')['time'] < time() && $plugin->getOption('license_key') && !empty($plugin->getOption('license_key')))
+        if((!get_option($plugin->getSlug().'_last_check_license') || get_option($plugin->getSlug().'_last_check_license')['time'] == '' || get_option($plugin->getSlug().'_last_check_license')['time'] < time()) && $plugin->getOption('license_key') && !empty($plugin->getOption('license_key')))
         {
-            update_option($plugin->getSlug().'_last_check_license', array('name'=>$plugin->getPluginName(), 'time'=>time()));
             $license_data_single = singleCheckLicense($plugin->getOption('license_key'), $plugin);
             if(!empty($license_data_single)) {
                 set_data_license($plugin, $license_data_single);
@@ -308,6 +323,7 @@ function set_data_license($plugin, $license_data)
 }
 function singleCheckLicense( $license_key, $plugin)
 {
+    update_option($plugin->getSlug().'_last_check_license', array('name'=>$plugin->getPluginName(), 'time'=>time()));
     $api_params = array(
         'edd_action' => 'check_license',
         'license'    => $license_key,
@@ -316,13 +332,26 @@ function singleCheckLicense( $license_key, $plugin)
     );
 
     $response = wp_remote_post( 'https://www.pixelyoursite.com', array(
-        'timeout'   => 120,
+        'timeout'   => 30,
         'sslverify' => false,
         'body'      => $api_params
     ) );
 
     if ( is_wp_error( $response ) ) {
         return $response;
+    }
+	$status_code = wp_remote_retrieve_response_code($response);
+    if($status_code == 403) {
+	    $server_ip = file_get_contents('https://api64.ipify.org?format=json');
+	    $server_ip = $server_ip ? json_decode($server_ip, true)['ip'] : '******';
+	    $admin_notice = array(
+		    'class' => 'danger',
+		    'msg'   => __("The request may have been blocked by our firewall, please try again after a few hours. If the problem persists, contact our support and provide your IP address ({$server_ip})", 'pixelyoursite')
+	    );
+
+	    if ( ! empty( $admin_notice ) ) {
+		    set_transient( "pys_{$plugin->getSlug()}_license_notice_403", $admin_notice, 60 * 5 );
+	    }
     }
 
     // $license_data->license will be either "valid" or "invalid"
@@ -537,7 +566,19 @@ function licenseActivate( $license_key, $plugin ) {
 	if ( is_wp_error( $response ) ) {
 		return $response;
 	}
+	$status_code = wp_remote_retrieve_response_code($response);
+	if($status_code == 403) {
+		$server_ip = file_get_contents('https://api64.ipify.org?format=json');
+		$server_ip = $server_ip ? json_decode($server_ip, true)['ip'] : '******';
+		$admin_notice = array(
+			'class' => 'danger',
+			'msg'   => __("The request may have been blocked by our firewall, please try again after a few hours. If the problem persists, contact our support and provide your IP address ({$server_ip})", 'pixelyoursite')
+		);
 
+		if ( ! empty( $admin_notice ) ) {
+			set_transient( "pys_{$plugin->getSlug()}_license_notice_403", $admin_notice, 60 * 5 );
+		}
+	}
 	// $license_data->license will be either "valid" or "invalid"
 	return json_decode( wp_remote_retrieve_body( $response ) );
 
@@ -567,7 +608,19 @@ function licenseDeactivate( $license_key, $plugin ) {
 	if ( is_wp_error( $response ) ) {
 		return $response;
 	}
+	$status_code = wp_remote_retrieve_response_code($response);
+	if($status_code == 403) {
+		$server_ip = file_get_contents('https://api64.ipify.org?format=json');
+		$server_ip = $server_ip ? json_decode($server_ip, true)['ip'] : '******';
+		$admin_notice = array(
+			'class' => 'danger',
+			'msg'   => __("The request may have been blocked by our firewall, please try again after a few hours. If the problem persists, contact our support and provide your IP address ({$server_ip})", 'pixelyoursite')
+		);
 
+		if ( ! empty( $admin_notice ) ) {
+			set_transient( "pys_{$plugin->getSlug()}_license_notice_403", $admin_notice, 60 * 5 );
+		}
+	}
 	// $license_data->license will be either "deactivated" or "failed"
 	return json_decode( wp_remote_retrieve_body( $response ) );
 

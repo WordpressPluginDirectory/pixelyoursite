@@ -10,24 +10,44 @@ use PixelYourSite\GA\Helpers;
 
 ?>
 
-<h2 class="section-title">Google Analytics Settings</h2>
+<h2 class="section-title">Google Tags Settings</h2>
 
 <!-- General -->
 <div class="card card-static">
+    <div class="card-header">
+        General
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+				<?php PYS()->render_switcher_input('google_consent_mode'); ?>
+                <h4 class="switcher-label">Fire Google tags with consent mode granted</h4>
+
+                <p class="mt-1 mb-0">
+                    How to enable Google Consent Mode V2:
+                    <a href="https://www.pixelyoursite.com/google-consent-mode-v2-wordpress?utm_source=plugin&utm_medium=free&utm_campaign=google-consent" target="_blank">click here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Google Analytics Settings -->
+<div class="card card-static">
 	<div class="card-header">
-		General
+        Google Analytics
 	</div>
 	<div class="card-body">
         <div class="row mb-3">
             <div class="col">
                 <?php GA()->render_switcher_input( 'enabled' ); ?>
-                <h4 class="switcher-label">Enable Google Analytics</h4>
+                <h4 class="switcher-label">Enable Google Analytics IDs</h4>
             </div>
         </div>
-        <div class="row">
+        <div class="row mb-3">
             <div class="col">
-                <?php GA()->render_switcher_input( 'enhance_link_attribution' ); ?>
-                <h4 class="switcher-label">Enable Enhance Link Attribution</h4>
+                <?php GA()->render_switcher_input( 'disable_noscript' ); ?>
+                <h4 class="switcher-label">Disable noscript</h4>
             </div>
         </div>
 
@@ -44,53 +64,47 @@ use PixelYourSite\GA\Helpers;
                 </div>
             </div>
 
-
-        <div class="row">
-            <div class="col">
-				<?php GA()->render_switcher_input( 'anonimize_ip' ); ?>
-                <h4 class="switcher-label">Anonimize IP</h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-11 col-offset-left">
-                <div class="indicator indicator-off">OFF</div>
-                <h4 class="indicator-label">Tracking Custom Dimensions</h4>
-            </div>
-            <div class="col-1">
-		        <?php renderExternalHelpIcon( 'https://www.pixelyoursite.com/documentation/google-analytics-custom-dimensions?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-analytics-settings' ); ?>
-            </div>
-        </div>
 	</div>
 </div>
 
-<!-- Google Optimize -->
+<!-- Ads Settings -->
 <div class="card card-static">
     <div class="card-header">
-        Google Optimize <?php renderProBadge( 'https://www.pixelyoursite.com/google-analytics?utm_source=pys-free-plugin&utm_medium=pro-badge&utm_campaign=pro-feature' ); ?>
+        Google Ads <?php renderSpBadge(); ?>
     </div>
     <div class="card-body">
         <div class="row mb-3">
             <div class="col">
-                <?php renderDummySwitcher(); ?>
-                <h4 class="switcher-label">Enable Google Optimize</h4>
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable Google Ads IDs</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Fire the page_view_event on posts</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Fire the page_view event on pages</h4>
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col">
-                <?php renderDummyTextInput('Enter Optimize ID'); ?>
+            <div class="col mt-2">
+                <label>Fire the page_view event on custom post type:</label>
+				<?php renderDummyTextInput( 'Post types' ); ?>
             </div>
         </div>
-        <div class="row ">
-            <div class="col">
-                <p>
-                    Learn how to configure Google Optimize:
-                    <a href="https://www.youtube.com/watch?v=a5jPcLbdgy0" target="_blank">watch
-                        video</a>
-                </p>
+        <div class="row">
+            <div class="col  form-inline">
+                <label>google_business_vertical:</label><?php renderDummyTextInput( 'google_business_vertical' ); ?>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Cross-Domain Tracking -->
 <!-- @link: https://developers.google.com/analytics/devguides/collection/gtagjs/cross-domain -->

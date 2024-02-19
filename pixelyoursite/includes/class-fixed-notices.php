@@ -107,7 +107,7 @@ class NoticesFixed {
 
 
         ?>
-        <div class="notice notice-info is-dismissible pys-promo-fixed-notice pys-fixed-notice <?php echo (isset($notice['enabelDismiss']) && $notice['enabelDismiss']==false)? 'notice-disable-dismiss' : '';?>" data-slug="<?=$notice['slug']?>">
+        <div class="notice notice-info is-dismissible pys-promo-fixed-notice pys-fixed-notice <?php echo (isset($notice['enabelDismiss']) && $notice['enabelDismiss']==false)? 'notice-disable-dismiss' : ''; ?>" data-slug="<?=$notice['slug']; ?>">
             <div class="logo-notice">
                 <img src="<?php echo PYS_FREE_URL; ?>/dist/images/logo-original.png" alt="plugin logo"/>
             </div>
@@ -116,15 +116,15 @@ class NoticesFixed {
                     <?php if(isset($notice['title'])) : ?>
                         <div class="notice-title">
                         <span>
-                            <?php echo $notice['title'];?>
+                            <?php echo $notice['title']; ?>
                         </span>
                         </div>
-                    <?php endif;?>
+                    <?php endif; ?>
                     <?php if($notice['message']) : ?>
                         <div class="notice-message">
                             <p><?php echo $notice['message']; ?></p>
                         </div>
-                    <?php endif;?>
+                    <?php endif; ?>
                 </div>
             </div>
             <button type="button" class="notice-dismiss custom-dismiss-button"><span class="screen-reader-text">Dismiss</span></button>
@@ -160,13 +160,13 @@ class NoticesFixed {
 
         if(isset($group['multiMessage'])):
         ?>
-        <div class="notice notice-info is-dismissible pys-chain-fixed-notice pys-fixed-notice <?php echo isset($group['color'])? 'notice-color-'.$group['color']:'';?> <?php echo (isset($group['enabelDismiss']) && $group['enabelDismiss']==false)? 'notice-disable-dismiss' : '';?>" >
+        <div class="notice notice-info is-dismissible pys-chain-fixed-notice pys-fixed-notice <?php echo isset($group['color'])? 'notice-color-'.$group['color']:''; ?> <?php echo (isset($group['enabelDismiss']) && $group['enabelDismiss']==false)? 'notice-disable-dismiss' : ''; ?>" >
             <div class="notice_content">
                 <?php if(isset($group['enabelLogo']) && $group['enabelLogo']!=false) :?>
                     <div class="logo-notice">
                         <img src="<?php echo PYS_FREE_URL; ?>/dist/images/logo-original.png" alt="plugin logo"/>
                     </div>
-                <?php endif;?>
+                <?php endif; ?>
                 <div class="notice-content">
                     <?php foreach ($group['multiMessage'] as $notice) :
                         if ( ! $notice ) {
@@ -174,31 +174,31 @@ class NoticesFixed {
                         }
                         ?>
 
-                        <div class="notice-item" data-slug="<?=$notice['slug']?>">
+                        <div class="notice-item" data-slug="<?=$notice['slug']; ?>">
                             <?php if(isset($notice['title']) && $notice['title'] != '') : ?>
                                 <div class="notice-title">
                             <span>
-                                <?php echo $notice['title'];?>
+                                <?php echo $notice['title']; ?>
                             </span>
                                 </div>
-                            <?php endif;?>
+                            <?php endif; ?>
                             <?php if(isset($notice['message']) && $notice['message'] != '') : ?>
                                 <div class="notice-message">
                                     <p><?php echo $notice['message']; ?></p>
                                     <?php if((isset($notice['button_text']) && isset($notice['button_url'])) && ($notice['button_text'] != '' && $notice['button_url'] != '')) : ?>
-                                        <a class="notice-watch-link" href="<?= $notice['button_url']?>" target="_blank"><?= $notice['button_text']?></a>
-                                    <?php endif;?>
+                                        <a class="notice-watch-link" href="<?= $notice['button_url']; ?>" target="_blank"><?= $notice['button_text']; ?></a>
+                                    <?php endif; ?>
                                 </div>
-                            <?php endif;?>
+                            <?php endif; ?>
                             <hr>
                         </div>
 
-                    <?php endforeach;?>
+                    <?php endforeach; ?>
                     <?php if(isset($group['enabelYoutubeLink']) && $group['enabelYoutubeLink']!=false) :?>
                         <div class="bottom-chanel-link">
                             <span>Improve your tracking with our video tips: <a href="https://www.youtube.com/channel/UCnie2zvwAjTLz9B4rqvAlFQ?sub_confirmation=1" target="_blank">Subscribe to our YouTube channel</a></span>
                         </div>
-                    <?php endif;?>
+                    <?php endif; ?>
                 </div>
 
                 <button type="button" class="notice-dismiss custom-dismiss-button"><span class="screen-reader-text">Dismiss</span></button>
@@ -206,14 +206,14 @@ class NoticesFixed {
             <?php if(isset($group['optoutEnabel']) && $group['optoutEnabel']!=false) : ?>
                 <div class="notice_opt_out_block">
                     <div class="opt_out_message">
-                        <span><?php echo $group['optoutMessage'];?></span>
+                        <span><?php echo $group['optoutMessage']; ?></span>
                     </div>
-                    <div class="opt_out_dismiss_button"><button><?php echo $group['optoutButtonText'];?></button></div>
+                    <div class="opt_out_dismiss_button"><button><?php echo $group['optoutButtonText']; ?></button></div>
                 </div>
-            <?php endif;?>
+            <?php endif; ?>
         </div>
 
-    <?php endif;?>
+    <?php endif; ?>
         <script type='application/javascript'>
             jQuery(document).on('click','.opt_out_dismiss_button button', function (e){
                 e.preventDefault();

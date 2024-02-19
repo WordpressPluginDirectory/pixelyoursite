@@ -100,12 +100,8 @@ class GA extends Settings implements Pixel {
 
         return array(
             'trackingIds' => $this->getPixelIDs(),
-            'enhanceLinkAttr' => $this->getOption('enhance_link_attribution'),
-            'anonimizeIP' => $this->getOption('anonimize_ip'),
             'commentEventEnabled' => $this->getOption('comment_event_enabled'),
-            'commentEventNonInteractive' => $this->getOption('comment_event_non_interactive'),
             'downloadEnabled' => $this->getOption('download_event_enabled'),
-            'downloadEventNonInteractive' => $this->getOption('download_event_non_interactive'),
             'formEventEnabled' => $this->getOption('form_event_enabled'),
             'crossDomainEnabled' => $this->getOption('cross_domain_enabled'),
             'crossDomainAcceptIncoming' => $this->getOption('cross_domain_accept_incoming'),
@@ -130,18 +126,11 @@ class GA extends Settings implements Pixel {
             return [];
         }
 
-        $onlyGA4event = ['woo_view_cart'];
-        $isGA4Event = in_array($event->getId(), $onlyGA4event);
-        $pixelIds = array();
-        if($isGA4Event)
-        {
-            if($this->isGaV4($this->getPixelIDs()[0])){
-                $pixelIds = $this->getPixelIDs();
-            }
-        }
-        else{
-            $pixelIds = $this->getPixelIDs();
-        }
+        //$onlyGA4event = ['woo_view_cart'];
+        //$isGA4Event = in_array($event->getId(), $onlyGA4event);
+        $pixelIds = array_filter($this->getPixelIDs(), static function ($tag) {
+            return strpos($tag, 'UA-') === false;
+        });
 
         if(count($pixelIds) > 0) {
             $pixelEvent = clone $event;
@@ -173,19 +162,16 @@ class GA extends Settings implements Pixel {
 
             case 'automatic_event_signup' : {
                 $event->addPayload(["name" => "sign_up"]);
-                $event->addParams(array('non_interaction'=>$this->getOption($event->getId()."_non_interactive_enabled")));
                 $isActive = $this->getOption($event->getId().'_enabled');
             } break;
             case 'automatic_event_login' :{
                 $event->addPayload(["name" => "login"]);
-                $event->addParams(array('non_interaction'=>$this->getOption($event->getId()."_non_interactive_enabled")));
                 $isActive = $this->getOption($event->getId().'_enabled');
             } break;
             case 'automatic_event_search' :{
                 $event->addPayload(["name" => "search"]);
                 $event->addParams([
                     "search_term"       =>  empty( $_GET['s'] ) ? null : $_GET['s'],
-                    'non_interaction'   =>  $this->getOption($event->getId()."_non_interactive_enabled")
                 ]);
                 $isActive = $this->getOption($event->getId().'_enabled');
             } break;
@@ -195,7 +181,6 @@ class GA extends Settings implements Pixel {
             case 'automatic_event_comment' :
             case 'automatic_event_scroll' :
             case 'automatic_event_time_on_page' : {
-                $event->addParams(array('non_interaction'=>$this->getOption($event->getId()."_non_interactive_enabled")));
                 $isActive = $this->getOption($event->getId().'_enabled');
             }break;
 
@@ -349,7 +334,7 @@ class GA extends Settings implements Pixel {
 	
 	public function outputNoScriptEvents() {
 	 
-		if ( ! $this->configured() ) {
+		if ( ! $this->configured() || $this->getOption('disable_noscript')) {
 			return;
 		}
 
@@ -358,12 +343,10 @@ class GA extends Settings implements Pixel {
 		foreach ( $eventsManager->getStaticEvents( 'ga' ) as $eventName => $events ) {
 			foreach ( $events as $event ) {
 				foreach ( $this->getPixelIDs() as $pixelID ) {
-
 					$args = array(
 						'v'   => 1,
 						'tid' => $pixelID,
 						't'   => 'event',
-						'aip' => $this->getOption( 'anonimize_ip' ),
 					);
 
 					//@see: https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#ec
@@ -383,9 +366,9 @@ class GA extends Settings implements Pixel {
 						$args['ev'] = urlencode( $event['params']['value'] );
 					}
 
-					if ( isset( $event['params']['items'] ) ) {
+                    if ( isset( $event['params']['items'] ) && is_array( $event['params']['items'] )) {
 
-						foreach ( $event['params']['items'] as $key => $item ) {
+                        foreach ( $event['params']['items'] as $key => $item ) {
                             if(isset($item['id']))
 							    @$args["pr{$key}id" ] = urlencode( $item['id'] );
                             if(isset($item['name']))
@@ -463,7 +446,6 @@ class GA extends Settings implements Pixel {
                 'value'           => $event->ga_event_value,
             );
         }
-        $params['non_interaction'] = $event->ga_non_interactive;
 
 
 		return array(
@@ -526,7 +508,6 @@ class GA extends Settings implements Pixel {
 			'event_category'  => 'ecommerce',
 			'event_label'     => 'category',
 			'items'           => $items,
-			'non_interaction' => $this->getOption( 'woo_view_category_non_interactive' ),
 		);
 		
 		return array(
@@ -586,7 +567,6 @@ class GA extends Settings implements Pixel {
         }
         $params = array(
             'event_category'  => 'ecommerce',
-            'non_interaction' => $this->getOption( 'woo_view_content_non_interactive' ),
         );
         $params['items'] = $items;
 
@@ -720,7 +700,6 @@ class GA extends Settings implements Pixel {
 		$params = array(
 			'event_category'  => 'ecommerce',
 			'items'           => $items,
-			'non_interaction' => $this->getOption( 'woo_add_to_cart_non_interactive' ),
 		);
 
         $data = array(
@@ -749,7 +728,6 @@ class GA extends Settings implements Pixel {
 		}
 
 		$params = $this->getWooCartParams();
-		$params['non_interaction'] = true;
 
 		return array(
 			'name' => 'add_to_cart',
@@ -804,8 +782,7 @@ class GA extends Settings implements Pixel {
                     'price'    => getWooProductPriceToDisplay( $product_id, $cart_item['quantity'] ),
                     'variant'  => $variation_name,
                 ),
-            ),
-            'non_interaction' => $this->getOption( 'woo_remove_from_cart_non_interactive' ),];
+            )];
 
         if(!empty($categories))
         {
@@ -825,7 +802,6 @@ class GA extends Settings implements Pixel {
 		}
 
 		$params = $this->getWooCartParams();
-		$params['non_interaction'] = $this->getOption( 'woo_initiate_checkout_non_interactive' );
 
 		return array(
 			'name'  => 'begin_checkout',
@@ -842,7 +818,7 @@ class GA extends Settings implements Pixel {
         $key = sanitize_key($_REQUEST['key']);
         $cache_key = 'order_id_' . $key;
         $order_id = get_transient( $cache_key );
-        if (is_order_received_page() && empty($order_id) && $wp->query_vars['order-received']) {
+        if (PYS()->woo_is_order_received_page() && empty($order_id) && $wp->query_vars['order-received']) {
 
             $order_id = absint( $wp->query_vars['order-received'] );
             if ($order_id) {
@@ -938,7 +914,6 @@ class GA extends Settings implements Pixel {
 			'value'           => $order->get_total(),
 			'currency'        => get_woocommerce_currency(),
 			'items'           => $items,
-			'non_interaction' => $this->getOption( 'woo_purchase_non_interactive' ),
 		);
 
         $params['fees'] = get_fees($order);
@@ -1027,7 +1002,6 @@ class GA extends Settings implements Pixel {
 					'price'    => getEddDownloadPriceToDisplay( $post->ID ),
 				),
 			),
-			'non_interaction' => $this->getOption( 'edd_view_content_non_interactive' ),
 		);
 
 		return array(
@@ -1059,7 +1033,6 @@ class GA extends Settings implements Pixel {
 					'price'    => getEddDownloadPriceToDisplay( $download_id, $price_index ),
 				),
 			),
-			'non_interaction' => $this->getOption( 'edd_add_to_cart_non_interactive' ),
 		);
 		
 		return $params;
@@ -1140,13 +1113,6 @@ class GA extends Settings implements Pixel {
 			'items' => $items,
 		);
 
-		if ( $context == 'add_to_cart' ) {
-			$params['non_interaction'] = true;
-		} elseif ( $context == 'begin_checkout' ) {
-			$params['non_interaction'] = $this->getOption( 'edd_initiate_checkout_non_interactive' );
-		} elseif ( $context == 'purchase' ) {
-			$params['non_interaction'] = $this->getOption( 'edd_purchase_non_interactive' );
-		}
 
 		if ( $context == 'purchase' ) {
 
@@ -1192,7 +1158,6 @@ class GA extends Settings implements Pixel {
 //						'variant'  => $variation_name,
 					),
 				),
-				'non_interaction' => $this->getOption( 'edd_remove_from_cart_non_interactive' ),
 			),
 		);
 
@@ -1245,7 +1210,6 @@ class GA extends Settings implements Pixel {
 			'event_category'  => 'ecommerce',
 			'event_label'     => $list_name,
 			'items'           => $items,
-			'non_interaction' => $this->getOption( 'edd_view_category_non_interactive' ),
 		);
 
 		return array(

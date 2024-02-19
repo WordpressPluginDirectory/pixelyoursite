@@ -238,13 +238,15 @@ if (!Array.prototype.includes) {
 
         function checkSession() {
             let duration = options.last_visit_duration * 60000
-            if( Cookies.get('pys_start_session') === undefined ||
-                Cookies.get('pys_session_limit') === undefined) {
-                var now = new Date();
-                now.setTime(now.getTime() + duration);
-                Cookies.set('pys_session_limit', true,{ expires: now })
-                Cookies.set('pys_start_session', true)
-                return true
+            if(!options.cookie.disabled_all_cookie && !options.cookie.disabled_start_session_cookie) {
+                if (Cookies.get('pys_start_session') === undefined ||
+                    Cookies.get('pys_session_limit') === undefined) {
+                    var now = new Date();
+                    now.setTime(now.getTime() + duration);
+                    Cookies.set('pys_session_limit', true, {expires: now})
+                    Cookies.set('pys_start_session', true)
+                    return true
+                }
             }
             return false
 
@@ -315,6 +317,35 @@ if (!Array.prototype.includes) {
         }
 
 
+        function getLandingPageValue() {
+            let name = "pys_landing_page"
+            if(options.visit_data_model === "last_visit") {
+                name = "last_pys_landing_page"
+            }
+            if(Cookies.get(name) && Cookies.get(name) !== "undefined") {
+                return Cookies.get(name);
+            }
+            else if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.TrafficLanding){
+                return options.tracking_analytics.TrafficLanding;
+            } else{
+                return "";
+            }
+        }
+        function getTrafficSourceValue() {
+            let name = "pysTrafficSource"
+            if(options.visit_data_model === "last_visit") {
+                name = "last_pysTrafficSource"
+            }
+            if(Cookies.get(name) && Cookies.get(name) !== "undefined") {
+                return Cookies.get(name);
+            }
+            else if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.TrafficSource){
+                return options.tracking_analytics.TrafficSource;
+            } else{
+                return "";
+            }
+        }
+
         function getUTMId(useLast = false) {
             try {
                 let cookiePrefix = 'pys_'
@@ -325,6 +356,9 @@ if (!Array.prototype.includes) {
                 $.each(utmId, function (index, name) {
                     if (Cookies.get(cookiePrefix + name)) {
                         terms[name] = Cookies.get(cookiePrefix + name)
+                    }
+                    else if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.TrafficUtmsId[name]) {
+                        terms[name] = filterEmails(options.tracking_analytics.TrafficUtmsId[name])
                     }
                 });
                 return terms;
@@ -348,6 +382,9 @@ if (!Array.prototype.includes) {
                     if (Cookies.get(cookiePrefix + name)) {
                         let value = Cookies.get(cookiePrefix + name);
                         terms[name] = filterEmails(value); // do not allow email in request params (Issue #70)
+                    }
+                    else if(options.hasOwnProperty("tracking_analytics") && options.tracking_analytics.TrafficUtms[name]) {
+                        terms[name] = filterEmails(options.tracking_analytics.TrafficUtms[name])
                     }
                 });
 
@@ -538,6 +575,10 @@ if (!Array.prototype.includes) {
                             });
                         }
 
+                    }
+                    if(options.cookie.disabled_start_session_cookie) {
+                        Cookies.remove('pys_start_session')
+                        Cookies.remove('pys_session_limit')
                     }
                     if(options.cookie.disabled_all_cookie)
                     {
@@ -816,6 +857,16 @@ if (!Array.prototype.includes) {
 
                     gtag('js', new Date());
 
+                    if ( options.google_consent_mode ) {
+                        let data = {};
+                        data[ 'analytics_storage' ] = options.gdpr.analytics_storage.enabled ? options.gdpr.analytics_storage.value : 'granted';
+                        data[ 'ad_storage' ] = options.gdpr.ad_storage.enabled ? options.gdpr.ad_storage.value : 'granted';
+                        data[ 'ad_user_data' ] = options.gdpr.ad_user_data.enabled ? options.gdpr.ad_user_data.value : 'granted';
+                        data[ 'ad_personalization' ] = options.gdpr.ad_personalization.enabled ? options.gdpr.ad_personalization.value : 'granted';
+
+                        gtag( 'consent', 'default', data );
+                    }
+
                     gtag_loaded = true;
 
                 }
@@ -877,10 +928,7 @@ if (!Array.prototype.includes) {
                 if (options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined" ) {
 
                     var test_prefix = CS_Data.test_prefix;
-                    if ((typeof CS_Data.cs_google_analytics_consent_mode !== "undefined" && CS_Data.cs_google_analytics_consent_mode == 1) && pixel == 'analytics') {
-                        return true;
-                    }
-                    if ((typeof CS_Data.cs_google_ads_consent_mode !== "undefined" && CS_Data.cs_google_ads_consent_mode == 1) && pixel == 'google_ads') {
+                    if ((typeof CS_Data.cs_google_consent_mode_enabled !== "undefined" && CS_Data.cs_google_consent_mode_enabled == 1) && ( pixel == 'analytics' || pixel == 'google_ads' ) ) {
                         return true;
                     }
 
@@ -1286,10 +1334,10 @@ if (!Array.prototype.includes) {
                 });
 
                 var dateTime = getDateTime();
-                var landing = Cookies.get('pys_landing_page');
-                var lastLanding = Cookies.get('last_pys_landing_page');
-                var trafic = Cookies.get('pysTrafficSource');
-                var lastTrafic = Cookies.get('last_pysTrafficSource');
+                var landing = getLandingPageValue();
+                var lastLanding = getLandingPageValue();
+                var trafic = getTrafficSourceValue();
+                var lastTrafic = getTrafficSourceValue();
 
                 var $form = null;
                 if($('body').hasClass('woocommerce-checkout')) {
@@ -1372,17 +1420,9 @@ if (!Array.prototype.includes) {
             let eventId = null;
             if(options.facebook.serverApiEnabled) {
 
-                if(allData.e_id === "woo_remove_from_cart" || allData.e_id === "woo_add_to_cart_on_button_click") {// server event will sended from hook
-                    let isAddToCartFromJs =  options.woo.hasOwnProperty("addToCartCatchMethod")
-                        && options.woo.addToCartCatchMethod === "add_cart_js";
-
-                    if(isAddToCartFromJs || allData.e_id !== "woo_add_to_cart_on_button_click") {
-                        Facebook.updateEventId(allData.name);
-                        allData.eventID = Facebook.getEventId(allData.name);
-                    } else {
-                        // not update eventID for woo_add_to_cart_on_button_click,
-                        // web event created by ajax from server
-                    }
+                if(allData.e_id === "woo_remove_from_cart") {// server event will sended from hook
+                    Facebook.updateEventId(allData.name);
+                    allData.eventID = Facebook.getEventId(allData.name);
                 } else {
                     if( options.ajaxForServerEvent
                         || isApiDisabled
@@ -1883,11 +1923,9 @@ if (!Array.prototype.includes) {
                 delete param.ecomm_prodid;
                 delete param.ecomm_pagetype;
                 delete param.ecomm_totalvalue;
-                delete param.non_interaction;
                 if(name === 'search') {
                     param['search'] = param.search_term;
                     delete param.search_term;
-                    delete param.non_interaction;
                     delete param.dynx_itemid;
                     delete param.dynx_pagetype;
                     delete param.dynx_totalvalue;
@@ -1903,16 +1941,14 @@ if (!Array.prototype.includes) {
                     case 'TelClick' : {
                         let params = {
                             event_category: "Key Actions",
-                            event_action: name,
-                            non_interaction: param.non_interaction,
+                            event_action: name
                         }
                         return params;
                     }
                     case 'Form' : {
                         let params = {
                             event_category: "Key Actions",
-                            event_action: name,
-                            non_interaction: param.non_interaction,
+                            event_action: name
                         }
                         var formClass = (typeof param.form_class != 'undefined') ? 'class: ' + param.form_class : '';
                         if(formClass != "") {
@@ -1924,8 +1960,7 @@ if (!Array.prototype.includes) {
                         let params = {
                             event_category: "Key Actions",
                             event_action: name,
-                            event_label: param.download_name,
-                            non_interaction: param.non_interaction,
+                            event_label: param.download_name
                         }
                         return params;
                     }
@@ -1934,8 +1969,7 @@ if (!Array.prototype.includes) {
                         let params = {
                             event_category: "Key Actions",
                             event_action: name,
-                            event_label: document.title,
-                            non_interaction: param.non_interaction,
+                            event_label: document.title
                         }
                         return params;
                     }
@@ -1943,8 +1977,7 @@ if (!Array.prototype.includes) {
                         let params = {
                             event_category: "Key Actions",
                             event_action: name,
-                            event_label: param.search_term,
-                            non_interaction: param.non_interaction,
+                            event_label: param.search_term
                         }
                         return params;
                     }
@@ -1989,12 +2022,7 @@ if (!Array.prototype.includes) {
                 }
 
                 Utils.loadGoogleTag(options.ga.trackingIds[0]);
-
-                var config = {
-                    'link_attribution': options.ga.enhanceLinkAttr,
-                    'anonymize_ip': options.ga.anonimizeIP
-                };
-
+                var config = [];
                 // Cross-Domain tracking
                 if (options.ga.crossDomainEnabled) {
                     config.linker = {
@@ -2809,7 +2837,7 @@ if (!Array.prototype.includes) {
     }
 
 }(jQuery, pysOptions);
-if (pysOptions.ajaxForServerEvent && !Cookies.get('pbid')) {
+if (pysOptions.ajaxForServerEvent && !Cookies.get('pbid')  && !(pysOptions.cookie.disabled_all_cookie || pysOptions.cookie.externalID_disabled_by_api)) {
     jQuery.ajax({
         url: pysOptions.ajaxUrl,
         dataType: 'json',

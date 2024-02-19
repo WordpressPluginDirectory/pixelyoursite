@@ -38,12 +38,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<h4 class="switcher-label">Remove Facebook default events</h4>
 			</div>
 		</div>
+		<div class="row mb-3">
+			<div class="col">
+				<?php Facebook()->render_switcher_input( 'disable_noscript' ); ?>
+				<h4 class="switcher-label">Disable noscript</h4>
+			</div>
+		</div>
         <!--
         <div class="row">
             <div class="col">
                 <?php Facebook()->render_switcher_input( 'send_external_id_demo',false,true ); ?>
                 <h4 class="switcher-label">Send external id</h4>
-                <?php renderProBadge();?>
+                <?php renderProBadge(); ?>
             </div>
         </div>
         -->

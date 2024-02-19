@@ -99,7 +99,7 @@ class AjaxHookEventManager {
         }
         $standardParams = getStandardParams();
 
-        PYS()->getLog()->debug('trackWooAddToCartEvent is_ajax_request '.$is_ajax_request);
+        PYS()->getLog()->debug('trackWooAddToCartEvent is_hook_request '.$is_ajax_request);
         $dataList = [];
         foreach ( PYS()->getRegisteredPixels() as $pixel ) {
 

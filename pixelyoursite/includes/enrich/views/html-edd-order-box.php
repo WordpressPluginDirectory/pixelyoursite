@@ -33,11 +33,11 @@ $meta = $payment->get_meta();
                 </tr>
                 <tr >
                     <th>Landing Page:</th>
-                    <td><a href="<?=$data['pys_landing']?>" target="_blank" ><?=$data['pys_landing']?></a></td>
+                    <td><a href="<?=$data['pys_landing']; ?>" target="_blank" ><?=$data['pys_landing']; ?></a></td>
                 </tr>
                 <tr>
                     <th>Traffic source:</th>
-                    <td><?=$data['pys_source']?></td>
+                    <td><?=$data['pys_source']; ?></td>
                 </tr>
                 <?php
                 $utms = explode("|",$data['pys_utm']);
@@ -54,7 +54,7 @@ $meta = $payment->get_meta();
                 </tr>
                 <tr >
                     <?php
-                    $lastLanding = isset($data['last_pys_landing']) ? $data['last_pys_landing'] : "";?>
+                    $lastLanding = isset($data['last_pys_landing']) ? $data['last_pys_landing'] : ""; ?>
                     <th>Landing Page:</th>
                     <td><a href="<?=$lastLanding?>" target="_blank" ><?=$lastLanding?></a></td>
                 </tr>
@@ -81,15 +81,15 @@ $meta = $payment->get_meta();
                 </tr>
                 <tr >
                     <th>Hour:</th>
-                    <td><?=$userTime[0]?></td>
+                    <td><?=$userTime[0]; ?></td>
                 </tr>
                 <tr >
                     <th>Day:</th>
-                    <td><?=$userTime[1]?></td>
+                    <td><?=$userTime[1]; ?></td>
                 </tr>
                 <tr >
                     <th>Month:</th>
-                    <td><?=$userTime[2]?></td>
+                    <td><?=$userTime[2]; ?></td>
                 </tr>
 
                 <tr>

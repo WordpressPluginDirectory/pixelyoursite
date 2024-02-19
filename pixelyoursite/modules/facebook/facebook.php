@@ -420,7 +420,7 @@ class Facebook extends Settings implements Pixel {
 
 	public function outputNoScriptEvents() {
 	 
-		if ( ! $this->configured() ) {
+		if ( ! $this->configured() || $this->getOption('disable_noscript')) {
 			return;
 		}
 
@@ -431,7 +431,6 @@ class Facebook extends Settings implements Pixel {
 			foreach ( $events as $event ) {
                 if( $event['name'] == "hCR") continue;
 				foreach ( $this->getPixelIDs() as $pixelID ) {
-
 					$args = array(
 						'id'       => $pixelID,
 						'ev'       => urlencode( $event['name'] ),
@@ -812,7 +811,7 @@ class Facebook extends Settings implements Pixel {
         $cache_key = 'order_id_' . $order_key;
         $order_id = get_transient( $cache_key );
         global $wp;
-        if (is_order_received_page() && empty($order_id) && $wp->query_vars['order-received']) {
+        if (PYS()->woo_is_order_received_page() && empty($order_id) && $wp->query_vars['order-received']) {
 
             $order_id = absint( $wp->query_vars['order-received'] );
             if ($order_id) {

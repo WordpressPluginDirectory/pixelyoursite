@@ -15,7 +15,7 @@ class EnrichOrder {
     public function init() {
         //woo
         if(PYS()->getOption("woo_enabled_save_data_to_orders")) {
-            add_action( 'woocommerce_checkout_update_order_meta',array($this,'woo_save_checkout_fields'),10, 2);
+            add_action( 'woocommerce_new_order',array($this,'woo_save_checkout_fields'),10, 1);
             add_action( 'add_meta_boxes', array($this,'woo_add_order_meta_boxes') );
             if(PYS()->getOption("woo_add_enrich_to_admin_email")) {
                 add_action( 'woocommerce_email_customer_details', array($this,'woo_add_enrich_to_admin_email'),80,4 );
@@ -48,26 +48,23 @@ class EnrichOrder {
     }
 
     function woo_render_order_fields($post) {
-        $orderId = ( $post instanceof \WP_Post ) ? $post->ID : $post->get_id();
+        if ($post instanceof \WP_Post) {
+            $orderId = $post->ID;
+        } elseif (method_exists($post, 'get_id')) {
+            $orderId = $post->get_id();
+        } else {
+            // Обработка ситуации, когда $post не является ни объектом \WP_Post, ни объектом с методом get_id().
+            $orderId = null; // Или другое значение по умолчанию.
+        }
         echo "<div style='margin:20px 10px'><p>With the paid plugin, you can see more data on the WooCommerce Reports page. 
                 <a href='https://www.pixelyoursite.com/woocommerce-first-party-reports?utm_source=free-plugin&utm_medium=order-page&utm_campaign=reports-order-page&utm_content=woocommerce-reports-client-page&utm_term=order-page-reports' target='_blank'>Click here for details</a>
                 </p>You can stop storing this data from the plugin's <a href='".admin_url("admin.php?page=pixelyoursite&tab=woo")."' target='_blank'>WooCommerce page</a>.</div>";
         include 'views/html-order-meta-box.php';
     }
 
-    function woo_save_checkout_fields($order_id, $data) {
+    function woo_save_checkout_fields($order_id) {
         $pysData = [];
-        $pysData['pys_landing'] = isset($_REQUEST['pys_landing']) ? sanitize_text_field($_REQUEST['pys_landing']) : "";
-        $pysData['pys_source'] = isset($_REQUEST['pys_source']) ? sanitize_text_field($_REQUEST['pys_source']) : "";
-        $pysData['pys_utm'] = isset($_REQUEST['pys_utm']) ? sanitize_text_field($_REQUEST['pys_utm']) : "";
-        $pysData['pys_browser_time'] = isset($_REQUEST['pys_browser_time']) ? sanitize_text_field($_REQUEST['pys_browser_time']) : "";
-
-        $pysData['last_pys_landing'] = isset($_REQUEST['last_pys_landing']) ? sanitize_text_field($_REQUEST['last_pys_landing']) : "";
-        $pysData['last_pys_source'] = isset($_REQUEST['last_pys_source']) ? sanitize_text_field($_REQUEST['last_pys_source']) : "";
-        $pysData['last_pys_utm'] = isset($_REQUEST['last_pys_utm']) ? sanitize_text_field($_REQUEST['last_pys_utm']) : "";
-
-        $pysData['pys_utm_id'] = isset($_REQUEST['pys_utm_id']) ? sanitize_text_field($_REQUEST['pys_utm_id']) : "";
-        $pysData['last_pys_utm_id'] = isset($_REQUEST['last_pys_utm_id']) ? sanitize_text_field($_REQUEST['last_pys_utm_id']) : "";
+        $pysData = $this->getPysData();
 
         $order = wc_get_order($order_id);
         if ( isWooCommerceVersionGte('3.0.0') ) {
@@ -106,22 +103,78 @@ class EnrichOrder {
         if ( 0 !== did_action('edd_pre_process_purchase') ) {
             $pysData = [];
 
-            $pysData['pys_landing'] = isset($_POST['pys_landing']) ? sanitize_text_field($_POST['pys_landing']) : "";
-            $pysData['pys_source'] = isset($_POST['pys_source']) ? sanitize_text_field($_POST['pys_source']) : "";
-            $pysData['pys_utm'] = isset($_POST['pys_utm']) ? sanitize_text_field($_POST['pys_utm']) : "";
-            $pysData['pys_browser_time'] = isset($_POST['pys_browser_time']) ? sanitize_text_field($_POST['pys_browser_time']) : "";
+            $pys_landing = '';
+            $pys_source = '';
+
+            $utms = getUtms(true);
+            $utms_id = getUtmsId(true);
+
+            $pys_utm = implode("|", array_map(function ($key, $value) {
+                return "$key:$value";
+            }, array_keys($utms), $utms));
+            $pys_utm_id = implode("|", array_map(function ($key, $value) {
+                return "$key:$value";
+            }, array_keys($utms_id), $utms_id));
+            $pys_browser_time = getBrowserTime();
+            if (isset($_COOKIE['pys_landing_page']) || isset($_SESSION['LandingPage'])) {
+                $pys_landing = $_COOKIE['pys_landing_page'] ?? $_SESSION['LandingPage'];
+            }
+            if (isset($_COOKIE['pysTrafficSource']) || isset($_SESSION['TrafficSource'])) {
+                $pys_source = $_COOKIE['pysTrafficSource'] ?? $_SESSION['TrafficSource'];
+            }
+            $pysData['pys_landing'] = isset($_REQUEST['pys_landing']) ? sanitize_text_field($_REQUEST['pys_landing']) : $pys_landing;
+            $pysData['pys_source'] = isset($_REQUEST['pys_source']) ? sanitize_text_field($_REQUEST['pys_source']) : $pys_source;
+            $pysData['pys_utm'] = isset($_REQUEST['pys_utm']) ? sanitize_text_field($_REQUEST['pys_utm']) : $pys_utm;
+            $pysData['pys_browser_time'] = isset($_REQUEST['pys_browser_time']) ? sanitize_text_field($_REQUEST['pys_browser_time']) : $pys_browser_time;
 
 
-            $pysData['last_pys_landing'] = isset($_REQUEST['last_pys_landing']) ? sanitize_text_field($_REQUEST['last_pys_landing']) : "";
-            $pysData['last_pys_source'] = isset($_REQUEST['last_pys_source']) ? sanitize_text_field($_REQUEST['last_pys_source']) : "";
-            $pysData['last_pys_utm'] = isset($_REQUEST['last_pys_utm']) ? sanitize_text_field($_REQUEST['last_pys_utm']) : "";
+            $pysData['last_pys_landing'] = isset($_REQUEST['last_pys_landing']) ? sanitize_text_field($_REQUEST['last_pys_landing']) : $pys_landing;
+            $pysData['last_pys_source'] = isset($_REQUEST['last_pys_source']) ? sanitize_text_field($_REQUEST['last_pys_source']) : $pys_source;
+            $pysData['last_pys_utm'] = isset($_REQUEST['last_pys_utm']) ? sanitize_text_field($_REQUEST['last_pys_utm']) : $pys_utm;
 
-            $pysData['pys_utm_id'] = isset($_REQUEST['pys_utm_id']) ? sanitize_text_field($_REQUEST['pys_utm_id']) : "";
-            $pysData['last_pys_utm_id'] = isset($_REQUEST['last_pys_utm_id']) ? sanitize_text_field($_REQUEST['last_pys_utm_id']) : "";
+            $pysData['pys_utm_id'] = isset($_REQUEST['pys_utm_id']) ? sanitize_text_field($_REQUEST['pys_utm_id']) : $pys_utm_id;
+            $pysData['last_pys_utm_id'] = isset($_REQUEST['last_pys_utm_id']) ? sanitize_text_field($_REQUEST['last_pys_utm_id']) : $pys_utm_id;
+
 
             $payment_meta['pys_enrich_data'] = $pysData;
         }
         return $payment_meta;
+    }
+
+    function getPysData(){
+        $pysData = array();
+        $pys_landing = '';
+        $pys_source = '';
+        $utms = getUtms(true);
+        $utms_id = getUtmsId(true);
+
+        $pys_utm = implode("|", array_map(function ($key, $value) {
+            return "$key:$value";
+        }, array_keys($utms), $utms));
+        $pys_utm_id = implode("|", array_map(function ($key, $value) {
+            return "$key:$value";
+        }, array_keys($utms_id), $utms_id));
+        $pys_browser_time = getBrowserTime();
+        if (isset($_COOKIE['pys_landing_page']) || isset($_SESSION['LandingPage'])) {
+            $pys_landing = $_COOKIE['pys_landing_page'] ?? $_SESSION['LandingPage'];
+        }
+        if (isset($_COOKIE['pysTrafficSource']) || isset($_SESSION['TrafficSource'])) {
+            $pys_source = $_COOKIE['pysTrafficSource'] ?? $_SESSION['TrafficSource'];
+        }
+        PYS()->getLog()->debug("Check", $pys_source);
+        $pysData['pys_landing'] = isset($_REQUEST['pys_landing']) ? sanitize_text_field($_REQUEST['pys_landing']) : $pys_landing;
+        $pysData['pys_source'] = isset($_REQUEST['pys_source']) ? sanitize_text_field($_REQUEST['pys_source']) : $pys_source;
+        $pysData['pys_utm'] = isset($_REQUEST['pys_utm']) ? sanitize_text_field($_REQUEST['pys_utm']) : $pys_utm;
+        $pysData['pys_browser_time'] = isset($_REQUEST['pys_browser_time']) ? sanitize_text_field($_REQUEST['pys_browser_time']) : $pys_browser_time;
+
+        $pysData['last_pys_landing'] = isset($_REQUEST['last_pys_landing']) ? sanitize_text_field($_REQUEST['last_pys_landing']) : $pys_landing;
+        $pysData['last_pys_source'] = isset($_REQUEST['last_pys_source']) ? sanitize_text_field($_REQUEST['last_pys_source']) : $pys_source;
+        $pysData['last_pys_utm'] = isset($_REQUEST['last_pys_utm']) ? sanitize_text_field($_REQUEST['last_pys_utm']) : $pys_utm;
+
+        $pysData['pys_utm_id'] = isset($_REQUEST['pys_utm_id']) ? sanitize_text_field($_REQUEST['pys_utm_id']) : $pys_utm_id;
+        $pysData['last_pys_utm_id'] = isset($_REQUEST['last_pys_utm_id']) ? sanitize_text_field($_REQUEST['last_pys_utm_id']) : $pys_utm_id;
+
+        return $pysData;
     }
 }
 

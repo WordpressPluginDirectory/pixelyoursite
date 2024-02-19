@@ -50,7 +50,7 @@ class FacebookServer {
             add_action( 'wp_ajax_pys_api_event',array($this,"catchAjaxEvent"));
             add_action( 'wp_ajax_nopriv_pys_api_event', array($this,"catchAjaxEvent"));
             add_action( 'woocommerce_remove_cart_item', array($this, 'trackRemoveFromCartEvent'), 10, 2);
-            add_action( 'woocommerce_add_to_cart', array($this, 'trackAddToCartEvent'), 40, 4);
+            //add_action( 'woocommerce_add_to_cart', array($this, 'trackAddToCartEvent'), 40, 4);
 
             //add_action( 'woocommerce_order_status_completed', array( $this, 'completed_purchase' ) );
             // initialize the s2s event async task
@@ -167,15 +167,12 @@ class FacebookServer {
 
     function trackRemoveFromCartEvent ($cart_item_key,$cart) {
         $eventId = 'woo_remove_from_cart';
+        PYS()->getLog()->debug('trackRemoveFromCartEvent');
 
-        $url = $_SERVER['HTTP_HOST'].strtok($_SERVER["REQUEST_URI"], '?');
-        $postId = url_to_postid($url);
-        $cart_id = wc_get_page_id( 'cart' );
         $item = $cart->get_cart_item($cart_item_key);
 
 
-
-        if(PYS()->getOption( 'woo_remove_from_cart_enabled') && $cart_id==$postId) {
+        if(PYS()->getOption( 'woo_remove_from_cart_enabled')) {
             PYS()->getLog()->debug('trackRemoveFromCartEvent send fb server with out browser event');
             $event = new SingleEvent("woo_remove_from_cart",EventTypes::$STATIC,'woo');
             $event->args=['item'=>$item];
@@ -314,16 +311,15 @@ class FacebookServer {
         $pysData['fbc'] = ServerEventHelper::getFbc();
         $pysData['fbp'] = ServerEventHelper::getFbp();
         $order = wc_get_order($order_id);
-        if ( isWooCommerceVersionGte('3.0.0') ) {
+        if (isWooCommerceVersionGte('3.0.0') && !empty($order)) {
             // WooCommerce >= 3.0
-            if($order) {
-                $order->update_meta_data("pys_fb_cookie",$pysData);
+                $order->update_meta_data("pys_fb_cookie", $pysData);
                 $order->save();
-            }
-
         } else {
             // WooCommerce < 3.0
-            update_post_meta( $order_id, 'pys_fb_cookie', $pysData );
+            if(!empty($order_id)){
+                update_post_meta($order_id, 'pys_fb_cookie', $pysData);
+            }
         }
     }
 

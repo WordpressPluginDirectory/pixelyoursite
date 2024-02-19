@@ -53,15 +53,15 @@ class HeadFooter extends Settings {
 	public function register_meta_box() {
 		
 		if ( current_user_can( 'manage_pys' ) && current_user_can('unfiltered_html') ) {
-			
+
 			$screens = get_post_types( array( 'public' => true ) );
-			
+
 			foreach ( $screens as $screen ) {
 				add_meta_box( 'pys-head-footer', 'PixelYourSite Head & Footer Scripts',
 					array( $this, 'render_meta_box' ),
 					$screen );
 			}
-			
+
 		}
 
 	}
@@ -129,12 +129,12 @@ class HeadFooter extends Settings {
 		 * WooCommerce Order Received page
 		 */
 
-		if ( isWooCommerceActive() && is_order_received_page() ) {
+		if ( isWooCommerceActive() && PYS()->woo_is_order_received_page() ) {
 			add_action( 'wp_head', array( $this, 'output_head_woo_order_received' ) );
 			add_action( 'wp_footer', array( $this, 'output_footer_woo_order_received' ) );
 		}
 
-		$disabled_by_woo = isWooCommerceActive() && is_order_received_page() &&
+		$disabled_by_woo = isWooCommerceActive() && PYS()->woo_is_order_received_page() &&
 		                   $this->getOption( 'woo_order_received_disable_global' );
 
 		if ( $disabled_by_woo ) {

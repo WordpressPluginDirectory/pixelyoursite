@@ -95,6 +95,15 @@ function adminGetFixedNotices() {
             'enabelLogo' => true,
             'color' => 'green',
             'multiMessage' => [
+
+                [
+                  'slug'  => 'free_block_2_message_3_v2',
+                  'message' => 'How to enable Google Consent Mode when using PixelYourSite.',
+                  'title' => 'Google Consent Mode V2',
+                  'button_text' => 'Watch video',
+                  'button_url' => 'https://www.youtube.com/watch?v=uYfFesnKcW0',
+                ],
+
                 [
                     'slug'  => 'free_block_2_message_1_v1',
                     'message' => 'Learn how to create Custom Conversions on Meta using your pixel events. Use them to optimize your ads and track your ads results.',
@@ -109,6 +118,9 @@ function adminGetFixedNotices() {
                     'button_text' => 'Watch video',
                     'button_url' => 'https://www.youtube.com/watch?v=EvzGMAvBnbs',
                 ],
+
+
+
             ],
             'optoutEnabel' => true,
             'optoutMessage' => "This is message 2 of a series of 9 notifications containing tips and tricks about how to use our plugin.",

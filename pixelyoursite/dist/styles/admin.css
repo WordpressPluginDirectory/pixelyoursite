@@ -93,3 +93,6 @@
     background-color: #fff;
     border-color: #FF0000;
 }
+#pys .not-support-tag{
+    color: red;
+}

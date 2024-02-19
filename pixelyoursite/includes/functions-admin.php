@@ -102,9 +102,9 @@ function getAdminSecondaryNavTabs() {
             'url'  => buildAdminUrl( 'pixelyoursite', 'facebook_settings' ),
             'name' => 'Meta Settings',
         ),
-        'ga_settings'       => array(
-            'url'  => buildAdminUrl( 'pixelyoursite', 'ga_settings' ),
-            'name' => 'Google Analytics Settings',
+        'google_tags_settings'       => array(
+            'url'  => buildAdminUrl( 'pixelyoursite', 'google_tags_settings' ),
+            'name' => 'Google Tags Settings',
         ),
     );
 
@@ -214,7 +214,9 @@ function purgeCache() {
         sg_cachepress_purge_cache();
 
     }
-
+    if(isRealCookieBannerPluginActivated()){
+        wp_rcb_invalidate_templates_cache();
+    }
 }
 
 function adminIncompatibleVersionNotice( $pluginName, $minVersion ) {
@@ -230,6 +232,7 @@ function adminIncompatibleVersionNotice( $pluginName, $minVersion ) {
 }
 
 function adminRenderNotices() {
+
 
     if ( ! current_user_can( 'manage_pys' ) ) {
         return;
@@ -288,13 +291,19 @@ function adminRenderNotices() {
     }
 
     $ga_tracking_id = GA()->getPixelIDs() ;
-
+    $noticeRenderNotSupportUA = false;
     if ( GA()->enabled() && empty( $ga_tracking_id ) ) {
         $no_ga_pixels = true;
+
     } else {
         $no_ga_pixels = false;
+        if (!isGaV4($ga_tracking_id)) {
+            $noticeRenderNotSupportUA = true;
+        }
     }
-
+    if(GA()->enabled() && $noticeRenderNotSupportUA){
+        adminRenderNotSupportUA($noticeRenderNotSupportUA);
+    }
     $pinterest_pixel_id = Pinterest()->getOption( 'pixel_id' );
     $pinterest_license_status = Pinterest()->getOption( 'license_status' );
 
@@ -598,6 +607,66 @@ function adminRenderNoPixelsNotice() {
     <?php
 }
 
+
+function adminRenderNotSupportUA( $show = false) {
+
+
+    $user_id = get_current_user_id();
+
+    // show only if never dismissed or dismissed more than a week ago
+    $meta_key = 'pys_ga_UA_notice_dismissed_at';
+    $dismissed_at = get_user_meta( $user_id, $meta_key );
+    $week_ago = time() - WEEK_IN_SECONDS;
+    if ( $dismissed_at && is_array( $dismissed_at ) ) {
+        $dismissed_at = reset( $dismissed_at );
+    }
+    if ( !$dismissed_at || ($dismissed_at && $dismissed_at < $week_ago) && $show) {
+            ?>
+            <div class="notice notice-error is-dismissible pys_ga_UA_notice">
+                <p><b>PixelYourSite Tip: </b>The old Universal Analytics properties are not supported by Google Analytics anymore. You must use the new GA4 properties instead. <a href="https://www.youtube.com/watch?v=KkiGbfl1q48" target="_blank">Watch this video to find how to get your GA4 tag</a>.</p>
+            </div>
+            <?php
+    }
+    ?>
+
+    <script type="application/javascript">
+        jQuery(document).on('click', '.pys_ga_UA_notice .notice-dismiss', function () {
+
+            jQuery.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'pys_notice_UA_dismiss',
+                    nonce: '<?php esc_attr_e( wp_create_nonce( 'pys_notice_UA_dismiss' ) ); ?>',
+                    user_id: '<?php esc_attr_e( $user_id ); ?>',
+                    addon_slug: 'ga',
+                    meta_key: 'UA_notice'
+                }
+            })
+
+        })
+    </script>
+
+    <?php
+}
+add_action( 'wp_ajax_pys_notice_UA_dismiss', 'adminNoticeUADismissHandler' );
+
+function adminNoticeUADismissHandler() {
+
+    if ( empty( $_REQUEST['nonce'] ) || ! wp_verify_nonce( $_REQUEST['nonce'], 'pys_notice_UA_dismiss' ) ) {
+        return;
+    }
+
+    if ( empty( $_REQUEST['user_id'] ) || empty( $_REQUEST['addon_slug'] ) || empty( $_REQUEST['meta_key'] ) ) {
+        return;
+    }
+
+    // save time when notice was dismissed
+    $meta_key = 'pys_' . sanitize_text_field( $_REQUEST['addon_slug'] ) . '_' . sanitize_text_field( $_REQUEST['meta_key'] ) . '_dismissed_at';
+    update_user_meta( sanitize_text_field($_REQUEST['user_id']), $meta_key, time() );
+    die();
+}
+
+
 /**
  * @param Plugin|Settings $plugin
  */
@@ -868,3 +937,20 @@ function addMetaTagFields($pixel,$url) { ?>
         </div>
     </div>
 <?php }
+
+
+function isGaV4($tag) {
+    if (is_array($tag)) {
+        foreach ($tag as $t) {
+            if (!is_string($t)) {
+                return false;
+            }
+            if (strpos($t, 'G') === 0) {
+                return true;
+            }
+        }
+        return false;
+    } else {
+        return strpos($tag, 'G') === 0;
+    }
+}

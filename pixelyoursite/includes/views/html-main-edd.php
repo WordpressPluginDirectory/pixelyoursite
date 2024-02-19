@@ -25,6 +25,20 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <h4 class="switcher-label">Google Analytics auto-renewals purchase tracking</h4><?php renderProBadge(); ?>
             </div>
         </div>
+        <div  class="row">
+            <div class="col">
+				<?php renderDummySwitcher( false ); ?>
+                <h4 class="switcher-label">TikTok Advanced Purchase Tracking</h4><?php renderProBadge(); ?>
+            </div>
+        </div>
+		<?php if ( Pinterest()->enabled() ) : ?>
+            <div  class="row">
+                <div class="col">
+					<?php renderDummySwitcher( false ); ?>
+                    <h4 class="switcher-label">Pinterest Advanced Purchase Tracking</h4><?php renderProBadge(); ?>
+                </div>
+            </div>
+		<?php endif; ?>
         <p class="small">
             The plugin will send a Purchase event to Meta and Google using API when auto-renewals take place or when a new order is placed by an admin on the backend. Meta Conversion API token and GA4 Measurement Protocol secret are required.
         </p>
@@ -85,7 +99,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="card-body">
         <div class="row">
             <div class="col">
-                <p>Enhanced Conversions for Google Ads with PixelYourSite (9:14) - <a href="https://www.youtube.com/watch?v=0uuTiOnVw80" target="_blank">watch now</a></p>
+                <p>Enhanced Conversions for Google Ads with PixelYourSite (9:14) - <a href="https://www.youtube.com/watch?v=-bN5D_HJyuA" target="_blank">watch now</a></p>
                 <p>Track Facebook (META) Ads results with Google Analytics 4 (GA4) using UTMs (10:13) - <a href="https://www.youtube.com/watch?v=v3TfmX5H1Ts" target="_blank">watch now</a></p>
             </div>
         </div>
@@ -99,7 +113,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="card-body">
         <div class="row">
             <div class="col-5 form-inline">
-                <label>Prefix: </label><?php renderDummyTextInput("Prefix");?>
+                <label>Prefix: </label><?php renderDummyTextInput("Prefix"); ?>
             </div>
         </div>
         <div class="row mt-3">
@@ -344,7 +358,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- Purchase -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('edd_purchase_enabled');?>Track Purchases <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('edd_purchase_enabled'); ?>Track Purchases <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -432,12 +446,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the purchase event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row mb-2">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'edd_purchase_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
+
         <?php endif; ?>
 
         <div class="row">
@@ -464,7 +473,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- InitiateCheckout -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('edd_initiate_checkout_enabled');?>Track the Checkout Page <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('edd_initiate_checkout_enabled'); ?>Track the Checkout Page <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -536,12 +545,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the begin_checkout event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'edd_initiate_checkout_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
+
         <?php endif; ?>
 
         <div class="row">
@@ -559,7 +563,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- AddToCart -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('edd_add_to_cart_enabled');?>Track add to cart <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('edd_add_to_cart_enabled'); ?>Track add to cart <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -631,12 +635,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the add_to_cart event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'edd_add_to_cart_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
+
         <?php endif; ?>
 
         <div class="row">
@@ -654,7 +653,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- ViewContent -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('edd_view_content_enabled');?>Track product pages <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('edd_view_content_enabled'); ?>Track product pages <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -733,12 +732,7 @@ e&utm_campaign=pro-feature' ); ?>
                     <h4 class="switcher-label">Enable the view_item event on Google Analytics</h4>
                 </div>
             </div>
-            <div class="row">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'edd_view_content_non_interactive',
-                        'Non-interactive event' ); ?>
-                </div>
-            </div>
+
         <?php endif; ?>
 
         <div class="row">
@@ -756,7 +750,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- ViewCategory -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('edd_view_category_enabled');?>Track product category pages <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('edd_view_category_enabled'); ?>Track product category pages <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -774,12 +768,6 @@ e&utm_campaign=pro-feature' ); ?>
                 <div class="col">
                     <?php GA()->render_switcher_input( 'edd_view_category_enabled' ); ?>
                     <h4 class="switcher-label">Enable the view_item_list event on Google Analytics</h4>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'edd_view_category_non_interactive',
-                        'Non-interactive event' ); ?>
                 </div>
             </div>
         <?php endif; ?>
@@ -838,11 +826,6 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row mb-2">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
 
         <div class="row">
             <div class="col">
@@ -862,6 +845,13 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">Enable on Bing</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable on TikTok</h4>
             </div>
         </div>
 
@@ -895,11 +885,6 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row mb-2">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
 
         <div class="row">
             <div class="col">
@@ -919,6 +904,13 @@ e&utm_campaign=pro-feature' ); ?>
             <div class="col">
                 <?php renderDummySwitcher(); ?>
                 <h4 class="switcher-label">Enable on Bing</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable on TikTok</h4>
             </div>
         </div>
 
@@ -953,11 +945,7 @@ e&utm_campaign=pro-feature' ); ?>
                 <h4 class="switcher-label">Send the event to Google Analytics</h4>
             </div>
         </div>
-        <div class="row mb-2">
-            <div class="col col-offset-left">
-                <?php renderDummyCheckbox( 'Non-interactive event' ); ?>
-            </div>
-        </div>
+
 
         <div class="row">
             <div class="col">
@@ -980,6 +968,13 @@ e&utm_campaign=pro-feature' ); ?>
             </div>
         </div>
 
+        <div class="row">
+            <div class="col">
+				<?php renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Enable on TikTok</h4>
+            </div>
+        </div>
+
         <div class="row mt-3">
             <div class="col col-offset-left form-inline">
                 <label>Fire this event when the client has LTV at least</label>
@@ -992,7 +987,7 @@ e&utm_campaign=pro-feature' ); ?>
 <!-- RemoveFromCart -->
 <div class="card">
     <div class="card-header has_switch">
-        <?php PYS()->render_switcher_input('edd_remove_from_cart_enabled');?>Track remove from cart <?php cardCollapseBtn(); ?>
+        <?php PYS()->render_switcher_input('edd_remove_from_cart_enabled'); ?>Track remove from cart <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
 
@@ -1010,12 +1005,6 @@ e&utm_campaign=pro-feature' ); ?>
                 <div class="col">
                     <?php GA()->render_switcher_input( 'edd_remove_from_cart_enabled' ); ?>
                     <h4 class="switcher-label">Enable the remove_from_cart event on Google Analytics</h4>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col col-offset-left">
-                    <?php GA()->render_checkbox_input( 'edd_remove_from_cart_non_interactive',
-                        'Non-interactive event' ); ?>
                 </div>
             </div>
         <?php endif; ?>

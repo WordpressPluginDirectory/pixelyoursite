@@ -30,7 +30,8 @@ class Plugin_Updater {
 	private $version = '';
 	private $wp_override = false;
 	private $cache_key = '';
-	
+
+    private $beta = false;
 	/**
 	 * Class constructor.
 	 *
@@ -110,14 +111,14 @@ class Plugin_Updater {
 		
 		$version_info = $this->get_cached_version_info();
 
-		if ( false === $version_info ) {
+		if ( $this->is_cache_expired() ) {
 			$version_info = $this->api_request( 'plugin_latest_version',
 				array( 'slug' => $this->slug, 'beta' => $this->beta ) );
 
             if($this->slug == "pixelyoursite-pinterest") {
                 $timeout = strtotime( '+48 hours', current_time( 'timestamp' ) );
             } else {
-                $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+                $timeout = strtotime( '+24 hours', current_time( 'timestamp' ) );
             }
 			$this->set_version_info_cache( $version_info,"",$timeout );
 			
@@ -174,13 +175,13 @@ class Plugin_Updater {
 			
 			$version_info = $this->get_cached_version_info();
 			
-			if ( false === $version_info ) {
+			if ( $this->is_cache_expired() ) {
 				$version_info = $this->api_request( 'plugin_latest_version',
 					array( 'slug' => $this->slug, 'beta' => $this->beta ) );
                 if($this->slug == "pixelyoursite-pinterest") {
                     $timeout = strtotime( '+48 hours', current_time( 'timestamp' ) );
                 } else {
-                    $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+                    $timeout = strtotime( '+24 hours', current_time( 'timestamp' ) );
                 }
 				$this->set_version_info_cache( $version_info,"",$timeout );
 			}
@@ -298,7 +299,7 @@ class Plugin_Updater {
             if($this->slug == "pixelyoursite-pinterest") {
                 $timeout = strtotime( '+48 hours', current_time( 'timestamp' ) );
             } else {
-                $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+                $timeout = strtotime( '+24 hours', current_time( 'timestamp' ) );
             }
 			$this->set_version_info_cache( $api_response, $cache_key,$timeout );
 			
@@ -400,8 +401,6 @@ class Plugin_Updater {
 		
 		if ( $request && isset( $request->sections ) ) {
 			$request->sections = maybe_unserialize( $request->sections );
-		} else {
-			$request = false;
 		}
 		
 		if ( $request && isset( $request->banners ) ) {
@@ -478,7 +477,7 @@ class Plugin_Updater {
             if($slag == "pixelyoursite-pinterest") {
                 $timeout = strtotime( '+48 hours', current_time( 'timestamp' ) );
             } else {
-                $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+                $timeout = strtotime( '+24 hours', current_time( 'timestamp' ) );
             }
 			$this->set_version_info_cache( $version_info, $cache_key,$timeout );
 			
@@ -491,18 +490,26 @@ class Plugin_Updater {
 		exit;
 	}
 	
-	public function get_cached_version_info( $cache_key = '' ) {
-		
+	public function is_cache_expired( $cache_key = '' ){
 		if ( empty( $cache_key ) ) {
 			$cache_key = $this->cache_key;
 		}
-		
+
 		$cache = get_option( $cache_key );
-		
+
 		if ( empty( $cache['timeout'] ) || current_time( 'timestamp' ) > $cache['timeout'] ) {
-			return false; // Cache is expired
+			return true; // Cache is expired
 		}
-		
+		return false;
+	}
+	public function get_cached_version_info( $cache_key = '' ) {
+
+		if ( empty( $cache_key ) ) {
+			$cache_key = $this->cache_key;
+		}
+
+		$cache = get_option( $cache_key );
+
 		return json_decode( $cache['value'] );
 		
 	}
@@ -512,8 +519,9 @@ class Plugin_Updater {
 		if ( empty( $cache_key ) ) {
 			$cache_key = $this->cache_key;
 		}
-		if($timeout == null) {
-            $timeout = strtotime( '+3 hours', current_time( 'timestamp' ) );
+
+        if($timeout == null) {
+            $timeout = strtotime( '+24 hours', current_time( 'timestamp' ) );
         }
 		$data = array(
 			'timeout' => $timeout,

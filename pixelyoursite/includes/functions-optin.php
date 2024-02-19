@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-add_action( 'admin_notices', 'PixelYourSite\adminRenderOptinNotices' );
+add_action( 'admin_notices', 'PixelYourSite\adminRenderOptinNotices', 9 );
 function adminRenderOptinNotices() {
     
     if ( ! current_user_can( 'manage_pys' ) ) {

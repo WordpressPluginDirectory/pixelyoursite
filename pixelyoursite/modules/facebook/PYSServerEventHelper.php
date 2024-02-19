@@ -186,7 +186,7 @@ class ServerEventHelper {
          * Add purchase WooCommerce Advanced Matching params
          */
         if ( PixelYourSite\isWooCommerceActive() && isEventEnabled( 'woo_purchase_enabled' ) &&
-            ($wooOrder || ( is_order_received_page() && wooIsRequestContainOrderId() ))
+            ($wooOrder || ( PYS()->woo_is_order_received_page() && wooIsRequestContainOrderId() ))
         ) {
             if(wooIsRequestContainOrderId()) {
                 $order_id = wooGetOrderIdFromRequest();

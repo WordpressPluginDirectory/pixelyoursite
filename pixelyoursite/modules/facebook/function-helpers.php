@@ -51,7 +51,7 @@ function getAdvancedMatchingParams() {
 		 * Add purchase WooCommerce Advanced Matching params
 		 */
 
-		if ( is_order_received_page() && isset( $_REQUEST['key'] ) && $_REQUEST['key'] != "" ) {
+		if ( PixelYourSite\PYS()->woo_is_order_received_page() && isset( $_REQUEST['key'] ) && $_REQUEST['key'] != "" ) {
             $order_key = sanitize_key($_REQUEST['key']);
             $cache_key = 'order_id_' . $order_key;
             $order_id = get_transient( $cache_key );

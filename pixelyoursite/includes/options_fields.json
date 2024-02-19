@@ -134,5 +134,6 @@
 
   "send_external_id": "checkbox",
   "external_id_expire": "number",
-  "server_event_use_ajax" : "checkbox"
+  "server_event_use_ajax" : "checkbox",
+  "google_consent_mode": "checkbox"
 }
