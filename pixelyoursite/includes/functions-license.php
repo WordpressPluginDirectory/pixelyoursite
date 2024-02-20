@@ -344,6 +344,11 @@ function singleCheckLicense( $license_key, $plugin)
     if($status_code == 403) {
 	    $server_ip = file_get_contents('https://api64.ipify.org?format=json');
 	    $server_ip = $server_ip ? json_decode($server_ip, true)['ip'] : '******';
+        $host= gethostname();
+        $added_ip = gethostbyname($host);
+        if(!empty($added_ip) && $added_ip != $server_ip){
+            $server_ip .= ', '. $added_ip;
+        }
 	    $admin_notice = array(
 		    'class' => 'danger',
 		    'msg'   => __("The request may have been blocked by our firewall, please try again after a few hours. If the problem persists, contact our support and provide your IP address ({$server_ip})", 'pixelyoursite')
@@ -570,6 +575,11 @@ function licenseActivate( $license_key, $plugin ) {
 	if($status_code == 403) {
 		$server_ip = file_get_contents('https://api64.ipify.org?format=json');
 		$server_ip = $server_ip ? json_decode($server_ip, true)['ip'] : '******';
+        $host= gethostname();
+        $added_ip = gethostbyname($host);
+        if(!empty($added_ip) && $added_ip != $server_ip){
+            $server_ip .= ', '. $added_ip;
+        }
 		$admin_notice = array(
 			'class' => 'danger',
 			'msg'   => __("The request may have been blocked by our firewall, please try again after a few hours. If the problem persists, contact our support and provide your IP address ({$server_ip})", 'pixelyoursite')
@@ -612,6 +622,11 @@ function licenseDeactivate( $license_key, $plugin ) {
 	if($status_code == 403) {
 		$server_ip = file_get_contents('https://api64.ipify.org?format=json');
 		$server_ip = $server_ip ? json_decode($server_ip, true)['ip'] : '******';
+        $host= gethostname();
+        $added_ip = gethostbyname($host);
+        if(!empty($added_ip) && $added_ip != $server_ip){
+            $server_ip .= ', '. $added_ip;
+        }
 		$admin_notice = array(
 			'class' => 'danger',
 			'msg'   => __("The request may have been blocked by our firewall, please try again after a few hours. If the problem persists, contact our support and provide your IP address ({$server_ip})", 'pixelyoursite')

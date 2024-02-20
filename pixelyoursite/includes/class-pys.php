@@ -56,7 +56,6 @@ final class PYS extends Settings implements Plugin {
 	    add_action( 'admin_init', 'PixelYourSite\manageAdminPermissions' );
 
 	    // Priority 9 used to keep things same as on PRO version
-        add_action( 'wp', array( $this, 'set_pbid'), -1);
         add_action( 'wp', array( $this, 'controllSessionStart'), -1);
         add_action( 'init', array( $this, 'init' ), 9 );
         add_action( 'init', array( $this, 'afterInit' ), 11 );
@@ -172,8 +171,8 @@ final class PYS extends Settings implements Plugin {
 
             add_action('RCB/Templates/TechnicalHandlingIntegration', function ( $integration ) {
 
-                $this->handle_rcb_integration($integration, Facebook()->configured(), 'facebook-pixel', PYS_PLUGIN_FILE);
-                $this->handle_rcb_integration($integration, GA()->configured(), 'google-analytics-analytics-4', PYS_PLUGIN_FILE);
+                $this->handle_rcb_integration($integration, Facebook()->configured(), 'facebook-pixel', PYS_FREE_PLUGIN_FILE);
+                $this->handle_rcb_integration($integration, GA()->configured(), 'google-analytics-analytics-4', PYS_FREE_PLUGIN_FILE);
                 if(isPinterestActive()){
                     $this->handle_rcb_integration($integration, Pinterest()->configured(), 'pinterest-tag', PYS_PINTEREST_PLUGIN_FILE);
                 }
@@ -191,6 +190,16 @@ final class PYS extends Settings implements Plugin {
         AjaxHookEventManager::instance()->addHooks();
     }
 
+    private static function handle_rcb_integration( $integration, $is_active, $type, $plugin_dir) {
+
+        if (
+            $is_active
+            && $integration->integrate($plugin_dir, $type)
+        ) {
+            $integration->setCodeOptIn('');
+            $integration->setCodeOptOut('');
+        }
+    }
     function controllSessionStart(){
         if (!is_admin() && php_sapi_name() !== 'cli' && session_status() != PHP_SESSION_DISABLED) {
             if (!headers_sent() && session_status() == PHP_SESSION_NONE) {
@@ -226,6 +235,7 @@ final class PYS extends Settings implements Plugin {
     public function set_pbid()
     {
         $pbidCookieName = 'pbid';
+        $encryptedUniqueId = false;
         $externalIdExpire = PYS()->getOption("external_id_expire");
         $isTrackExternalId = EventsManager::isTrackExternalId();
 
@@ -234,15 +244,35 @@ final class PYS extends Settings implements Plugin {
                 setcookie($pbidCookieName, '', time() - 3600, '/');
             }
         }
-
-        if (!isset($_COOKIE[$pbidCookieName]) && $isTrackExternalId) {
+        if ((!isset($_COOKIE[$pbidCookieName]) || empty($_COOKIE[$pbidCookieName])) && $isTrackExternalId) {
             $uniqueId = bin2hex(random_bytes(16));
             $encryptedUniqueId = hash('sha256', $uniqueId);
-            setcookie($pbidCookieName, $encryptedUniqueId, time() + ($externalIdExpire * 24 * 60 * 60), '/');
-            return $encryptedUniqueId;
+
         }
 
-        return null;
+        ob_start();
+        ?>
+        <script id="set-pbid-for-pys">
+            function pys_get_pbid(name) {
+                var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+                return v ? v[2] : null;
+            }
+            function pys_set_pbid(name, value, days) {
+                var d = new Date;
+                d.setTime(d.getTime() + 24*60*60*1000*days);
+                document.cookie = name + "=" + value + ";path=/;expires=" + d.toGMTString();
+            }
+            var name = 'pbid';
+            var pbidHash = "<?=$encryptedUniqueId?>";
+
+            if(pys_get_pbid(name) != pbidHash || pys_get_pbid(name) == '') { // prevent re send event if user update page
+                pys_set_pbid(name,pbidHash,<?=$externalIdExpire?>)
+            }
+        </script>
+        <?php
+
+
+        ob_end_flush();
     }
     public function get_pbid_ajax(){
         if(defined('DOING_AJAX') && wp_doing_ajax()){

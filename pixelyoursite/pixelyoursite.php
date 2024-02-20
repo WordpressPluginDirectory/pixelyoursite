@@ -4,13 +4,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'PYS_FREE_VERSION', '9.5.0' );
+define( 'PYS_FREE_VERSION', '9.5.0.1' );
 define( 'PYS_FREE_PINTEREST_MIN_VERSION', '5.3.3' );
 define( 'PYS_FREE_BING_MIN_VERSION', '2.2.2' );
 define( 'PYS_FREE_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'PYS_FREE_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
-define( 'PYS_PLUGIN_FILE', __FILE__ );
-define( 'PYS_PLUGIN_BASENAME', plugin_basename( PYS_PLUGIN_FILE ) );
+define( 'PYS_FREE_PLUGIN_FILE', __FILE__ );
+define( 'PYS_FREE_PLUGIN_BASENAME', plugin_basename( PYS_FREE_PLUGIN_FILE ) );
 
 
 

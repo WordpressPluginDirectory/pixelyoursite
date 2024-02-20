@@ -155,8 +155,8 @@ function getAdvancedMatchingParams() {
 
 	}
     if(PixelYourSite\EventsManager::isTrackExternalId()){
-        if (isset($_COOKIE['pbid'])) {
-            $params['external_id'] = $_COOKIE['pbid'];
+        if (PixelYourSite\PYS()->get_pbid()) {
+            $params['external_id'] = PixelYourSite\PYS()->get_pbid();
         }
     }
 	$sanitized = array();
