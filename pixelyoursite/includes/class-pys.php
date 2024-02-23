@@ -56,7 +56,7 @@ final class PYS extends Settings implements Plugin {
 	    add_action( 'admin_init', 'PixelYourSite\manageAdminPermissions' );
 
 	    // Priority 9 used to keep things same as on PRO version
-        add_action( 'wp', array( $this, 'controllSessionStart'), -1);
+        add_action( 'wp', array( $this, 'controllSessionStart'), 10);
         add_action( 'init', array( $this, 'init' ), 9 );
         add_action( 'init', array( $this, 'afterInit' ), 11 );
 
@@ -190,7 +190,7 @@ final class PYS extends Settings implements Plugin {
         AjaxHookEventManager::instance()->addHooks();
     }
 
-    private static function handle_rcb_integration( $integration, $is_active, $type, $plugin_dir) {
+    private function handle_rcb_integration( $integration, $is_active, $type, $plugin_dir) {
 
         if (
             $is_active

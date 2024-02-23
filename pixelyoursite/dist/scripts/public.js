@@ -2022,7 +2022,7 @@ if (!Array.prototype.includes) {
                 }
 
                 Utils.loadGoogleTag(options.ga.trackingIds[0]);
-                var config = [];
+                var config = {};
                 // Cross-Domain tracking
                 if (options.ga.crossDomainEnabled) {
                     config.linker = {

@@ -3,8 +3,8 @@ Contributors: PixelYourSite
 Tags: Meta Pixel, Facebook Pixel, Facebook Conversion API, CAPI, Facebook Pixel Events, Facebook Dynamic Product Ads, Facebook Conversion Value, WooCommerce Facebook Pixel, Easy Digital Downloads Facebook Pixel, Google Analytics, Google Analytics Enhanced Ecommerce, GA4, WooCommerce Google Analytics, Easy Digital Downloads Google Analytics, Google Consent Mode, head & footer scripts, Pinterest tag
 Requires at least: 3.0.1
 Requires PHP: 5.4
-Tested up to: 6.3
-Stable tag: 9.5.0.1
+Tested up to: 6.4
+Stable tag: 9.5.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -469,6 +469,13 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.5.1 =
+
+* Fix for an issue with Google Analytics missing the default PageView event fired by the tag.
+
+* Additional changes to the Real Cookie Banner related code to avoid some possible issues. 
+
 
 = PixelYourSite 9.5.0.1 =
 

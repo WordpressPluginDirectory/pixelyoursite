@@ -507,6 +507,7 @@ class GA extends Settings implements Pixel {
 		$params = array(
 			'event_category'  => 'ecommerce',
 			'event_label'     => 'category',
+            'currency'        => get_woocommerce_currency(),
 			'items'           => $items,
 		);
 		
@@ -567,6 +568,7 @@ class GA extends Settings implements Pixel {
         }
         $params = array(
             'event_category'  => 'ecommerce',
+            'currency'        => get_woocommerce_currency(),
         );
         $params['items'] = $items;
 
@@ -640,6 +642,7 @@ class GA extends Settings implements Pixel {
             }
         }
         $params['items'] = $items;
+        $params['currency'] =  get_woocommerce_currency();
         $params['value'] = getWooEventCartTotal($event);
 
         return $params;
@@ -699,6 +702,7 @@ class GA extends Settings implements Pixel {
 
 		$params = array(
 			'event_category'  => 'ecommerce',
+            'currency'        => get_woocommerce_currency(),
 			'items'           => $items,
 		);
 
@@ -977,6 +981,7 @@ class GA extends Settings implements Pixel {
 		
 		$params = array(
 			'event_category' => 'ecommerce',
+            'currency'        => get_woocommerce_currency(),
 			'items' => $items,
 		);
 
@@ -993,6 +998,7 @@ class GA extends Settings implements Pixel {
 
 		$params = array(
 			'event_category'  => 'ecommerce',
+            'currency' => edd_get_currency(),
 			'items'           => array(
 				array(
 					'id'       => $post->ID,
@@ -1024,6 +1030,7 @@ class GA extends Settings implements Pixel {
 
 		$params = array(
 			'event_category'  => 'ecommerce',
+            'currency' => edd_get_currency(),
 			'items'           => array(
 				array(
 					'id'       => GA\Helpers\getEddDownloadContentId($download_id),
@@ -1110,6 +1117,7 @@ class GA extends Settings implements Pixel {
 
 		$params = array(
 			'event_category' => 'ecommerce',
+            'currency' => edd_get_currency(),
 			'items' => $items,
 		);
 
@@ -1209,6 +1217,7 @@ class GA extends Settings implements Pixel {
 		$params = array(
 			'event_category'  => 'ecommerce',
 			'event_label'     => $list_name,
+            'currency' => edd_get_currency(),
 			'items'           => $items,
 		);
 
