@@ -220,7 +220,6 @@ final class PYS extends Settings implements Plugin {
             if (empty($_SESSION['TrafficUtmsId'])) {
                 $_SESSION['TrafficUtmsId'] = getUtmsId();
             }
-            session_write_close();
         }
     }
 

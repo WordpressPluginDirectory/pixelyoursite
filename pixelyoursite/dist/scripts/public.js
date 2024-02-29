@@ -1626,6 +1626,7 @@ if (!Array.prototype.includes) {
                         if(!advancedMatching) {
                             fbq('init', pixelId);
                         } else {
+                            var test_prefix = CS_Data.test_prefix;
                             var cs_advanced_matching = Cookies.get('cs_enabled_advanced_matching'+test_prefix);
                             if (jQuery('#cs_enabled_advanced_matching'+test_prefix).length > 0) {
                                 if (cs_advanced_matching == 'yes') {

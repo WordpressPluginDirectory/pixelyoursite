@@ -1,14 +1,14 @@
 ===PixelYourSite - Your smart PIXEL (TAG) Manager===
 Contributors: PixelYourSite
-Tags: Meta Pixel, Facebook Pixel, Facebook Conversion API, CAPI, Facebook Pixel Events, Facebook Dynamic Product Ads, Facebook Conversion Value, WooCommerce Facebook Pixel, Easy Digital Downloads Facebook Pixel, Google Analytics, Google Analytics Enhanced Ecommerce, GA4, WooCommerce Google Analytics, Easy Digital Downloads Google Analytics, Google Consent Mode, head & footer scripts, Pinterest tag
+Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent Mode V2
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.4
-Stable tag: 9.5.1
+Stable tag: 9.5.1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Meta Pixel (Facebook Pixel) & Conversion API (CAPI), Google Analytics 4 (GA4) or the old Universal, plus ANY other script. WooCommerce and EDD with Facebook Dynamic Product Ads and Google Magnetisation tracking. Track any action with events. Pinterest Tag support via a dedicated paid add-on. Dedicated paid Bing Tag add-on.
+Add your Meta Pixel (old Facebook Pixel) with Conversion API events, Google Analytics (GA4) with Consent Mode support, and ANY script (Head & Footer).
 
 == Description ==
 **Manage your Meta Pixel (Facebook Pixel), implement Facebook Conversion API, add your Google Analytics 4 (GA4) or an old Universal property with a single plugin. Add ANY other script (Head & Footer feature). The Pinterest Tag can be implemented via [paid add-on](https://www.pixelyoursite.com/pinterest-tag).**
@@ -469,6 +469,11 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.5.1.1 =
+
+* Fix for an issue related to PHP sessions.
+
 
 = PixelYourSite 9.5.1 =
 
