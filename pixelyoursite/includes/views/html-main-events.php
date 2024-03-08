@@ -170,7 +170,7 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                                     <i class="fa fa-facebook-square" style="opacity: .25;"></i>
                                 <?php endif; ?>
 
-                                <?php if ( GA()->enabled() && $event->isGoogleAnalyticsEnabled() ) : ?>
+                                <?php if ( GA()->enabled() && $event->isUnifyAnalyticsEnabled() ) : ?>
                                     <i class="fa fa-area-chart"></i>
                                 <?php else : ?>
                                     <i class="fa fa-area-chart" style="opacity: .25;"></i>

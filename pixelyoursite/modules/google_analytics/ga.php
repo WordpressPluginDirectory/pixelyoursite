@@ -425,17 +425,17 @@ class GA extends Settings implements Pixel {
 	 */
 	private function getCustomEventData( $event ) {
 
-		$ga_action = $event->getGoogleAnalyticsAction();
+		$ga_action = $event->getMergedAction();
 
-		if ( ! $event->isGoogleAnalyticsEnabled() || empty( $ga_action ) ) {
+		if ( ! $event->isUnifyAnalyticsEnabled() || empty( $ga_action ) ) {
 			return false;
 		}
 
 
         if($event->isGaV4()) {
-            $params = $event->getGaParams();
+            $params = $event->getMergedGaParams();
 
-            foreach ($event->getGACustomParams() as $item) {
+            foreach ($event->getGAMergedCustomParams() as $item) {
                 $params[$item['name']] = $item['value'];
             }
 
@@ -449,7 +449,7 @@ class GA extends Settings implements Pixel {
 
 
 		return array(
-			'name'  => $event->getGoogleAnalyticsAction(),
+			'name'  => $event->getMergedAction(),
 			'data'  => $params,
 			'delay' => $event->getDelay(),
 		);
@@ -834,7 +834,8 @@ class GA extends Settings implements Pixel {
             set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
         }
 
-		$order = new \WC_Order( $order_id );
+        $order    = wc_get_order( $order_id );
+        if(!$order) return false;
 		$items = array();
 		$product_ids = array();
 		$total_value = 0;

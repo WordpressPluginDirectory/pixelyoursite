@@ -201,6 +201,13 @@ final class PYS extends Settings implements Plugin {
         }
     }
     function controllSessionStart(){
+        $sessionPath = session_save_path();
+
+        // Checking if the directory exists and is writable
+        if (!file_exists($sessionPath) || !is_writable($sessionPath)) {
+            // If the directory does not exist or is not writable, stop executing the function
+            return;
+        }
         if (!is_admin() && php_sapi_name() !== 'cli' && session_status() != PHP_SESSION_DISABLED) {
             if (!headers_sent() && session_status() == PHP_SESSION_NONE) {
                 session_start();

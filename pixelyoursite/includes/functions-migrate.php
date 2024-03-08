@@ -16,24 +16,34 @@ function maybeMigrate() {
 		return;
 	}
 	
-	$pys_free_7_version = get_option( 'pys_core_version', false );
+	$pys_free_7_version = get_option( 'pys_core_free_version', false );
 
-    if ($pys_free_7_version && version_compare($pys_free_7_version, '9.0.0', '<') ) {
+    if (!$pys_free_7_version || ($pys_free_7_version && version_compare($pys_free_7_version, '9.5.1.1', '<') && !get_option( 'pys_custom_event_migrate_free', false )) ) {
+        migrate_unify_custom_events();
+
+        update_option( 'pys_core_free_version', PYS_FREE_VERSION );
+        update_option( 'pys_updated_at', time() );
+    } elseif ($pys_free_7_version && version_compare($pys_free_7_version, '9.0.0', '<') ) {
         migrate_9_0_0();
 
-        update_option( 'pys_core_version', PYS_FREE_VERSION );
+        update_option( 'pys_core_free_version', PYS_FREE_VERSION );
         update_option( 'pys_updated_at', time() );
     } elseif ($pys_free_7_version && version_compare($pys_free_7_version, '7.1.0', '<')) {
 
         migrate_7_1_0_bing_defaults();
 
-        update_option( 'pys_core_version', PYS_FREE_VERSION );
+        update_option( 'pys_core_free_version', PYS_FREE_VERSION );
         update_option( 'pys_updated_at', time() );
 
     }
 	
 }
-
+function migrate_unify_custom_events(){
+    foreach (CustomEventFactory::get() as $event) {
+        $event->migrateUnifyGA();
+    }
+    update_option( 'pys_custom_event_migrate_free', true );
+}
 function migrate_9_0_0() {
     $globalOptions = [
         "automatic_events_enabled" => PYS()->getOption("signal_events_enabled") || PYS()->getOption("automatic_events_enabled"),

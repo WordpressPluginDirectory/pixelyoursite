@@ -1913,8 +1913,6 @@ if (!Array.prototype.includes) {
         }
         function mapParamsTov4(tag,name,param) {
             //GA4 automatically collects a number of parameters for all events
-            delete param.page_title;
-            delete param.event_url;
             delete param.landing_page;
             // end
             if(isv4(tag)) {
@@ -1931,68 +1929,6 @@ if (!Array.prototype.includes) {
                     delete param.dynx_pagetype;
                     delete param.dynx_totalvalue;
                 }
-            } else {
-
-                switch (name) {
-
-                    case 'Comment' :
-                    case 'login' :
-                    case 'sign_up' :
-                    case 'EmailClick' :
-                    case 'TelClick' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name
-                        }
-                        return params;
-                    }
-                    case 'Form' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name
-                        }
-                        var formClass = (typeof param.form_class != 'undefined') ? 'class: ' + param.form_class : '';
-                        if(formClass != "") {
-                            params["event_label"] = formClass;
-                        }
-                        return params;
-                    }
-                    case 'Download' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name,
-                            event_label: param.download_name
-                        }
-                        return params;
-                    }
-                    case 'TimeOnPage' :
-                    case 'PageScroll' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name,
-                            event_label: document.title
-                        }
-                        return params;
-                    }
-                    case 'search' : {
-                        let params = {
-                            event_category: "Key Actions",
-                            event_action: name,
-                            event_label: param.search_term
-                        }
-                        return params;
-                    }
-                }
-
-                //delete standard params
-
-                delete param.post_type;
-                delete param.post_id;
-                delete param.plugin;
-                delete param.user_role;
-                delete param.cartlows;
-                delete param.cartflows_flow;
-                delete param.cartflows_step;
             }
             return param;
         }

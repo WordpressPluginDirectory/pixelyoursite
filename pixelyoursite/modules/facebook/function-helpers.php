@@ -595,7 +595,8 @@ function getCompleteRegistrationOrderParams() {
         $order_id = (int) wc_get_order_id_by_order_key( $order_key );
         set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
     }
-    $order = new \WC_Order( $order_id );
+    $order    = wc_get_order( $order_id );
+    if(!$order) return false;
 
     $value_option   = PixelYourSite\Facebook()->getOption( 'woo_complete_registration_custom_value' );
     $global_value   = PixelYourSite\Facebook()->getOption( 'woo_complete_registration_global_value', 0 );

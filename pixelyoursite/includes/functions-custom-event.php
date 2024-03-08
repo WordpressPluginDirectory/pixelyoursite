@@ -54,7 +54,7 @@ function renderTextInput( &$event, $key, $placeholder = '' ) {
  * @param string      $key
  * @param array       $options
  */
-function renderGroupSelectInput( &$event, $key, $groups, $full_width = false ) {
+function renderGroupSelectInput( &$event, $key, $groups, $full_width = false,$classes = '' ) {
 
     $attr_name  = "pys[event][$key]";
     $attr_id    = 'pys_event_' . $key;
@@ -64,7 +64,7 @@ function renderGroupSelectInput( &$event, $key, $groups, $full_width = false ) {
 
     ?>
 
-    <select class="form-control-sm" id="<?php esc_attr_e( $attr_id ); ?>"
+    <select class="form-control-sm <?=$classes?>" id="<?php esc_attr_e( $attr_id ); ?>"
             name="<?php esc_attr_e( $attr_name ); ?>" autocomplete="off" style="<?php esc_attr_e( $attr_width ); ?>">
 
         <?php foreach ($groups as $group => $options) :?>
@@ -80,7 +80,29 @@ function renderGroupSelectInput( &$event, $key, $groups, $full_width = false ) {
 
     <?php
 }
+/**
+ * @param CustomEvent $event
+ * @param string      $key
+ */
+function renderGoogleAnalyticsMergedActionInput( &$event, $key ) {
+    renderGroupSelectInput( $event, $key, $event->GAEvents, false,'action_merged_g4' );
+}
+function renderMergedGAParamInput( $key, $val ) {
 
+    $attr_name = "pys[event][ga_ads_params][$key]";
+    $attr_id = 'pys_event_ga_ads_' . $key;
+    $attr_value = $val;
+
+    ?>
+
+    <input type="text" name="<?php esc_attr_e( $attr_name ); ?>"
+           id="<?php esc_attr_e( $attr_id ); ?>"
+           value="<?php esc_attr_e( $attr_value ); ?>"
+           class="form-control">
+
+    <?php
+
+}
 /**
  * @param CustomEvent $event
  * @param string      $key

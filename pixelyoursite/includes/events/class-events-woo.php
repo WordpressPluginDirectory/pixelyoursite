@@ -318,7 +318,8 @@ class EventsWoo extends EventsFactory {
     }
 
     private function getWooOrderActiveCategories($orderId,$activeIds) {
-        $order = new \WC_Order( $orderId );
+        $order    = wc_get_order( $orderId );
+        if(!$order) return false;
 
         $fireForCategory = array();
         foreach ($order->get_items() as $item) {

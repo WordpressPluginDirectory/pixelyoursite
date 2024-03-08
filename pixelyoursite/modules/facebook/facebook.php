@@ -822,7 +822,8 @@ class Facebook extends Settings implements Pixel {
             $order_id = (int) wc_get_order_id_by_order_key( $order_key );
             set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
         }
-        $order    = new \WC_Order( $order_id );
+        $order    = wc_get_order( $order_id );
+        if(!$order) return false;
         
         $content_ids        = array();
         $content_names      = array();

@@ -1,17 +1,17 @@
-===PixelYourSite - Your smart PIXEL (TAG) Manager===
+===PixelYourSite - Your smart PIXEL (TAG) & API Manager===
 Contributors: PixelYourSite
 Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent Mode V2
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.4
-Stable tag: 9.5.1.1
+Stable tag: 9.5.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Add your Meta Pixel (old Facebook Pixel) with Conversion API events, Google Analytics (GA4) with Consent Mode support, and ANY script (Head & Footer).
 
 == Description ==
-**Manage your Meta Pixel (Facebook Pixel), implement Facebook Conversion API, add your Google Analytics 4 (GA4) or an old Universal property with a single plugin. Add ANY other script (Head & Footer feature). The Pinterest Tag can be implemented via [paid add-on](https://www.pixelyoursite.com/pinterest-tag).**
+**Manage your Meta Pixel (Facebook Pixel), implement Facebook Conversion API, or add your Google Analytics 4 (GA4) with a single plugin. Add ANY other script (Head & Footer feature). The Pinterest Tag can be implemented via [paid add-on](https://www.pixelyoursite.com/pinterest-tag).**
 
 PixelYourSite's Automatic Events will track important actions and send them to all your configured pixels (searches, form submit, comments, downloads). Use these events to understand your visitors' behaviour inside Google Analytics, or to create audiences and conversions for Meta (Facebook), or Google.
 
@@ -469,6 +469,16 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.5.2 =
+
+* Automated events parameters for Google tags were updated to match the data sent to the other type of tags. These parameters can be used to create custom dimensions.
+
+* Fixing a possible issue on WooCommerce order confirmation pages for non-existing order IDs.
+
+* Fixing a possible issue related to importing Google custom events configured with the free plugin when the pro version is installed.
+
+* Video links updated.
 
 = PixelYourSite 9.5.1.1 =
 
