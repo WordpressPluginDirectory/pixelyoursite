@@ -200,17 +200,14 @@ final class PYS extends Settings implements Plugin {
             $integration->setCodeOptOut('');
         }
     }
+
     function controllSessionStart(){
-        $sessionPath = session_save_path();
+        if(PYS()->getOption('session_disable')) return;
 
         // Checking if the directory exists and is writable
-        if (!file_exists($sessionPath) || !is_writable($sessionPath)) {
-            // If the directory does not exist or is not writable, stop executing the function
-            return;
-        }
         if (!is_admin() && php_sapi_name() !== 'cli' && session_status() != PHP_SESSION_DISABLED) {
             if (!headers_sent() && session_status() == PHP_SESSION_NONE) {
-                session_start();
+                if(!session_start()) return;
             }
             if (empty($_SESSION['TrafficSource'])) {
                 $_SESSION['TrafficSource'] = getTrafficSource();
@@ -238,58 +235,20 @@ final class PYS extends Settings implements Plugin {
         else return false;
 
     }
-    public function set_pbid()
-    {
-        $pbidCookieName = 'pbid';
-        $encryptedUniqueId = false;
-        $externalIdExpire = PYS()->getOption("external_id_expire");
-        $isTrackExternalId = EventsManager::isTrackExternalId();
 
-        if (!$isTrackExternalId) {
-            if (isset($_COOKIE[$pbidCookieName])) {
-                setcookie($pbidCookieName, '', time() - 3600, '/');
-            }
-        }
-        if ((!isset($_COOKIE[$pbidCookieName]) || empty($_COOKIE[$pbidCookieName])) && $isTrackExternalId) {
-            $uniqueId = bin2hex(random_bytes(16));
-            $encryptedUniqueId = hash('sha256', $uniqueId);
-
-        }
-
-        ob_start();
-        ?>
-        <script id="set-pbid-for-pys">
-            function pys_get_pbid(name) {
-                var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-                return v ? v[2] : null;
-            }
-            function pys_set_pbid(name, value, days) {
-                var d = new Date;
-                d.setTime(d.getTime() + 24*60*60*1000*days);
-                document.cookie = name + "=" + value + ";path=/;expires=" + d.toGMTString();
-            }
-            var name = 'pbid';
-            var pbidHash = "<?=$encryptedUniqueId?>";
-
-            if(pys_get_pbid(name) != pbidHash || pys_get_pbid(name) == '') { // prevent re send event if user update page
-                pys_set_pbid(name,pbidHash,<?=$externalIdExpire?>)
-            }
-        </script>
-        <?php
-
-
-        ob_end_flush();
-    }
     public function get_pbid_ajax(){
         if(defined('DOING_AJAX') && wp_doing_ajax()){
             $pbidCookieName = 'pbid';
             $isTrackExternalId = EventsManager::isTrackExternalId();
 
 
-            if (!isset($_COOKIE[$pbidCookieName]) && $isTrackExternalId) {
+            if (empty($_COOKIE[$pbidCookieName]) && $isTrackExternalId) {
                 $uniqueId = bin2hex(random_bytes(16));
                 $encryptedUniqueId = hash('sha256', $uniqueId);
                 wp_send_json_success( array('pbid'=>$encryptedUniqueId));
+            }
+            elseif(!empty($_COOKIE[$pbidCookieName]) && $isTrackExternalId){
+                wp_send_json_success( array('pbid'=>$_COOKIE[$pbidCookieName]));
             }
         }
     }

@@ -168,7 +168,7 @@ class EventsManager {
 
 		$options[ 'tracking_analytics' ] = array(
 			"TrafficSource"  => getTrafficSource(),
-			"TrafficLanding" => $_COOKIE[ 'pys_landing_page' ] ?? $_SESSION[ 'LandingPage' ],
+			"TrafficLanding" => $_COOKIE[ 'pys_landing_page' ] ?? $_SESSION[ 'LandingPage' ] ?? 'undefined',
 			"TrafficUtms"    => getUtms(),
 			"TrafficUtmsId"  => getUtmsId(),
 		);
@@ -225,7 +225,7 @@ class EventsManager {
 
 		// initial event
 		$initEvent = new SingleEvent('init_event',EventTypes::$STATIC,'');
-		if(get_post_type() == "post") {
+		if(get_post_type() == "post" && !is_archive()) {
 			global $post;
 			$catIds = wp_get_object_terms( $post->ID, 'category', array( 'fields' => 'names' ) );
 			$initEvent->addParams([

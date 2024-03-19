@@ -321,16 +321,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                         How to configure Custom Conversions on Meta (Facebook) based on Events & Parameters (11:03) - watch now
                     </a>
                 </p>
-
+              
                 <p><a href="https://www.youtube.com/watch?v=snUKcsTbvCk" target="_blank">Improve META (Facebook) EMQ score
                         with form automatic data detection (11:48) - watch now</a></p>
                 <p><a href="https://www.youtube.com/watch?v=X65h4uhsMJY" target="_blank">
                         Track ANY WordPress Form - Meta, Google, Pinterest, Bing (3:52) - watch video</a></p>
                 <p><a href="https://www.youtube.com/watch?v=c4Hrb8WK5bw" target="_blank">
                         Fire a LEAD event on form submit - WordPress & PixelYourSite (5:58) - watch video</a></p>
-                <p><a href="https://www.youtube.com/watch?v=gRl5g-8zTGA" target="_blank">
-                        Google Analytics: View PixelYourSite' Events Parameters with Custom Dimensions (10:44) - watch video</a></p>
-
             </div>
         </div>
         <div class="row">
@@ -980,7 +977,16 @@ if ( ! defined( 'ABSPATH' ) ) {
                 browser console (developer tools).</h4>
         </div>
     </div>
+    <div class="row mb-3">
+        <div class="col">
+            <div class="form-inline">
+                <?php PYS()->render_switcher_input('session_disable'); ?>
+                <h4 class="switcher-label">Disable PHP sessions</h4>
+            </div>
 
+            <small class="mt-1">If you are having problems with sessions or cache when the plugin is enabled due to the creation of the PHPSESSID cookie, disable this option. This may reduce the effectiveness of some of our session-based parameters, such as landing page, traffic source, or UTM.</small>
+        </div>
+    </div>
     <div class="row mb-3">
         <div class="col">
             <?php PYS()->render_switcher_input( 'enable_remove_source_url_params' ); ?>

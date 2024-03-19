@@ -10,6 +10,7 @@
   "cookie_duration": 7,
   "last_visit_duration": 60,
   "debug_enabled": false,
+  "session_disable": true,
   "do_not_track_user_roles": [],
   "admin_permissions": [
     "administrator"

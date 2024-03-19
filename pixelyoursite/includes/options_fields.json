@@ -10,6 +10,7 @@
   "cookie_duration": "number",
   "last_visit_duration": "number",
   "debug_enabled": "checkbox",
+  "session_disable": "checkbox",
   "do_not_track_user_roles": "multi_select",
   "admin_permissions": "multi_select",
 

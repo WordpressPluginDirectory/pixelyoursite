@@ -1116,6 +1116,9 @@ function getStandardParams() {
             $params['page_title'] = $term->name;
         }
 
+    }elseif(is_archive()){
+        $params['page_title'] = get_the_archive_title();
+        $params['post_type'] = 'archive';
     } elseif ((isWooCommerceActive() && $cpt == 'product') ||
         (isEddActive() && $cpt == 'download') ) {
         $params['page_title'] = $post->post_title;
