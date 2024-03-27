@@ -484,7 +484,71 @@ if (!Array.prototype.includes) {
                     Cookies.set('pys_session_limit', true,{ expires: now })
                     Cookies.set('pys_start_session', true);
                 }
+                if (options.gdpr.ajax_enabled && !options.gdpr.consent_magic_integration_enabled) {
 
+                    // retrieves actual PYS GDPR filters values which allow to avoid cache issues
+                    $.get({
+                        url: options.ajaxUrl,
+                        dataType: 'json',
+                        data: {
+                            action: 'pys_get_gdpr_filters_values'
+                        },
+                        success: function (res) {
+
+                            if (res.success) {
+
+                                options.gdpr.all_disabled_by_api = res.data.all_disabled_by_api;
+                                options.gdpr.facebook_disabled_by_api = res.data.facebook_disabled_by_api;
+                                options.gdpr.tiktok_disabled_by_api = res.data.tiktok_disabled_by_api;
+                                options.gdpr.analytics_disabled_by_api = res.data.analytics_disabled_by_api;
+                                options.gdpr.google_ads_disabled_by_api = res.data.google_ads_disabled_by_api;
+                                options.gdpr.pinterest_disabled_by_api = res.data.pinterest_disabled_by_api;
+                                options.gdpr.bing_disabled_by_api = res.data.bing_disabled_by_api;
+
+                                options.cookie.externalID_disabled_by_api = res.data.externalID_disabled_by_api;
+                                options.cookie.disabled_all_cookie = res.data.disabled_all_cookie;
+                                options.cookie.disabled_advanced_form_data_cookie = res.data.disabled_advanced_form_data_cookie;
+                                options.cookie.disabled_landing_page_cookie = res.data.disabled_landing_page_cookie;
+                                options.cookie.disabled_first_visit_cookie = res.data.disabled_first_visit_cookie;
+                                options.cookie.disabled_trafficsource_cookie = res.data.disabled_trafficsource_cookie;
+                                options.cookie.disabled_utmTerms_cookie = res.data.disabled_utmTerms_cookie;
+                                options.cookie.disabled_utmId_cookie = res.data.disabled_utmId_cookie;
+
+                            }
+                        }
+                    });
+                }
+                if (options.ajaxForServerEvent && !Cookies.get('pbid')) {
+                    if(Facebook.advancedMatching() && Facebook.advancedMatching().external_id && !(options.cookie.disabled_all_cookie || options.cookie.externalID_disabled_by_api)){
+                        let expires = parseInt(options.external_id_expire || 180);
+                        Cookies.set('pbid', Facebook.advancedMatching().external_id, { expires: expires, path: '/' });
+                    }
+                    else{
+                        jQuery.ajax({
+                            url: options.ajaxUrl,
+                            dataType: 'json',
+                            data: {
+                                action: 'pys_get_pbid'
+                            },
+                            success: function (res) {
+                                if (res.data && res.data.pbid != false && options.send_external_id) {
+                                    if(!(options.cookie.disabled_all_cookie || options.cookie.externalID_disabled_by_api)){
+                                        var expires = parseInt(options.external_id_expire || 180);
+                                        Cookies.set('pbid', res.data.pbid, { expires: expires, path: '/' });
+                                    }
+
+                                    if(options.hasOwnProperty('facebook')) {
+                                        options.facebook.advancedMatching = {
+                                            ...options.facebook.advancedMatching,  // распыляем текущие значения advancedMatching
+                                            external_id: res.data.pbid
+                                        };
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                }
                 let expires = parseInt(options.cookie_duration); //  days
                 let queryVars = getQueryVars();
                 let landing = window.location.href.split('?')[0];
@@ -949,71 +1013,43 @@ if (!Array.prototype.includes) {
                 /**
                  * ConsentMagic
                  */
-                if (options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined" ) {
+                if ( options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined" ) {
 
                     var test_prefix = CS_Data.test_prefix;
-                    if ((typeof CS_Data.cs_google_consent_mode_enabled !== "undefined" && CS_Data.cs_google_consent_mode_enabled == 1) && ( pixel == 'analytics' || pixel == 'google_ads' ) ) {
-                        return true;
+                    if ( ( typeof CS_Data.cs_google_consent_mode_enabled !== "undefined" && CS_Data.cs_google_consent_mode_enabled == 1 ) && ( pixel == 'analytics' || pixel == 'google_ads' ) ) {
+                        if ( CS_Data.cs_cache_enabled == 0 || ( CS_Data.cs_cache_enabled == 1 && window.CS_Cache && window.CS_Cache.check_status ) ) {
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
 
-                    if ( CS_Data.cs_cache_enabled == 1 ) {
-                        var substring = "cs_enabled_cookie_term";
-                        var theCookies = document.cookie.split(';');
+                    var substring = "cs_enabled_cookie_term";
+                    var theCookies = document.cookie.split( ';' );
 
-                        for (var i = 1 ; i <= theCookies.length; i++) {
-                            if ( theCookies[ i - 1 ].indexOf( substring ) !== -1 ) {
-                                var categoryCookie = theCookies[ i - 1 ].replace( 'cs_enabled_cookie_term' + test_prefix + '_', '' );
-                                categoryCookie = Number( categoryCookie.replace( /\D+/g, "" ) );
-                                var cs_cookie_val = Cookies.get( 'cs_enabled_cookie_term' + test_prefix + '_' + categoryCookie );
+                    for ( var i = 1; i <= theCookies.length; i++ ) {
+                        if ( theCookies[ i - 1 ].indexOf( substring ) !== -1 ) {
+                            var categoryCookie = theCookies[ i - 1 ].replace( 'cs_enabled_cookie_term' + test_prefix + '_', '' );
+                            categoryCookie = Number( categoryCookie.replace( /\D+/g, "" ) );
+                            var cs_cookie_val = Cookies.get( 'cs_enabled_cookie_term' + test_prefix + '_' + categoryCookie );
 
-                                if ( categoryCookie === CS_Data.cs_script_cat.facebook && pixel == 'facebook' ) {
-                                    if ( cs_cookie_val == 'yes' ) {
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
-                                } else if ( categoryCookie === CS_Data.cs_script_cat.bing && pixel == 'bing' ) {
-                                    if ( cs_cookie_val == 'yes' ) {
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
-                                } else if ( categoryCookie === CS_Data.cs_script_cat.analytics && pixel == 'analytics' ) {
-                                    if ( cs_cookie_val == 'yes' ) {
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
-                                } else if ( categoryCookie === CS_Data.cs_script_cat.gads && pixel == 'google_ads' ) {
-                                    if ( cs_cookie_val == 'yes' ) {
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
-                                } else if ( categoryCookie === CS_Data.cs_script_cat.pinterest && pixel == 'pinterest' ) {
-                                    if ( cs_cookie_val == 'yes' ) {
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
-                                } else if ( categoryCookie === CS_Data.cs_script_cat.tiktok && pixel == 'tiktok' ) {
-                                    if ( cs_cookie_val == 'yes' ) {
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
-                                }
+                            if ( categoryCookie === CS_Data.cs_script_cat.facebook && pixel == 'facebook' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.bing && pixel == 'bing' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.analytics && pixel == 'analytics' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.gads && pixel == 'google_ads' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.pinterest && pixel == 'pinterest' ) {
+                                return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat.tiktok && pixel == 'tiktok' ) {
+                                return cs_cookie_val == 'yes';
                             }
-                        }
-                    } else {
-                        var cs_cookie = Cookies.get('cs_viewed_cookie_policy'+test_prefix);
-                        if (typeof cs_cookie === 'undefined' || cs_cookie === 'yes') {
-                            return true;
                         }
                     }
 
                     return false;
-
                 }
 
                 /**
@@ -1420,6 +1456,12 @@ if (!Array.prototype.includes) {
         ];
 
         var initialized = false;
+        var genereateFbp = function (){
+                return !Cookies.get('_fbp') ? 'fb.1.'+Date.now()+'.'+Math.floor(1000000000 + Math.random() * 9000000000) : Cookies.get('_fbp');
+            };
+        var genereateFbc = function (){
+            return getUrlParameter('fbclid') ? 'fb.1.'+Date.now()+'.'+getUrlParameter('fbclid') : ''
+        };
 
         // fire server side event gdpr plugin installed
         var isApiDisabled = options.gdpr.all_disabled_by_api ||
@@ -1468,8 +1510,7 @@ if (!Array.prototype.includes) {
 
                         if(name == 'PageView') {
                             let expires = parseInt(options.cookie_duration);
-                            var currentTimeInSeconds=Date.now();
-                            var randomNum = Math.floor(1000000000 + Math.random() * 9000000000);
+
                             timeoutDelay = 0;
                             if(allData.delay > 0)
                             {
@@ -1486,11 +1527,13 @@ if (!Array.prototype.includes) {
                             setTimeout(function(){
                                 if(!Cookies.get('_fbp'))
                                 {
-                                    Cookies.set('_fbp','fb.1.'+currentTimeInSeconds+'.'+randomNum,  { expires: expires })
+                                    Cookies.set('_fbp',genereateFbp(),  { expires: expires });
+                                    json['data']['_fbp'] = genereateFbp();
                                 }
                                 if(getUrlParameter('fbclid') && !Cookies.get('_fbc'))
                                 {
-                                    Cookies.set('_fbc', 'fb.1.'+currentTimeInSeconds+'.'+getUrlParameter('fbclid'),  { expires: expires })
+                                    Cookies.set('_fbc', genereateFbc(),  { expires: expires });
+                                    json['data']['_fbc'] = genereateFbc();
                                 }
                                 jQuery.ajax( {
                                     type: 'POST',
@@ -1549,8 +1592,12 @@ if (!Array.prototype.includes) {
             if(eventId != null) {
                 arg.eventID = eventId;
             }
-
-            fbq(actionType, name, params,arg);
+            if(name == 'PageView'){
+                fbq(actionType, name, data, arg);
+            }
+            else{
+                fbq(actionType, name, params, arg);
+            }
         }
 
         /**
@@ -2810,7 +2857,7 @@ if (pysOptions.gdpr.cookie_law_info_integration_enabled) {
     }
 }
 
-if (pysOptions.ajaxForServerEvent && !Cookies.get('pbid') && !(pysOptions.cookie.disabled_all_cookie || pysOptions.cookie.externalID_disabled_by_api || disabled_GDRP_plugin)) {
+if (pysOptions.ajaxForServerEvent && !Cookies.get('pbid')) {
     jQuery.ajax({
         url: pysOptions.ajaxUrl,
         dataType: 'json',
@@ -2819,10 +2866,16 @@ if (pysOptions.ajaxForServerEvent && !Cookies.get('pbid') && !(pysOptions.cookie
         },
         success: function (res) {
             if (res.data && res.data.pbid != false && pysOptions.send_external_id) {
-                var expires = parseInt(pysOptions.external_id_expire || 180);
-                Cookies.set('pbid', res.data.pbid, { expires: expires, path: '/' });
+                if(!(pysOptions.cookie.disabled_all_cookie || pysOptions.cookie.externalID_disabled_by_api || disabled_GDRP_plugin)){
+                    var expires = parseInt(pysOptions.external_id_expire || 180);
+                    Cookies.set('pbid', res.data.pbid, { expires: expires, path: '/' });
+                }
+
                 if(pysOptions.hasOwnProperty('facebook')) {
-                    pysOptions.facebook.advancedMatching.external_id = res.data.pbid;
+                    pysOptions.facebook.advancedMatching = {
+                        ...pysOptions.facebook.advancedMatching,  // распыляем текущие значения advancedMatching
+                        external_id: res.data.pbid
+                    };
                 }
             }
         }

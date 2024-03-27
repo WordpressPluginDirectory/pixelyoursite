@@ -3,8 +3,8 @@ Contributors: PixelYourSite
 Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent Mode V2
 Requires at least: 3.0.1
 Requires PHP: 5.4
-Tested up to: 6.4
-Stable tag: 9.5.3
+Tested up to: 6.5
+Stable tag: 9.5.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -21,9 +21,9 @@ Google Consent Mode V2 support: [check this dedicated page for more details](htt
 
 **WooCommerce** and **Easy Digital Downloads** are fully supported, with Facebook Dynamic Ads pixel setup and Google Analytics Enhanced Ecommerce.
 
-Take a look at this video to see Facebook Conversion API in action:
+We have a YouTube channel called PixelYourSite where we explain a lot of stuff about the plugin, Meta API, Google Analytics, Google Ads, TikTok and so on. Check this one about Meta CAPI warnings: 
 
-[youtube https://www.youtube.com/watch?v=k_bL53qDE0E]
+[youtube https://www.youtube.com/watch?v=a30gmKty1v0]
 
 IMPORTANT:: Facebook Pixel Conversion API: [Learn how to enable and test Conversion API events](https://www.pixelyoursite.com/facebook-conversion-api-capi)
 
@@ -469,6 +469,15 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.5.4 =
+
+* Improvements in how we track Meta Conversion API fbc parameters. 
+
+* Changes regarding ConsentMagic cache option. 
+
+* WooCommerce 8.7 compatibility. 
+
 
 = PixelYourSite 9.5.3 =
 

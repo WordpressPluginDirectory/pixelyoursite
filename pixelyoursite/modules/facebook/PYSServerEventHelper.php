@@ -36,8 +36,8 @@ class ServerEventHelper {
             ->setClientUserAgent(self::getHttpUserAgent());
 
 
-        $fbp = self::getFbp();
-        $fbc = self::getFbc();
+        $fbp = self::getFbp() ?? $eventParams['_fbp'] ?? '';
+        $fbc = self::getFbc() ?? $eventParams['_fbc'] ?? '';
 
         if(!$fbp && $wooOrder) {
             $fbp = ServerEventHelper::getFbStatFromOrder('fbp',$wooOrder);
