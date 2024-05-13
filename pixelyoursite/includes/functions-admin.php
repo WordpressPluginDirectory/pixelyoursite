@@ -248,13 +248,13 @@ function adminRenderNotices() {
     {
         $meta_key = 'pys_notice_dont_CAPI_start_delay';
         $user_id = get_current_user_id();
-        $start_delay = get_user_meta( $user_id, $meta_key );
+        $start_delay = get_option( $meta_key ) ?? get_user_meta( $user_id, $meta_key );
         $day_ago = time() - DAY_IN_SECONDS;
         if($start_delay && $start_delay > $day_ago) {
             adminRenderNotCAPI(PYS());
         }
         else if(!$start_delay){
-            update_user_meta($user_id, $meta_key, time());
+            update_option($meta_key, time());
         }
 
     }
@@ -391,7 +391,7 @@ function adminRenderLicenseExpirationNotice( $plugin ) {
 
     // show only if never dismissed or dismissed more than a week ago
     $meta_key = 'pys_' . $slug . '_expiration_notice_dismissed_at';
-    $dismissed_at = get_user_meta( $user_id, $meta_key );
+    $dismissed_at = get_option($meta_key) ?? get_user_meta( $user_id, $meta_key );
     if ( $dismissed_at ) {
 
         if ( is_array( $dismissed_at ) ) {
@@ -451,8 +451,7 @@ function adminNoticeDismissHandler() {
 
     // save time when notice was dismissed
     $meta_key = 'pys_' . sanitize_text_field( $_REQUEST['addon_slug'] ) . '_' . sanitize_text_field( $_REQUEST['meta_key'] ) . '_dismissed_at';
-    $userId = sanitize_text_field( $_REQUEST['user_id'] );
-    update_user_meta($userId, $meta_key, time() );
+    update_option( $meta_key, time() );
 
 }
 
@@ -463,7 +462,7 @@ function adminRenderNotCAPI( $plugin ) {
 
     // show only if never dismissed or dismissed more than a week ago
     $meta_key = 'pys_' . $slug . '_CAPI_notice_dismissed_at';
-    $dismissed_at = get_user_meta( $user_id, $meta_key );
+    $dismissed_at = get_option( $meta_key ) ?? get_user_meta( $user_id, $meta_key );
     if ( $dismissed_at ) {
 
         if ( is_array( $dismissed_at ) ) {
@@ -529,7 +528,7 @@ function adminNoticeCAPIDismissHandler() {
 
     // save time when notice was dismissed
     $meta_key = 'pys_' . sanitize_text_field( $_REQUEST['addon_slug'] ) . '_' . sanitize_text_field( $_REQUEST['meta_key'] ) . '_dismissed_at';
-    update_user_meta( sanitize_text_field($_REQUEST['user_id']), $meta_key, time() );
+    update_option( $meta_key, time() );
     die();
 }
 
@@ -574,7 +573,7 @@ function adminRenderNoPixelsNotice() {
 
     // do not show dismissed notice
     $meta_key = 'pys_core_no_pixels_dismissed_at';
-    $dismissed_at = get_user_meta( $user_id, $meta_key );
+    $dismissed_at = get_option( $meta_key ) ?? get_user_meta( $user_id, $meta_key );
     if ( $dismissed_at ) {
         return;
     }
@@ -615,7 +614,7 @@ function adminRenderNotSupportUA( $show = false) {
 
     // show only if never dismissed or dismissed more than a week ago
     $meta_key = 'pys_ga_UA_notice_dismissed_at';
-    $dismissed_at = get_user_meta( $user_id, $meta_key );
+    $dismissed_at = get_option( $meta_key ) ?? get_user_meta( $user_id, $meta_key );
     $week_ago = time() - WEEK_IN_SECONDS;
     if ( $dismissed_at && is_array( $dismissed_at ) ) {
         $dismissed_at = reset( $dismissed_at );
@@ -662,7 +661,7 @@ function adminNoticeUADismissHandler() {
 
     // save time when notice was dismissed
     $meta_key = 'pys_' . sanitize_text_field( $_REQUEST['addon_slug'] ) . '_' . sanitize_text_field( $_REQUEST['meta_key'] ) . '_dismissed_at';
-    update_user_meta( sanitize_text_field($_REQUEST['user_id']), $meta_key, time() );
+    update_option( $meta_key, time() );
     die();
 }
 
@@ -681,7 +680,7 @@ function adminRenderNoPixelNotice( $plugin ) {
 
     // do not show dismissed notice
     $meta_key = 'pys_' . $slug . '_no_pixel_dismissed_at';
-    $dismissed_at = get_user_meta( $user_id, $meta_key );
+    $dismissed_at = get_option( $meta_key ) ?? get_user_meta( $user_id, $meta_key );
     if ( $dismissed_at ) {
         return;
     }

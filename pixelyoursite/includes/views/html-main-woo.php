@@ -291,18 +291,18 @@ use PixelYourSite\Facebook\Helpers;
 
 <?php endif; ?>
 
-<?php if ( GA()->enabled() ) : ?>
+<?php if ( GATags()->enabled() ) : ?>
 
-    <div class="card " id="pys-section-ga-id">
+    <div class="card" id="pys-section-ga-id">
         <div class="card-header">
-            Google Analytics ID setting<?php cardCollapseBtn(); ?>
+            Google Tags ID settings <?php cardCollapseBtn(); ?>
         </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col">
-                    <?php GA()->render_switcher_input( 'woo_variable_as_simple' ); ?>
+                    <?php GATags()->render_switcher_input( 'woo_variable_as_simple' ); ?>
                     <h4 class="switcher-label">Treat variable products like simple products</h4>
-                    <p class="mt-3">If you enable this option, the main ID will be used instead of the variation ID. Turn this option ON when your Product Catalog doesn't include the variants for variable products.</p>
+                    <p class="mt-3">If you enable this option, the main ID will be used instead of the variation ID. Turn this option ON when your Merchant Catalog doesn't include the variants for variable products.</p>
                 </div>
             </div>
             <div class="row mb-3">
@@ -313,13 +313,13 @@ use PixelYourSite\Facebook\Helpers;
             </div>
             <div class="row mb-3">
                 <div class="col-12">
-                    <?php GA()->render_checkbox_input( 'woo_variations_use_parent_name', "When tracking variations, use the parent name" ); ?>
+                    <?php GATags()->render_checkbox_input( 'woo_variations_use_parent_name', "When tracking variations, use the parent name" ); ?>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col col-offset-left form-inline">
-                    <label>ecomm_prodid</label>
-                    <?php GA()->render_select_input( 'woo_content_id',
+                    <label>id</label>
+                    <?php GATags()->render_select_input( 'woo_content_id',
                         array(
                             'product_id' => 'Product ID',
                             'product_sku'   => 'Product SKU',
@@ -329,27 +329,18 @@ use PixelYourSite\Facebook\Helpers;
             </div>
             <div class="row mb-3">
                 <div class="col col-offset-left form-inline">
-                    <label>ecomm_prodid prefix</label><?php GA()->render_text_input( 'woo_content_id_prefix', '(optional)' ); ?>
+                    <label>id prefix</label><?php GATags()->render_text_input( 'woo_content_id_prefix', '(optional)' ); ?>
                 </div>
             </div>
             <div class="row">
                 <div class="col col-offset-left form-inline">
-                    <label>ecomm_prodid suffix</label><?php GA()->render_text_input( 'woo_content_id_suffix', '(optional)' ); ?>
+                    <label>id suffix</label><?php GATags()->render_text_input( 'woo_content_id_suffix', '(optional)' ); ?>
                 </div>
             </div>
         </div>
     </div>
 <?php endif; ?>
 
-
-<!-- Google Ads Settings -->
-<div class="card card-disabled">
-    <div class="card-header">
-        Google Ads ID Setting <?php renderProBadge( 'https://www.pixelyoursite.com/google-analytics?utm_source=pys-free-plugin&utm_medium=pro-badg
-e&utm_campaign=pro-feature' ); ?>
-    </div>
-
-</div>
 
 <?php if ( Pinterest()->enabled() ) : ?>
 

@@ -176,17 +176,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <?php endif; ?>
 
-<?php if ( GA()->enabled() ) : ?>
+<?php if ( GATags()->enabled() ) : ?>
 
     <div class="card" id="pys-section-ga-id">
         <div class="card-header">
-            Google Analytics ID setting<?php cardCollapseBtn(); ?>
+            Google Tags ID settings <?php cardCollapseBtn(); ?>
         </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col col-offset-left form-inline">
                     <label>ecomm_prodid</label>
-                    <?php GA()->render_select_input( 'edd_content_id',
+                    <?php GATags()->render_select_input( 'edd_content_id',
                         array(
                             'download_id' => 'Download ID',
                             'download_sku'   => 'Download SKU',
@@ -196,27 +196,17 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="row mb-3">
                 <div class="col col-offset-left form-inline">
-                    <label>ecomm_prodid prefix</label><?php GA()->render_text_input( 'edd_content_id_prefix', '(optional)' ); ?>
+                    <label>ecomm_prodid prefix</label><?php GATags()->render_text_input( 'edd_content_id_prefix', '(optional)' ); ?>
                 </div>
             </div>
             <div class="row">
                 <div class="col col-offset-left form-inline">
-                    <label>ecomm_prodid suffix</label><?php GA()->render_text_input( 'edd_content_id_suffix', '(optional)' ); ?>
+                    <label>ecomm_prodid suffix</label><?php GATags()->render_text_input( 'edd_content_id_suffix', '(optional)' ); ?>
                 </div>
             </div>
         </div>
     </div>
 <?php endif; ?>
-
-
-    <div class="card card-static card-disabled">
-        <div class="card-header">
-            Google Ads ID Settings
-            <?php renderProBadge( 'https://www.pixelyoursite.com/google-analytics?utm_source=pys-free-plugin&utm_medium=pro-badg
-e&utm_campaign=pro-feature' ); ?>
-        </div>
-
-    </div>
 
 
 <?php if ( Pinterest()->enabled() ) : ?>

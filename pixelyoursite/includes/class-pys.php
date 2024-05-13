@@ -23,7 +23,7 @@ final class PYS extends Settings implements Plugin {
     private $registeredPlugins = array();
 
     private $adminPagesSlugs = array();
-
+    private $externalId;
     /**
      * @var PYS_Logger
      */
@@ -57,6 +57,7 @@ final class PYS extends Settings implements Plugin {
 
 	    // Priority 9 used to keep things same as on PRO version
         add_action( 'wp', array( $this, 'controllSessionStart'), 10);
+        add_action( 'init', array( $this, 'set_pbid'), 8);
         add_action( 'init', array( $this, 'init' ), 9 );
         add_action( 'init', array( $this, 'afterInit' ), 11 );
 
@@ -228,27 +229,28 @@ final class PYS extends Settings implements Plugin {
     }
 
     function get_pbid(){
+        return $this->externalId;
+    }
+    function set_pbid(){
         $pbidCookieName = 'pbid';
-        if (isset($_COOKIE[$pbidCookieName])) {
-            return $_COOKIE[$pbidCookieName];
-        }
-        else return false;
+        $isTrackExternalId = EventsManager::isTrackExternalId();
 
+
+        if (empty($_COOKIE[$pbidCookieName]) && $isTrackExternalId) {
+            $uniqueId = bin2hex(random_bytes(16));
+            $encryptedUniqueId = hash('sha256', $uniqueId);
+            $this->externalId = $encryptedUniqueId;
+        }
+        elseif(!empty($_COOKIE[$pbidCookieName]) && $isTrackExternalId){
+            $this->externalId = $_COOKIE[$pbidCookieName];
+        }
     }
 
     public function get_pbid_ajax(){
         if(defined('DOING_AJAX') && wp_doing_ajax()){
-            $pbidCookieName = 'pbid';
             $isTrackExternalId = EventsManager::isTrackExternalId();
-
-
-            if (empty($_COOKIE[$pbidCookieName]) && $isTrackExternalId) {
-                $uniqueId = bin2hex(random_bytes(16));
-                $encryptedUniqueId = hash('sha256', $uniqueId);
-                wp_send_json_success( array('pbid'=>$encryptedUniqueId));
-            }
-            elseif(!empty($_COOKIE[$pbidCookieName]) && $isTrackExternalId){
-                wp_send_json_success( array('pbid'=>$_COOKIE[$pbidCookieName]));
+            if ($isTrackExternalId && !empty($this->externalId)) {
+                wp_send_json_success( array('pbid'=> $this->externalId));
             }
         }
     }
@@ -299,7 +301,7 @@ final class PYS extends Settings implements Plugin {
 		    $this->addOption( 'general_event_on_' . $post_type->name . '_enabled', 'checkbox', false );
 
 	    }
-	    
+
 	    maybeMigrate();
 
     }
@@ -484,7 +486,8 @@ final class PYS extends Settings implements Plugin {
                 'oBot', 'C-T bot', 'Updownerbot', 'Snoopy', 'heritrix', 'Yeti',
                 'DomainVader', 'DCPbot', 'PaperLiBot', 'APIs-Google', 'AdsBot-Google-Mobile',
                 'AdsBot-Google-Mobile', 'AdsBot-Google-Mobile-Apps', 'FeedFetcher-Google',
-                'Google-Read-Aloud', 'DuplexWeb-Google', 'Storebot-Google', 'lscache_runner'
+                'Google-Read-Aloud', 'DuplexWeb-Google', 'Storebot-Google', 'lscache_runner',
+                'ClaudeBot', 'SeekportBot'
             );
 
             foreach($options as $row) {
@@ -813,7 +816,7 @@ final class PYS extends Settings implements Plugin {
 	        	/** @var Plugin|Pixel|Settings $obj */
 		        $obj->updateOptions();
 	        }
-
+            GATags()->updateOptions();
 	        purgeCache();
 
         }

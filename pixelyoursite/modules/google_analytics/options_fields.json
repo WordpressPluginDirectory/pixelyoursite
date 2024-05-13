@@ -1,6 +1,7 @@
 {
   "enabled": "checkbox",
   "is_enable_debug_mode": "array",
+  "server_container_url": "array",
   "tracking_id": "array",
 
   "cross_domain_enabled": "checkbox",

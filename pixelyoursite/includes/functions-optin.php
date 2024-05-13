@@ -17,14 +17,14 @@ function adminRenderOptinNotices() {
     $user_id = $user->ID;
 
     // never show again for opted-in users
-    if ( get_user_meta( $user_id, 'pys_core_opted_in_dismissed_at', true ) ) {
+    if ( get_option( 'pys_core_opted_in_dismissed_at' ) || get_user_meta( $user_id, 'pys_core_opted_in_dismissed_at', true ) ) {
         return;
     }
     
-    $second_time_dismissed_at = get_user_meta( $user_id, 'pys_core_optin_second_time_dismissed_at', true );
-    $first_time_dismissed_at = get_user_meta( $user_id, 'pys_core_optin_first_time_dismissed_at', true );
+    $second_time_dismissed_at = get_option( 'pys_core_optin_second_time_dismissed_at' ) ?? get_user_meta( $user_id, 'pys_core_optin_second_time_dismissed_at', true );
+    $first_time_dismissed_at = get_option( 'pys_core_optin_first_time_dismissed_at' ) ?? get_user_meta( $user_id, 'pys_core_optin_first_time_dismissed_at', true );
     
-    if ( get_user_meta( $user_id, 'pys_core_optin_third_time_dismissed_at', true ) ) {
+    if ( get_option( 'pys_core_optin_third_time_dismissed_at' ) || get_user_meta( $user_id, 'pys_core_optin_third_time_dismissed_at', true ) ) {
         return; // was dismissed 3 times
     } elseif ( $second_time_dismissed_at ) {
         $month_ago = time() - MONTH_IN_SECONDS;

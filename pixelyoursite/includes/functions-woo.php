@@ -88,7 +88,7 @@ function getWooEventCartSubtotal($event) {
     return pys_round($subTotal);
 }
 function getWooCartSubtotal() {
-
+    WC()->cart->calculate_totals();
 	// subtotal is always same value on front-end and depends on PYS options
 	$include_tax = get_option( 'woocommerce_tax_display_cart' ) == 'incl';
 

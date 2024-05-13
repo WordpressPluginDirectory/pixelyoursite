@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function maybeMigrate() {
-	
+
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 		return;
 	}
@@ -17,6 +17,14 @@ function maybeMigrate() {
 	}
 	
 	$pys_free_7_version = get_option( 'pys_core_free_version', false );
+
+    if (!$pys_free_7_version || ($pys_free_7_version && version_compare($pys_free_7_version, '9.5.6', '<'))) {
+
+        migrate_9_5_6();
+
+        update_option( 'pys_core_free_version', PYS_FREE_VERSION );
+        update_option( 'pys_updated_at', time() );
+    }
 
     if (!$pys_free_7_version || ($pys_free_7_version && version_compare($pys_free_7_version, '9.5.1.1', '<') && !get_option( 'pys_custom_event_migrate_free', false )) ) {
         migrate_unify_custom_events();
@@ -43,6 +51,30 @@ function migrate_unify_custom_events(){
         $event->migrateUnifyGA();
     }
     update_option( 'pys_custom_event_migrate_free', true );
+}
+function migrate_9_5_6() {
+    $ga_tags_woo_options = [];
+    $ga_tags_edd_options = [];
+    if(GA()->enabled()){
+        $ga_tags_woo_options = [
+            'woo_variable_as_simple' => GATags()->getOption('woo_variable_as_simple') ?? GA()->getOption('woo_variable_as_simple'),
+            'woo_variations_use_parent_name' => GATags()->getOption('woo_variations_use_parent_name') ?? GA()->getOption('woo_variations_use_parent_name'),
+            'woo_content_id' => GATags()->getOption('woo_content_id') ?? GA()->getOption('woo_content_id'),
+            'woo_content_id_prefix' => GATags()->getOption('woo_content_id_prefix') ?? GA()->getOption('woo_content_id_prefix'),
+            'woo_content_id_suffix' => GATags()->getOption('woo_content_id_suffix') ?? GA()->getOption('woo_content_id_suffix'),
+        ];
+
+        $ga_tags_edd_options = [
+            'edd_content_id' => GATags()->getOption('edd_content_id') ?? GA()->getOption('edd_content_id'),
+            'edd_content_id_prefix' => GATags()->getOption('edd_content_id_prefix') ?? GA()->getOption('edd_content_id_prefix'),
+            'edd_content_id_suffix' => GATags()->getOption('edd_content_id_suffix') ?? GA()->getOption('edd_content_id_suffix'),
+        ];
+    }
+    else{
+        return false;
+    }
+    GATags()->updateOptions($ga_tags_woo_options);
+    GATags()->updateOptions($ga_tags_edd_options);
 }
 function migrate_9_0_0() {
     $globalOptions = [

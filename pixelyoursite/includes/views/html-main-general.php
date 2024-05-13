@@ -206,6 +206,14 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 Generate the API secret inside your Google Analytics account: navigate to <b>Admin > Data Streams > choose your stream > Measurement Protocol API secrets</b>. The Measurement Protocol is used for WooCommerce and Easy Digital Downloads "Google Analytics Advanced Purchase Tracking" and refund tracking. Required for GA4 properties only.
                             </div>
                         </div>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <h4 class="label">Server container url (optional): </h4>
+                                <input type="text" class="custom-control-input"
+                                       name="pys[ga][server_container_url][-1]" value="0" checked/>
+                                <?php GA()->render_text_input_array_item("server_container_url", "https://analytics.example.com", 0); ?>
+                            </div>
+                        </div>
                         <div class ="mt-2">
                             <input type="checkbox" class="custom-control-input" name="pys[ga][is_enable_debug_mode][-1]" value="0" checked />
                             <?php GA()->render_checkbox_input_array("is_enable_debug_mode","Enable Analytics Debug mode for this property"); ?>

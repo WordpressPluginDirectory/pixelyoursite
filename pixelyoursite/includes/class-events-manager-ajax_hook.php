@@ -105,10 +105,8 @@ class AjaxHookEventManager {
 
             if( !empty($variation_id)
                 && $variation_id > 0
-                && ( !$pixel->getOption( 'woo_variable_as_simple' )
-                    || ( $pixel->getSlug() == "facebook"
-                        && !Facebook\Helpers\isDefaultWooContentIdLogic()
-                    )
+                && (($pixel->getSlug() == 'ga' && !GATags()->getOption( 'woo_variable_as_simple')) ||
+                    ( $pixel->getSlug() == "facebook" && !Facebook\Helpers\isDefaultWooContentIdLogic())
                 )
             ) {
                 $_product_id = $variation_id;

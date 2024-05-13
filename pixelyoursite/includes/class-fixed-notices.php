@@ -56,7 +56,7 @@ class NoticesFixed {
         if ( empty( $_REQUEST['nonce'] ) || ! wp_verify_nonce( $_REQUEST['nonce'], 'pys_fixed_notice_opt_dismiss') ) {
             return;
         }
-        $dismissedSlugs = (array)get_user_meta( $user_id, $this->dismissedKey,true);
+        $dismissedSlugs = (array) get_option($this->dismissedKey, array());
         foreach ($notices as $noticesGroup)
         {
             foreach ($noticesGroup['multiMessage'] as $noticesMessage) {
@@ -65,7 +65,7 @@ class NoticesFixed {
 
         }
         $dismissedSlugs = array_unique($dismissedSlugs);
-        update_user_meta($user_id, $this->dismissedKey, $dismissedSlugs );
+        update_option( $this->dismissedKey, $dismissedSlugs );
         echo json_encode($dismissedSlugs);
         die();
     }
@@ -82,7 +82,8 @@ class NoticesFixed {
         if ( empty( $_REQUEST['nonce'] ) || ! wp_verify_nonce( $_REQUEST['nonce'], 'pys_fixed_notice_dismiss' ) ) {
             return;
         }
-        $dismissedSlugs = (array)get_user_meta( $user_id, $this->dismissedKey,true);
+
+        $dismissedSlugs = (array) get_option($this->dismissedKey, array());
         foreach ($_POST['meta_key'] as $meta_key)
         {
             $dismissedSlugs[] = sanitize_text_field( $meta_key );
@@ -90,7 +91,7 @@ class NoticesFixed {
 
 
         // save dismissed notice
-        update_user_meta($user_id, $this->dismissedKey, $dismissedSlugs );
+        update_option( $this->dismissedKey, $dismissedSlugs );
         echo json_encode($this->whoIsNext($notices));
         die();
     }
@@ -323,6 +324,7 @@ class NoticesFixed {
         $minOrderBlock = 999999;
         $user_id = get_current_user_id();
         $noticeBlock = array();
+
         foreach ($noticeGroups as $keyGroup => $noticeGroup) {
             if(isset($noticeGroup['type']) && $noticeGroup['type'] == 'event chain')
             {
@@ -330,7 +332,7 @@ class NoticesFixed {
                 unset($paramGroup['multiMessage']);
                 $noticeBlock[$noticeGroup['order']] = $paramGroup;
                 foreach ($noticeGroup['multiMessage'] as $notice){
-                    if(!in_array($notice['slug'], (array)get_user_meta( $user_id, $this->dismissedKey,true ))) {
+                    if(!in_array($notice['slug'], (array) get_option( $this->dismissedKey, array())) && !in_array($notice['slug'], (array) get_user_meta($user_id, $this->dismissedKey, true))) {
                         $noticeBlock[$noticeGroup['order']]['multiMessage'][] = $notice;
                     }
                 }
@@ -343,21 +345,23 @@ class NoticesFixed {
                 $minOrderBlock = $block['order'];
             }
         }
-        if(get_user_meta($user_id, 'free_next_chain_notice', true) != $minOrderBlock)
+        if(get_option('free_next_chain_notice') != $minOrderBlock)
         {
-
-            if(get_user_meta($user_id, 'free_next_chain_notice', true) < $minOrderBlock && $minOrderBlock != 999999)
+            if((get_option('free_next_chain_notice') < $minOrderBlock && get_user_meta($user_id, 'free_next_chain_notice', true) < $minOrderBlock) && $minOrderBlock != 999999)
             {
-                update_user_meta($user_id, 'free_expiration_chain_notice_dismissed_at', time() + $this->convertTimeToSeconds(isset($noticeBlock[$minOrderBlock]['wait']) ? $noticeBlock[$minOrderBlock]['wait'] : 24, 'hours'));
+                update_option('free_next_chain_notice', $minOrderBlock);
+                update_option('free_expiration_chain_notice_dismissed_at', time() + $this->convertTimeToSeconds(isset($noticeBlock[$minOrderBlock]['wait']) ? $noticeBlock[$minOrderBlock]['wait'] : 24, 'hours'));
             }
-            else if(get_user_meta($user_id, 'free_next_chain_notice', true) > $minOrderBlock && $minOrderBlock != 999999)
+            else if((get_option('free_next_chain_notice') > $minOrderBlock || get_user_meta($user_id, 'free_next_chain_notice', true) > $minOrderBlock) && $minOrderBlock != 999999)
             {
-                update_user_meta($user_id, 'free_expiration_chain_notice_dismissed_at', time() + $this->convertTimeToSeconds(0, 'seconds'));
+                update_option('free_expiration_chain_notice_dismissed_at', time() + $this->convertTimeToSeconds(0, 'seconds'));
             }
-            update_user_meta($user_id, 'free_next_chain_notice', $minOrderBlock);
-
+            else{
+                update_option('free_next_chain_notice', $minOrderBlock);
+            }
         }
-        if(isset($noticeBlock[$minOrderBlock]) && (get_user_meta($user_id, 'free_next_chain_notice', true) == $minOrderBlock && time() >= get_user_meta($user_id, 'free_expiration_chain_notice_dismissed_at', true)))
+
+        if(isset($noticeBlock[$minOrderBlock]) && (get_option('free_next_chain_notice') >= $minOrderBlock && time() >= get_option('free_expiration_chain_notice_dismissed_at')))
         {
 
             return $noticeBlock[$minOrderBlock];

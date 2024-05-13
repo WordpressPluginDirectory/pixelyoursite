@@ -65,23 +65,20 @@ class GA extends Settings implements Pixel {
 	}
 
     public function getPixelDebugMode() {
-
-        $flags = (array) $this->getOption( 'is_enable_debug_mode' );
-
-        if ( isSuperPackActive() && SuperPack()->getOption( 'enabled' ) && SuperPack()->getOption( 'additional_ids_enabled' ) ) {
-            $additionalPixels = SuperPack()->getGaAdditionalPixel();
-            $index = 1;
-            foreach ($additionalPixels as $_pixel) {
-                if($_pixel->extensions['debug_mode'])
-                {
-                    $flags[] = 'index_'.$index;
-                }
-                $index++;
-            }
-            return $flags;
-        } else {
-            return (array) reset( $flags ); // return first id only
+        $flags = array();
+        if($this->getOption( 'server_container_url')){
+            $flags = (array) $this->getOption( 'is_enable_debug_mode' );
         }
+        return (array) reset( $flags ); // return first id only
+    }
+
+    public function getPixelServerContainerUrls() {
+        $flags = array();
+        if($this->getOption( 'server_container_url')){
+            $flags[$this->getPixelIDs()[0]] = (string) $this->getOption( 'server_container_url' )[0];
+        }
+
+        return $flags; // return first id only
     }
 
 	public function getPixelIDs() {
@@ -107,9 +104,10 @@ class GA extends Settings implements Pixel {
             'crossDomainAcceptIncoming' => $this->getOption('cross_domain_accept_incoming'),
             'crossDomainDomains' => $this->getOption('cross_domain_domains'),
             'isDebugEnabled'                => $this->getPixelDebugMode(),
+            'serverContainerUrls'                => $this->getPixelServerContainerUrls(),
             'disableAdvertisingFeatures'    => $this->getOption( 'disable_advertising_features' ),
             'disableAdvertisingPersonalization' => $this->getOption( 'disable_advertising_personalization' ),
-            'wooVariableAsSimple' => $this->getOption( 'woo_variable_as_simple' )
+            'wooVariableAsSimple' => GATags()->getOption( 'woo_variable_as_simple' )
         );
     }
     private function isGaV4($tag) {
@@ -548,7 +546,7 @@ class GA extends Settings implements Pixel {
 
         $items[] = $general_item;
 // Check if the product has variations
-        if ($product->is_type('variable') && !$this->getOption( 'woo_variable_as_simple' )) {
+        if ($product->is_type('variable') && !GATags()->getOption( 'woo_variable_as_simple' )) {
 
             $variations = $product->get_available_variations();
 
@@ -559,7 +557,7 @@ class GA extends Settings implements Pixel {
 
                 $item = array(
                     'id'       => $variationProductId,
-                    'name'     => $this->getOption('woo_variations_use_parent_name') ? $variationProduct->get_title() : $variationProduct->get_name(),
+                    'name'     => GATags()->getOption('woo_variations_use_parent_name') ? $variationProduct->get_title() : $variationProduct->get_name(),
                     'quantity' => $quantity,
                     'price'    => getWooProductPriceToDisplay($variationProduct->get_id(), $quantity, $customProductPrice)
                 );
@@ -618,7 +616,7 @@ class GA extends Settings implements Pixel {
                     }
                     $item = array(
                         'id'       => $content_id,
-                        'name'     => $this->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name(),
+                        'name'     => GATags()->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name(),
                         'quantity' => $cart_item['quantity'],
                         'price'    => $cart_item['quantity'] > 0 ? pys_round($price / $cart_item['quantity']) : $price,
                     );
@@ -675,11 +673,11 @@ class GA extends Settings implements Pixel {
             }
             $content_id = GA\Helpers\getWooProductContentId($child_id);
             $price = getWooProductPriceToDisplay( $child_id, $quantity );
-            $name = $this->getOption('woo_variations_use_parent_name') && $childProduct->is_type('variation') ? $childProduct->get_title() : $childProduct->get_name();
+            $name = GATags()->getOption('woo_variations_use_parent_name') && $childProduct->is_type('variation') ? $childProduct->get_title() : $childProduct->get_name();
 
 
             if ( $childProduct->get_type() == 'variation' ) {
-                $variation_name = !$this->getOption('woo_variations_use_parent_name') ? implode("/", $childProduct->get_variation_attributes()) : $product->get_title();
+                $variation_name = !GATags()->getOption('woo_variations_use_parent_name') ? implode("/", $childProduct->get_variation_attributes()) : $product->get_title();
                 $categories = $this->getCategoryArrayWoo($child_id, true);
             } else {
                 $categories = $this->getCategoryArrayWoo($child_id);
@@ -760,8 +758,8 @@ class GA extends Settings implements Pixel {
 
 		if ( ! empty( $cart_item['variation_id'] ) ) {
             $variation = wc_get_product( $cart_item['variation_id'] );
-            if($variation && $variation->get_type() == 'variation'  && !$this->getOption( 'woo_variable_as_simple' )) {
-                $variation_name = !$this->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
+            if($variation && $variation->get_type() == 'variation'  && !GATags()->getOption( 'woo_variable_as_simple' )) {
+                $variation_name = !GATags()->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
                 $categories = $this->getCategoryArrayWoo($product_id, true);
             } else {
                 $variation_name = null;
@@ -847,15 +845,15 @@ class GA extends Settings implements Pixel {
 
 			$product = wc_get_product( $product_id );
             if(!$product) continue;
-            $name = $this->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name();
+            $name = GATags()->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name();
 
 
 
             if ( $line_item['variation_id'] ) {
 				$variation = wc_get_product( $line_item['variation_id'] );
-                if($variation && $variation->get_type() == 'variation' && !$this->getOption( 'woo_variable_as_simple' )) {
+                if($variation && $variation->get_type() == 'variation' && !GATags()->getOption( 'woo_variable_as_simple' )) {
 
-                    $variation_name = !$this->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
+                    $variation_name = !GATags()->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
                     $categories = $this->getCategoryArrayWoo($product_id, true);
                 } else {
                     $variation_name = null;
@@ -944,13 +942,13 @@ class GA extends Settings implements Pixel {
 			$product = wc_get_product( $product_id );
 			if(!$product) continue;
 
-            $name = $this->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name();
+            $name = GATags()->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name();
 
 
 			if ( $cart_item['variation_id'] ) {
                 $variation = wc_get_product( $cart_item['variation_id'] );
-                if($variation && $variation->get_type() == 'variation' && !$this->getOption( 'woo_variable_as_simple' )) {
-                    $variation_name = !$this->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
+                if($variation && $variation->get_type() == 'variation' && !GATags()->getOption( 'woo_variable_as_simple' )) {
+                    $variation_name = !GATags()->getOption('woo_variations_use_parent_name') ? implode("/", $variation->get_variation_attributes()) : $product->get_title();
                     $categories = $this->getCategoryArrayWoo($product_id, true);
                 } else {
 

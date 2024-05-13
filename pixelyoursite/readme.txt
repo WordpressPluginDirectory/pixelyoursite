@@ -4,7 +4,7 @@ Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent M
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.5
-Stable tag: 9.5.4
+Stable tag: 9.6.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -469,6 +469,20 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.6.0 =
+
+* Google Analytics server container Url: you can send GA4 data to a GTM server side container. 
+
+* Notifications will be closed for all users, not just the one clicking on the hide option.
+
+* Fixing various warnings and small bugs( PHP Warning: Undefined array key)
+
+
+= PixelYourSite 9.5.5 =
+
+* Fixing a possible issue where the tags were permanently blocked by some consent plugins.
+
 
 = PixelYourSite 9.5.4 =
 

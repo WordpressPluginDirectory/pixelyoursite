@@ -263,8 +263,9 @@ class EventsManager {
         }
 
 
-        if(count($this->facebookServerEvents)>0 && Facebook()->enabled()) {
+        if(count($this->facebookServerEvents)>0 && Facebook()->enabled() && Facebook()->isServerApiEnabled()) {
             FacebookServer()->sendEventsAsync($this->facebookServerEvents);
+            $this->facebookServerEvents = array();
         }
 
         // remove new user mark
@@ -353,7 +354,7 @@ class EventsManager {
         $this->staticEvents[ $pixel->getSlug() ][ $event->getId() ][] = $eventData;
         // fire fb server api event
         if($pixel->getSlug() == "facebook") {
-            if( $eventData['delay'] == 0 && !PYS()->getOption( "server_event_use_ajax" )) {
+            if( $eventData['delay'] == 0) {
                 $this->facebookServerEvents[] = $event;
             }
         }

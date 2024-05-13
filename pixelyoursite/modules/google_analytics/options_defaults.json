@@ -1,6 +1,7 @@
 {
   "enabled": true,
   "is_enable_debug_mode": "",
+  "server_container_url": "",
   "tracking_id": "",
 
   "cross_domain_enabled": false,
