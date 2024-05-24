@@ -509,7 +509,7 @@ if (!Array.prototype.includes) {
                         }
                     });
                 }
-                if (options.ajaxForServerEvent && !Cookies.get('pbid')) {
+                if (options.ajaxForServerEvent && !Cookies.get('pbid') && Facebook.isEnabled()) {
                     if(Facebook.advancedMatching() && Facebook.advancedMatching().external_id && !(options.cookie.disabled_all_cookie || options.cookie.externalID_disabled_by_api)){
                         let expires = parseInt(options.external_id_expire || 180);
                         Cookies.set('pbid', Facebook.advancedMatching().external_id, { expires: expires, path: '/' });
