@@ -4,7 +4,7 @@ Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent M
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.5
-Stable tag: 9.6.0.1
+Stable tag: 9.6.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -469,6 +469,22 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.6.1 =
+
+* New options for the Google Analytics tags related to GTM server containers. This is still in beta.
+
+* New ON/OFF Ajax option for API events. It allows you to disable Ajax for static API events if there are problems when loading the page (such as updating the WooCommerce cart).
+
+* Fixing a possible problem with API events triggered by crawlers, or other non-visitor-related activities. This resulted in a very large number or API events compared to browser events. 
+
+* The crawler filter for API events is always turned ON. 
+
+* Improving the way we track and generate fbp. This can lead in time to better conversion tracking.
+
+* New video links and small UI changes.
+
+
 
 
 = PixelYourSite 9.6.0.1 =

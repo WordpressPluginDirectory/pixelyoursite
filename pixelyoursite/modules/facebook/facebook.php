@@ -21,7 +21,6 @@ class Facebook extends Settings implements Pixel {
 	private static $_instance;
 	
 	private $configured;
-    private $fbc, $fbp;
 	public static function instance() {
 		
 		if ( is_null( self::$_instance ) ) {
@@ -47,40 +46,6 @@ class Facebook extends Settings implements Pixel {
 	    	$core->registerPixel( $this );
 	    } );
         add_action( 'wp_head', array( $this, 'output_meta_tag' ) );
-        if (!isset($_COOKIE['_fbp'])) {
-            $this->fbp = 'fb.1.' . time() . '.' . rand(1000000000, 9999999999);
-        } else {
-            $this->fbp = $_COOKIE['_fbp'];
-        }
-
-        if (!isset($_COOKIE['_fbc'])) {
-            $fbclid = $this->getUrlParameter('fbclid');
-            $this->fbc = $fbclid ? 'fb.1.' . time() . '.' . $fbclid : '';
-        } else {
-            $this->fbc = $_COOKIE['_fbc'];
-        }
-    }
-
-    public function getUrlParameter($sParam) {
-        if(!isset($_SERVER['QUERY_STRING'])) return false;
-        $sPageURL = $_SERVER['QUERY_STRING'];
-        $sURLVariables = explode('&', $sPageURL);
-
-        foreach ($sURLVariables as $sURLVariable) {
-            $sParameterName = explode('=', $sURLVariable);
-
-            if ($sParameterName[0] === $sParam) {
-                return isset($sParameterName[1]) ? urldecode($sParameterName[1]) : true;
-            }
-        }
-
-        return false;
-    }
-    public function getFbp(){
-        return $this->fbp;
-    }
-    public function getFbc(){
-        return $this->fbc;
     }
 
     public function enabled() {
@@ -128,8 +93,6 @@ class Facebook extends Settings implements Pixel {
             'serverApiEnabled'    => $this->isServerApiEnabled() && count($this->getApiToken()) > 0,
             'wooCRSendFromServer' => $this->getOption("woo_complete_registration_send_from_server") && $this->getOption("woo_complete_registration_fire_every_time"),
 		    'send_external_id'          => $this->getOption('send_external_id'),
-            'fbp'                      => $this->fbp,
-            'fbc'                      => $this->fbc,
         );
 		
 	}
@@ -497,6 +460,8 @@ class Facebook extends Settings implements Pixel {
 	
 	private function getPageViewEventParams() {
 	    $data = array();
+        $cpt = get_post_type();
+        if(!$cpt) return false;
 		return array(
 			'name'  => 'PageView',
 			'data'  => $data,

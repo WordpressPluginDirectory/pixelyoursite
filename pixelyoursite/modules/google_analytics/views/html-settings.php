@@ -18,7 +18,7 @@ use PixelYourSite\GA\Helpers;
         General
     </div>
     <div class="card-body">
-        <div class="row">
+        <div class="row mb-3">
             <div class="col">
 				<?php PYS()->render_switcher_input('google_consent_mode'); ?>
                 <h4 class="switcher-label">Fire Google tags with consent mode granted</h4>
@@ -26,6 +26,34 @@ use PixelYourSite\GA\Helpers;
                 <p class="mt-1 mb-0">
                     How to enable Google Consent Mode V2:
                     <a href="https://www.pixelyoursite.com/google-consent-mode-v2-wordpress?utm_source=plugin&utm_medium=free&utm_campaign=google-consent" target="_blank">click here</a>
+                </p>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
+                <?php GA()->renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Pass through ad click, client ID, and session ID information in URLs (url_passthrough) <?php renderProBadge(); ?></h4>
+                <p class="mt-1 mb-0">
+                    Reference:
+                    <a href="https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced#gtag.js_5" target="_blank">click here</a>
+                </p>
+            </div>
+        </div>
+        <hr>
+        <div class="row mb-3">
+            <div class="col">
+                <?php GA()->renderDummySwitcher(); ?>
+                <h4 class="switcher-label">Send user provided data when possible <?php renderProBadge(); ?></h4>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col col-offset-left">
+                <div class="mb-1">
+                    <?php GA()->renderDummyCheckbox("Use encoding"); ?> <?php renderProBadge(); ?>
+                </div>
+                <p>
+                    <?php _e('Learn how to configure it: ', 'pys');?>
+                    <a href="https://www.youtube.com/watch?v=uQ8t7RJhVvI" target="_blank">watch video</a>
                 </p>
             </div>
         </div>

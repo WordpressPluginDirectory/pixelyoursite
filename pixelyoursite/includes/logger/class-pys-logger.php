@@ -88,9 +88,9 @@ class PYS_Logger
 
         if ( $file ) {
             if ( ! file_exists( $file ) ) {
-				if( !is_dir( $this->log_path ) ) {
-					mkdir( $this->log_path, 0777, true );
-				}
+                if( !is_dir( $this->log_path ) ) {
+                    mkdir( $this->log_path, 0777, true );
+                }
                 $temphandle = @fopen( $file, 'w+' ); // @codingStandardsIgnoreLine.
                 if ( is_resource( $temphandle ) ) {
                     @fclose( $temphandle ); // @codingStandardsIgnoreLine.
@@ -123,7 +123,28 @@ class PYS_Logger
         return trailingslashit( PYS_FREE_URL ) .'logs/'. static::get_log_file_name( );
     }
 
+    public function downloadLogFile() {
+        $file = static::get_log_file_path();
+        error_log(print_r($file, true));
+        if ($file) {
+            // Устанавливаем заголовки для скачивания файла
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.basename($file).'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
 
+            // Читаем файл и отправляем его пользователю
+            readfile($file);
+            exit;
+        } else {
+            // Если файл не найден, отправляем соответствующий ответ
+            http_response_code(404);
+            echo "File not found.";
+        }
+    }
 
     /**
      * Get a log file name.

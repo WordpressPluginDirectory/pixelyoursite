@@ -1,8 +1,12 @@
 {
   "enabled": true,
   "is_enable_debug_mode": "",
-  "server_container_url": "",
   "tracking_id": "",
+
+  "enable_server_container": true,
+  "first_party_collection": true,
+  "server_container_url": "",
+  "transport_url": "",
 
   "cross_domain_enabled": false,
   "cross_domain_accept_incoming": false,

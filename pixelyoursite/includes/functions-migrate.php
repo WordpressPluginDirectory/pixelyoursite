@@ -18,6 +18,13 @@ function maybeMigrate() {
 	
 	$pys_free_7_version = get_option( 'pys_core_free_version', false );
 
+    if (!$pys_free_7_version || ($pys_free_7_version && version_compare($pys_free_7_version, '9.6.1', '<'))) {
+        migrate_9_6_1();
+
+        update_option( 'pys_core_version', PYS_FREE_VERSION );
+        update_option( 'pys_updated_at', time() );
+    }
+
     if (!$pys_free_7_version || ($pys_free_7_version && version_compare($pys_free_7_version, '9.5.6', '<'))) {
 
         migrate_9_5_6();
@@ -51,6 +58,13 @@ function migrate_unify_custom_events(){
         $event->migrateUnifyGA();
     }
     update_option( 'pys_custom_event_migrate_free', true );
+}
+
+function migrate_9_6_1() {
+        $globalOptions = [
+            "block_robot_enabled" => true,
+        ];
+        PYS()->updateOptions($globalOptions);
 }
 function migrate_9_5_6() {
     $ga_tags_woo_options = [];

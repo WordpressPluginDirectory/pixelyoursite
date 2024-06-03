@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <a style="margin-right: 30px"
                href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite', 'logs' ) ); ?>&clear_plugin_logs=true">Clear
                 Meta API Logs</a>
-            <a href="<?= PYS_Logger::get_log_file_url() ?>" target="_blank" download>Download Meta API Logs</a>
+            <a href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite', 'logs' ) ); ?>&download_logs=meta"" target="_blank" download>Download Meta API logs</a>
         </div>
     </div>
     <div class="card-body">
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <a style="margin-right: 30px"
                    href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite', 'logs' ) ); ?>&clear_pinterest_logs=true">Clear
                     Pinterest API Logs</a>
-                <a href="<?= Pinterest_logger::get_log_file_url() ?>" target="_blank" download>Download Pinterest API
+                <a href="<?php echo esc_url( buildAdminUrl( 'pixelyoursite', 'logs' ) ); ?>&download_logs=pinterest" target="_blank" download>Download Pinterest API
                     Logs</a>
             </div>
         </div>

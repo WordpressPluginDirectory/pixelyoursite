@@ -206,6 +206,28 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 Generate the API secret inside your Google Analytics account: navigate to <b>Admin > Data Streams > choose your stream > Measurement Protocol API secrets</b>. The Measurement Protocol is used for WooCommerce and Easy Digital Downloads "Google Analytics Advanced Purchase Tracking" and refund tracking. Required for GA4 properties only.
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <input type="checkbox" class="custom-control-input"
+                                       name="pys[ga][is_enable_debug_mode][-1]" value="0" checked/>
+                                <?php GA()->render_checkbox_input_array("is_enable_debug_mode", "Enable Analytics Debug mode for this property"); ?>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <div class="mb-1">
+                                    <input type="text" class="custom-control-input"
+                                           name="pys[ga][enable_server_container][-1]" value="0" checked/>
+                                    <?php GA()->render_switcher_input("enable_server_container"); ?>
+                                    <h4 class="switcher-label">Enable Server container url (Beta)</h4>
+                                </div>
+                                <p>
+                                    <?php _e('Learn how to use it: ', 'pys');?>
+                                    <a href="https://www.youtube.com/watch?v=WZnmSoSJyBc" target="_blank">watch video</a>
+                                </p>
+                            </div>
+                        </div>
                         <div class="row align-items-center mb-3">
                             <div class="col-12">
                                 <h4 class="label">Server container url (optional): </h4>
@@ -214,10 +236,22 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 <?php GA()->render_text_input_array_item("server_container_url", "https://analytics.example.com", 0); ?>
                             </div>
                         </div>
-                        <div class ="mt-2">
-                            <input type="checkbox" class="custom-control-input" name="pys[ga][is_enable_debug_mode][-1]" value="0" checked />
-                            <?php GA()->render_checkbox_input_array("is_enable_debug_mode","Enable Analytics Debug mode for this property"); ?>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <h4 class="label">Transport url (optional): </h4>
+                                <input type="text" class="custom-control-input"
+                                       name="pys[ga][transport_url][-1]" value="0" checked/>
+                                <?php GA()->render_text_input_array_item("transport_url", "https://tagging.mywebsite.com", 0); ?>
+                            </div>
                         </div>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-12">
+                                <input type="text" class="custom-control-input"
+                                       name="pys[ga][first_party_collection][-1]" value="0" checked/>
+                                <?php GA()->render_checkbox_input("first_party_collection", "First party cookies selector first_party_collection (recommended)"); ?>
+                            </div>
+                        </div>
+                        <hr>
                         <p class="mt-1">
                             <strong>How to enable Google Consent Mode V2:</strong>
                             <a href="https://www.pixelyoursite.com/google-consent-mode-v2-wordpress?utm_source=plugin&utm_medium=free&utm_campaign=google-consent" target="_blank">click here</a>
@@ -971,10 +1005,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="panel">
     <div class="row mb-3">
-        <div class="col-12">
+        <div class="col-12 mb-2">
             <?php PYS()->render_switcher_input("server_event_use_ajax" ); ?>
             <h4 class="switcher-label">Use Ajax when API is enabled, or when external_id's are used. Keep this option active if you use a cache.</h4>
             <div><small class="mt-1">Use Ajax when Meta conversion API, or Pinterest API are enabled, or when external_id's are used. This helps serving unique event_id values for each pair of browser/server events, ensuring deduplication works. It also ensures uniques external_id's are used for each user. Keep this option active if you use a cache solution that can serve the same event_id or the same external_id multiple times.</small></div>
+        </div>
+        <div class="col-12">
+            <?php PYS()->render_switcher_input("server_static_event_use_ajax" ); ?>
+            <h4 class="switcher-label">Use Ajax for <b>Static events</b> when API is enabled.</h4>
+            <div><small>Do not use AJAX requests for static events if it interferes with page loading, or if the requests during loading block other site functions (such as updating the cart during loading).</small></div>
             <hr>
         </div>
     </div>
@@ -1081,7 +1120,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
     <div class="row mb-3">
         <div class="col">
-            <?php PYS()->render_switcher_input('block_robot_enabled'); ?>
+            <?php PYS()->render_switcher_input('block_robot_enabled', false, true, true); ?>
             <h4 class="switcher-label">Disable the plugin for known web crawlers</h4>
         </div>
     </div>

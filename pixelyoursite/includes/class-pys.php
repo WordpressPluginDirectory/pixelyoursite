@@ -103,6 +103,14 @@ final class PYS extends Settings implements Plugin {
     }
 
     public function init() {
+
+        if ( isset( $_GET[ 'download_logs' ] ) && $_GET['download_logs'] == 'meta' ) {
+            PYS()->getLog()->downloadLogFile();
+        }
+        elseif (isset( $_GET[ 'download_logs' ] ) && $_GET['download_logs'] == 'pinterest' && method_exists(Pinterest(), 'getLog')){
+            Pinterest()->getLog()->downloadLogFile();
+        }
+
         if ( isset( $_GET[ 'clear_plugin_logs' ] ) ) {
             PYS()->getLog()->remove();
             $actual_link = ( isset( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] === 'on' ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -396,7 +404,10 @@ final class PYS extends Settings implements Plugin {
         if (is_admin() || is_customize_preview() || is_preview()) {
             return;
         }
-
+        if($this->is_user_agent_bot())
+        {
+            return;
+        }
         // disable Events Manager on Elementor editor
         if (did_action('elementor/preview/init')
             || did_action('elementor/editor/init')
@@ -409,10 +420,7 @@ final class PYS extends Settings implements Plugin {
         if (function_exists('et_core_is_fb_enabled') && et_core_is_fb_enabled()) {
             return;
         }
-        if(PYS()->getOption( 'block_robot_enabled') && $this->is_user_agent_bot())
-        {
-            return;
-        }
+
         if(PYS()->getOption( 'block_ip_enabled') && in_array($this->get_user_ip(), PYS()->getOption('blocked_ips')))
         {
             return;
@@ -468,30 +476,38 @@ final class PYS extends Settings implements Plugin {
     function is_user_agent_bot(){
         if (!empty($_SERVER['HTTP_USER_AGENT'])) {
             $options = array(
-                'YandexBot', 'YandexAccessibilityBot', 'YandexMobileBot','YandexDirectDyn',
-                'YandexScreenshotBot', 'YandexImages', 'YandexVideo', 'YandexVideoParser',
-                'YandexMedia', 'YandexBlogs', 'YandexFavicons', 'YandexWebmaster',
-                'YandexPagechecker', 'YandexImageResizer','YandexAdNet', 'YandexDirect',
-                'YaDirectFetcher', 'YandexCalendar', 'YandexSitelinks', 'YandexMetrika',
-                'YandexNews', 'YandexNewslinks', 'YandexCatalog', 'YandexAntivirus',
-                'YandexMarket', 'YandexVertis', 'YandexForDomain', 'YandexSpravBot',
-                'YandexSearchShop', 'YandexMedianaBot', 'YandexOntoDB', 'YandexOntoDBAPI',
-                'Googlebot', 'Googlebot-Image', 'Googlebot-News', 'Googlebot-Video',
-                'Mediapartners-Google', 'AdsBot-Google', 'Chrome-Lighthouse', 'Lighthouse',
-                'Mail.RU_Bot', 'bingbot', 'Accoona', 'ia_archiver', 'Ask Jeeves',
-                'OmniExplorer_Bot', 'W3C_Validator', 'WebAlta', 'YahooFeedSeeker', 'Yahoo!',
-                'Ezooms', 'Tourlentabot', 'MJ12bot', 'AhrefsBot', 'SearchBot', 'SiteStatus',
-                'Nigma.ru', 'Baiduspider', 'Statsbot', 'SISTRIX', 'AcoonBot', 'findlinks',
-                'proximic', 'OpenindexSpider','statdom.ru', 'Exabot', 'Spider', 'SeznamBot',
-                'oBot', 'C-T bot', 'Updownerbot', 'Snoopy', 'heritrix', 'Yeti',
-                'DomainVader', 'DCPbot', 'PaperLiBot', 'APIs-Google', 'AdsBot-Google-Mobile',
-                'AdsBot-Google-Mobile', 'AdsBot-Google-Mobile-Apps', 'FeedFetcher-Google',
-                'Google-Read-Aloud', 'DuplexWeb-Google', 'Storebot-Google', 'lscache_runner',
-                'ClaudeBot', 'SeekportBot'
+                'YandexBot', 'YandexAccessibilityBot', 'YandexMobileBot', 'YandexDirectDyn', 'YandexScreenshotBot',
+                'YandexImages', 'YandexVideo', 'YandexVideoParser', 'YandexMedia', 'YandexBlogs',
+                'YandexFavicons', 'YandexWebmaster', 'YandexPagechecker', 'YandexImageResizer', 'YandexAdNet',
+                'YandexDirect', 'YaDirectFetcher', 'YandexCalendar', 'YandexSitelinks', 'YandexMetrika',
+                'YandexNews', 'YandexNewslinks', 'YandexCatalog', 'YandexAntivirus', 'YandexMarket',
+                'YandexVertis', 'YandexForDomain', 'YandexSpravBot', 'YandexSearchShop', 'YandexMedianaBot',
+                'YandexOntoDB', 'YandexOntoDBAPI', 'Googlebot', 'Googlebot-Image', 'Googlebot-News',
+                'Googlebot-Video', 'Mediapartners-Google', 'AdsBot-Google', 'Chrome-Lighthouse', 'Lighthouse',
+                'Mail.RU_Bot', 'bingbot', 'Accoona', 'ia_archiver', 'Ask Jeeves', 'OmniExplorer_Bot',
+                'W3C_Validator', 'WebAlta', 'YahooFeedSeeker', 'Yahoo!', 'Ezooms', 'Tourlentabot', 'MJ12bot',
+                'AhrefsBot', 'SearchBot', 'SiteStatus', 'Nigma.ru', 'Baiduspider', 'Statsbot', 'SISTRIX',
+                'AcoonBot', 'findlinks', 'proximic', 'OpenindexSpider', 'statdom.ru', 'Exabot', 'Spider',
+                'SeznamBot', 'oBot', 'C-T bot', 'Updownerbot', 'Snoopy', 'heritrix', 'Yeti', 'DomainVader',
+                'DCPbot', 'PaperLiBot', 'APIs-Google', 'AdsBot-Google-Mobile', 'AdsBot-Google-Mobile-Apps',
+                'FeedFetcher-Google', 'Google-Read-Aloud', 'DuplexWeb-Google', 'Storebot-Google', 'lscache_runner',
+                'ClaudeBot', 'SeekportBot', 'WP Rocket/Preload', 'WP-Rocket-Preload', 'GPTBot', 'Applebot',
+                'DuckDuckBot', 'Sogou', 'facebookexternalhit', 'Swiftbot', 'Slurp', 'CCBot', 'Go-http-client',
+                'Sogou Spider', 'Facebot', 'Alexa Crawler', 'Cốc Cốc Bot', 'Majestic-12', 'SemrushBot',
+                'DotBot', 'Qwantify', 'Pinterest', 'GrapeshotCrawler', 'archive.org_bot', 'LinkpadBot',
+                'uptimebot', 'Wget', 'curl', 'Google-Structured-Data-Testing-Tool', 'Google-PageSpeed Insights',
+                'Google-Site-Verification', 'BingPreview', 'Slackbot', 'TelegramBot', 'DiscordBot', 'WhatsApp',
+                'RedditBot', 'Yahoo! Slurp', 'Tumblr', 'PetalBot', 'FlipboardProxy', 'LinkedInBot',
+                'SkypeUriPreview', 'Google-Firebase-Storage', 'BitlyBot', 'FeedlyBot', 'AppleNewsBot',
+                'ZyBorg', 'ia_archiver-web.archive.org', 'Mediatoolkitbot', 'DeuSu', 'SMTBot', 'MegaIndex.ru',
+                'Seomoz', 'BLEXBot', 'YisouSpider', '360Spider', 'AddThis', 'TweetmemeBot', 'ContextAd Bot',
+                'Screaming Frog SEO Spider', 'Nutch', 'Baiduspider-image', 'Panscient.com', 'Twitterbot',
+                'YoudaoBot', 'OpenSiteExplorer', 'Linkfluence', 'YaK', 'ContentKing', 'Spinn3r', 'PhantomJS',
+                'HeadlessChrome', 'Snapchat', 'Pingdom', 'Googlebot-Mobile'
             );
 
             foreach($options as $row) {
-                if (stripos($_SERVER['HTTP_USER_AGENT'], $row) !== false) {
+                if (stripos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($row)) !== false) {
                     return true;
                 }
             }

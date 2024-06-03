@@ -91,6 +91,7 @@ class EventsManager {
 			'last_visit_duration'              => PYS()->getOption( 'last_visit_duration' ),
 			'enable_success_send_form'         => PYS()->getOption( 'enable_success_send_form' ),
 			'ajaxForServerEvent'               => PYS()->getOption( 'server_event_use_ajax' ),
+            "ajaxForServerStaticEvent"         => PYS()->getOption( 'server_static_event_use_ajax' ),
 			"send_external_id"                 => PYS()->getOption( 'send_external_id' ),
 			"external_id_expire"               => PYS()->getOption( 'external_id_expire' ),
 			"google_consent_mode"              => $google_consent_mode
@@ -338,13 +339,13 @@ class EventsManager {
         $eventData = $event->getData();
         $eventData = $this::filterEventParams($eventData,$slug);
         // send only for FB Server events
-        if($pixel->getSlug() == "facebook" &&
+        if(Facebook()->enabled() && $pixel->getSlug() == "facebook" &&
             ($event->getId() == "woo_complete_registration") &&
             Facebook()->isServerApiEnabled() &&
             Facebook()->getOption("woo_complete_registration_send_from_server") &&
             !$this->isGdprPluginEnabled() )
         {
-            if($eventData['delay'] == 0) {
+            if($eventData['delay'] == 0 && !PYS()->getOption( "server_static_event_use_ajax" )) {
                 $this->facebookServerEvents[] = $event;
             }
             return;
@@ -353,8 +354,8 @@ class EventsManager {
         //save static event data
         $this->staticEvents[ $pixel->getSlug() ][ $event->getId() ][] = $eventData;
         // fire fb server api event
-        if($pixel->getSlug() == "facebook") {
-            if( $eventData['delay'] == 0) {
+        if($pixel->getSlug() == "facebook" && Facebook()->enabled()) {
+            if( $eventData['delay'] == 0 && !PYS()->getOption( "server_static_event_use_ajax" )) {
                 $this->facebookServerEvents[] = $event;
             }
         }

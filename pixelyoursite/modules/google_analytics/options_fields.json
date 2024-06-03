@@ -1,8 +1,12 @@
 {
   "enabled": "checkbox",
   "is_enable_debug_mode": "array",
-  "server_container_url": "array",
   "tracking_id": "array",
+
+  "enable_server_container": "checkbox",
+  "first_party_collection": "checkbox",
+  "server_container_url": "array",
+  "transport_url": "array",
 
   "cross_domain_enabled": "checkbox",
   "cross_domain_accept_incoming": "checkbox",

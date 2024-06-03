@@ -26,10 +26,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="col">
 				<?php Facebook()->render_switcher_input( 'advanced_matching_enabled' ); ?>
 				<h4 class="switcher-label">Enable Advanced Matching</h4>
-                <div class="alert alert-primary mt-3">Because of a Facebook error, when Advanced Matching is ON, Custom
-                    Audiences based on the pixel
-                    will not show the size number ("Size: -1", or "Size Unavailable"). They will still work fine for
-                    retargeting or Lookalike Audiences. Details <a href="https://www.pixelyoursite.com/facebook-audience-size-not-available" target="_blank">here</a>.</div>
 			</div>
 		</div>
 		<div class="row">

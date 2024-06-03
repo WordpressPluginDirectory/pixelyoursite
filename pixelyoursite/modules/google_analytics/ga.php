@@ -66,19 +66,27 @@ class GA extends Settings implements Pixel {
 
     public function getPixelDebugMode() {
         $flags = array();
-        if($this->getOption( 'server_container_url')){
+        if($this->getOption( 'is_enable_debug_mode')){
             $flags = (array) $this->getOption( 'is_enable_debug_mode' );
         }
-        return (array) reset( $flags ); // return first id only
+        return $flags; // return first id only
     }
 
+    public function getPixelAdditionalConfig() {
+        $flags = array();
+        $mainTag = (string) $this->getPixelIDs()[0];
+        $flags[$mainTag]['first_party_collection'] = $this->getOption('first_party_collection');
+        return $flags;
+    }
     public function getPixelServerContainerUrls() {
         $flags = array();
-        if($this->getOption( 'server_container_url')){
-            $flags[$this->getPixelIDs()[0]] = (string) $this->getOption( 'server_container_url' )[0];
-        }
+        $mainTag = (string) $this->getPixelIDs()[0];
+        $flags[$mainTag]['enable_server_container'] = (string) $this->getOption('enable_server_container');
+        $flags[$mainTag]['server_container_url'] = $this->getOption('server_container_url') ? (string) $this->getOption('server_container_url')[0] : '';
+        $flags[$mainTag]['transport_url'] = $this->getOption('transport_url') ? (string) $this->getOption('transport_url')[0] : '';
 
-        return $flags; // return first id only
+
+        return $flags;// return first id only
     }
 
 	public function getPixelIDs() {
@@ -105,6 +113,7 @@ class GA extends Settings implements Pixel {
             'crossDomainDomains' => $this->getOption('cross_domain_domains'),
             'isDebugEnabled'                => $this->getPixelDebugMode(),
             'serverContainerUrls'                => $this->getPixelServerContainerUrls(),
+            'additionalConfig'  => $this->getPixelAdditionalConfig(),
             'disableAdvertisingFeatures'    => $this->getOption( 'disable_advertising_features' ),
             'disableAdvertisingPersonalization' => $this->getOption( 'disable_advertising_personalization' ),
             'wooVariableAsSimple' => GATags()->getOption( 'woo_variable_as_simple' )

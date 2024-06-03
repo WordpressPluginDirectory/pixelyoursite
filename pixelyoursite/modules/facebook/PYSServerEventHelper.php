@@ -10,7 +10,8 @@ defined('ABSPATH') or die('Direct access not allowed');
 
 
 class ServerEventHelper {
-
+    private static $fbp;
+    private static $fbc;
     /**
      * @param SingleEvent $event
      * @return Event | null
@@ -35,9 +36,21 @@ class ServerEventHelper {
             ->setClientIpAddress(self::getIpAddress())
             ->setClientUserAgent(self::getHttpUserAgent());
 
+        if (!self::getFbp() && (!isset($eventParams['_fbp']) || !$eventParams['_fbp'])) {
+            self::setFbp('fb.1.' . time() . '.' . rand(1000000000, 9999999999));
+            setcookie("_fbp", self::getFbp(), 2147483647,'/');
+        }
+
+        if (self::getUrlParameter('fbclid')) {
+            $fbclid = self::getUrlParameter('fbclid');
+            if($fbclid){
+                self::setFbc('fb.1.' . time() . '.' . $fbclid );
+                setcookie("_fbc", self::$fbc, 2147483647,'/');
+            }
+        }
 
         $fbp = self::getFbp() ?? $eventParams['_fbp'] ?? '';
-        $fbc = self::getFbc() ?? $eventParams['_fbc'] ?? '';
+        $fbc = self::getUrlParameter('fbclid') ?? self::getFbc() ?? $eventParams['_fbc'] ?? '';
 
         if(!$fbp && $wooOrder) {
             $fbp = ServerEventHelper::getFbStatFromOrder('fbp',$wooOrder);
@@ -158,14 +171,37 @@ class ServerEventHelper {
 
         return $request_uri;
     }
+    static function getUrlParameter($sParam) {
+        $sPageURL = $_SERVER['QUERY_STRING'];
+        $sURLVariables = explode('&', $sPageURL);
 
+        foreach ($sURLVariables as $sURLVariable) {
+            $sParameterName = explode('=', $sURLVariable);
+
+            if ($sParameterName[0] === $sParam) {
+                return isset($sParameterName[1]) ? urldecode($sParameterName[1]) : true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function setFbp($fbp) {
+        self::$fbp = $fbp;
+    }
+
+    public static function setFbc($fbc) {
+        self::$fbc = $fbc;
+    }
     public static function getFbp() {
         $fbp = null;
 
         if (!empty($_COOKIE['_fbp'])) {
             $fbp = $_COOKIE['_fbp'];
         }
-
+        elseif (!empty(self::$fbp)){
+            $fbp = self::$fbp;
+        }
         return $fbp;
     }
 
@@ -175,7 +211,9 @@ class ServerEventHelper {
         if (!empty($_COOKIE['_fbc'])) {
             $fbc = $_COOKIE['_fbc'];
         }
-
+        elseif (!empty(self::$fbc)){
+            $fbc = self::$fbc;
+        }
         return $fbc;
     }
 

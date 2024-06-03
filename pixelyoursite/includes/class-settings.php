@@ -388,8 +388,8 @@ abstract class Settings {
 	 * @param bool $collapse
 	 * @param bool $disabled
 	 */
-    public function render_switcher_input( $key, $collapse = false, $disabled = false ) {
-     
+    public function render_switcher_input( $key, $collapse = false, $disabled = false, $default = false) {
+
 	    $attr_name = "pys[$this->slug][$key]";
 	    $attr_id = 'pys_' . $this->slug . '_' . $key;
 	    $attr_value = $this->getOption( $key );
@@ -403,7 +403,7 @@ abstract class Settings {
         if ( $disabled ) {
 	        $classes[] = 'disabled';
             $attr_name = "";
-            $attr_value = false;
+            $attr_value = $default;
         }
         
         $classes = implode( ' ', $classes );
