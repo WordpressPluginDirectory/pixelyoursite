@@ -58,9 +58,22 @@ function getWooProductPriceToDisplay( $product_id, $qty = 1 ) {
     // take min price for variable product
     if($product->get_type() == "variable") {
         $prices = $product->get_variation_prices( true );
-        if(!empty( $prices['price'] )) {
-            $productPrice = current( $prices['price'] );
+        if(empty( $prices['price'] )) {
+            $productPrice = $product->get_price();
+        } else {
+            $variation_id = key($prices['price']); // Получаем ID вариации
+            $variation = wc_get_product($variation_id); // Создаем экземпляр вариации
+
+            $args = array(
+                'price' => $variation->get_price(),
+                'qty'   => 1
+            );
+
+            $productPrice = wc_get_price_excluding_tax($variation, $args);
         }
+
+    } else {
+        $productPrice = $product->get_price();
     }
 
     return (float) wc_get_price_to_display( $product, array( 'qty' => $qty,'price'=>$productPrice ) );

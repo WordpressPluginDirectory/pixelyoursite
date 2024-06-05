@@ -50,7 +50,7 @@ class ServerEventHelper {
         }
 
         $fbp = self::getFbp() ?? $eventParams['_fbp'] ?? '';
-        $fbc = self::getUrlParameter('fbclid') ?? self::getFbc() ?? $eventParams['_fbc'] ?? '';
+        $fbc = self::getFbc() ?? $eventParams['_fbc'] ?? '';
 
         if(!$fbp && $wooOrder) {
             $fbp = ServerEventHelper::getFbStatFromOrder('fbp',$wooOrder);

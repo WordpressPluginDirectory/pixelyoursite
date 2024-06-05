@@ -510,36 +510,35 @@ if (!Array.prototype.includes) {
                     });
                 }
                 if (options.ajaxForServerEvent && !Cookies.get('pbid') && Facebook.isEnabled()) {
+                     jQuery.ajax({
+                        url: options.ajaxUrl,
+                        dataType: 'json',
+                        data: {
+                            action: 'pys_get_pbid'
+                        },
+                        success: function (res) {
+                            if (res.data && res.data.pbid != false && options.send_external_id) {
+                                if(!(options.cookie.disabled_all_cookie || options.cookie.externalID_disabled_by_api)){
+                                    var expires = parseInt(options.external_id_expire || 180);
+                                    Cookies.set('pbid', res.data.pbid, { expires: expires, path: '/' });
+                                }
+
+                                if(options.hasOwnProperty('facebook')) {
+                                    options.facebook.advancedMatching = {
+                                        ...options.facebook.advancedMatching,  // распыляем текущие значения advancedMatching
+                                        external_id: res.data.pbid
+                                    };
+                                }
+                            }
+                        }
+                    });
+                } else if (Cookies.get('pbid') && Facebook.isEnabled()){
                     if(Facebook.advancedMatching() && Facebook.advancedMatching().external_id && !(options.cookie.disabled_all_cookie || options.cookie.externalID_disabled_by_api)){
                         let expires = parseInt(options.external_id_expire || 180);
                         Cookies.set('pbid', Facebook.advancedMatching().external_id, { expires: expires, path: '/' });
                     }
-                    else{
-                        jQuery.ajax({
-                            url: options.ajaxUrl,
-                            dataType: 'json',
-                            data: {
-                                action: 'pys_get_pbid'
-                            },
-                            success: function (res) {
-                                if (res.data && res.data.pbid != false && options.send_external_id) {
-                                    if(!(options.cookie.disabled_all_cookie || options.cookie.externalID_disabled_by_api)){
-                                        var expires = parseInt(options.external_id_expire || 180);
-                                        Cookies.set('pbid', res.data.pbid, { expires: expires, path: '/' });
-                                    }
-
-                                    if(options.hasOwnProperty('facebook')) {
-                                        options.facebook.advancedMatching = {
-                                            ...options.facebook.advancedMatching,  // распыляем текущие значения advancedMatching
-                                            external_id: res.data.pbid
-                                        };
-                                    }
-                                }
-                            }
-                        });
-                    }
-
                 }
+
                 let expires = parseInt(options.cookie_duration); //  days
                 let queryVars = getQueryVars();
                 let landing = window.location.href.split('?')[0];
@@ -1525,7 +1524,7 @@ if (!Array.prototype.includes) {
                     allData.eventID = Facebook.getEventId(allData.name);
                 } else {
                     // send event from server if they was bloc by gdpr or need send with delay
-                    if( !allData.eventID && (options.ajaxForServerEvent || event.type !== "static")) {
+                    if(options.ajaxForServerStaticEvent || event.type !== "static" || (!options.ajaxForServerStaticEvent && !allData.eventID)) {
                         allData.eventID = pys_generate_token(36);
                     }
 
