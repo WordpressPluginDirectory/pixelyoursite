@@ -37,6 +37,9 @@ use PixelYourSite\GA\Helpers;
                     Reference:
                     <a href="https://developers.google.com/tag-platform/security/guides/consent?consentmode=advanced#gtag.js_5" target="_blank">click here</a>
                 </p>
+                <p class="mt-1 mb-0">
+                    This option can improve tracking when cookies are denied: <a href="https://www.youtube.com/watch?v=wsNAbaoD5pM" target="_blank">watch video</a>
+                </p>
             </div>
         </div>
         <hr>

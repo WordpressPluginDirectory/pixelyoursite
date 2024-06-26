@@ -45,6 +45,7 @@ class Facebook extends Settings implements Pixel {
 
 	    	$core->registerPixel( $this );
 	    } );
+        add_filter('pys_facebook_settings_sanitize_verify_meta_tag_field', array($this, 'sanitize_verify_meta_tag_field'));
         add_action( 'wp_head', array( $this, 'output_meta_tag' ) );
     }
 
@@ -1304,6 +1305,28 @@ class Facebook extends Settings implements Pixel {
         foreach ($metaTags as $tag) {
             echo $tag;
         }
+    }
+    function sanitize_verify_meta_tag_field($values) {
+        $values = is_array( $values ) ? $values : array();
+        $sanitized = array();
+        $allowed_html = array(
+            'meta' => array(
+                'name' => array(),
+                'content' => array(),
+            ),
+        );
+        foreach ( $values as $key => $value ) {
+
+            $value = wp_kses($value, $allowed_html);
+            $new_value = $this->sanitize_textarea_field( $value );
+
+            if ( ! empty( $new_value ) && ! in_array( $new_value, $sanitized ) ) {
+                $sanitized[ $key ] = $new_value;
+            }
+
+        }
+
+        return $sanitized;
     }
 }
 

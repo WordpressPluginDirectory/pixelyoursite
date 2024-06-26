@@ -4,7 +4,7 @@ Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent M
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.5
-Stable tag: 9.6.1.1
+Stable tag: 9.6.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -469,6 +469,16 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.6.2 =
+
+* The GA4 server container URL option is OFF by default.
+ 
+* Code improvements.
+
+* New video links.
+
+* WooCommerce 9.0 support declared. 
 
 = PixelYourSite 9.6.1.1 =
 

@@ -65,47 +65,22 @@ if (!Array.prototype.includes) {
          * Public API
          */
         return {
-
-            isEnabled: function () {
-            },
-
-            disable: function () {
-            },
-
-            loadPixel: function () {
-            },
-
+            isEnabled: function () {},
+            disable: function () {},
+            loadPixel: function () {},
             fireEvent: function (name, data) {
                 return false;
             },
-
-            onCommentEvent: function () {
-            },
-
-            onDownloadEvent: function (params) {
-            },
-
-            onFormEvent: function (params) {
-            },
-
-            onWooAddToCartOnButtonEvent: function (product_id) {
-            },
-
-            onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {
-            },
-
-            onWooRemoveFromCartEvent: function (cart_item_hash) {
-            },
-
-            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {
-            },
-
-            onEddRemoveFromCartEvent: function (item) {
-            },
+            onCommentEvent: function () {},
+            onDownloadEvent: function (params) {},
+            onFormEvent: function (params) {},
+            onWooAddToCartOnButtonEvent: function (product_id) {},
+            onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {},
+            onWooRemoveFromCartEvent: function (cart_item_hash) {},
+            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {},
+            onEddRemoveFromCartEvent: function (item) {},
             onPageScroll: function (event) {},
-            onTime: function (event) {
-
-            },
+            onTime: function (event) {},
 
         }
 
@@ -117,65 +92,27 @@ if (!Array.prototype.includes) {
          * Public API
          */
         return {
-
-            isEnabled: function () {
-            },
-
-            disable: function () {
-            },
-
-            loadPixel: function () {
-            },
-
+            isEnabled: function () {},
+            disable: function () {},
+            loadPixel: function () {},
             fireEvent: function (name, data) {
                 return false;
             },
-
-            onAdSenseEvent: function () {
-            },
-
-            onClickEvent: function (params) {
-            },
-
-            onWatchVideo: function (params) {
-            },
-
-            onCommentEvent: function () {
-            },
-
-            onFormEvent: function (params) {
-            },
-
-            onDownloadEvent: function (params) {
-            },
-
-            onWooAddToCartOnButtonEvent: function (product_id) {
-            },
-
-            onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {
-            },
-
-            onWooRemoveFromCartEvent: function (cart_item_hash) {
-            },
-
-            onWooAffiliateEvent: function (product_id) {
-            },
-
-            onWooPayPalEvent: function () {
-            },
-
-            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {
-            },
-
-            onEddRemoveFromCartEvent: function (item) {
-            },
-
-            onPageScroll: function (event) {
-            },
-
-            onTime: function (event) {
-            },
-
+            onAdSenseEvent: function () {},
+            onClickEvent: function (params) {},
+            onWatchVideo: function (params) {},
+            onCommentEvent: function () {},
+            onFormEvent: function (params) {},
+            onDownloadEvent: function (params) {},
+            onWooAddToCartOnButtonEvent: function (product_id) {},
+            onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {},
+            onWooRemoveFromCartEvent: function (cart_item_hash) {},
+            onWooAffiliateEvent: function (product_id) {},
+            onWooPayPalEvent: function () {},
+            onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {},
+            onEddRemoveFromCartEvent: function (item) {},
+            onPageScroll: function (event) {},
+            onTime: function (event) {},
         }
 
     }();
@@ -1524,7 +1461,7 @@ if (!Array.prototype.includes) {
                     allData.eventID = Facebook.getEventId(allData.name);
                 } else {
                     // send event from server if they was bloc by gdpr or need send with delay
-                    if(options.ajaxForServerStaticEvent || event.type !== "static" || (!options.ajaxForServerStaticEvent && !allData.eventID)) {
+                    if(options.ajaxForServerStaticEvent || allData.type !== "static" || (!options.ajaxForServerStaticEvent && !allData.eventID)) {
                         allData.eventID = pys_generate_token(36);
                     }
 
