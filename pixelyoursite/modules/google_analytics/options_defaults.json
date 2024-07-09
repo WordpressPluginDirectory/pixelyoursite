@@ -53,5 +53,6 @@
   "automatic_event_time_on_page_enabled": true,
   "automatic_event_search_enabled": true,
 
-  "disable_noscript" : false
+  "disable_noscript" : false,
+  "custom_page_view_event": false
 }

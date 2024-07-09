@@ -69,10 +69,19 @@ use PixelYourSite\GA\Helpers;
         Google Analytics
 	</div>
 	<div class="card-body">
-        <div class="row mb-3">
+        <div class="row mb-4">
             <div class="col">
                 <?php GA()->render_switcher_input( 'enabled' ); ?>
                 <h4 class="switcher-label">Enable Google Analytics IDs</h4>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <?php GA()->render_switcher_input( 'custom_page_view_event' ); ?>
+                <h4 class="switcher-label">Control the page_view event</h4>
+                <p class="mt-1 mb-0">
+                    <small>Enable it if you use a GTM server container to fire API events. When we control the page_view event we can sent an event_id that is used for deduplication of API events.</small>
+                </p>
             </div>
         </div>
         <div class="row mb-3">

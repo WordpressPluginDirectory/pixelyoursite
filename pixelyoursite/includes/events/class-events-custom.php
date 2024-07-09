@@ -75,6 +75,7 @@ class EventsCustom extends EventsFactory {
             case 'page_visit': {
                 $singleEvent = new SingleEvent('custom_event',EventTypes::$STATIC,'custom');
                 $singleEvent->args = $event;
+                $singleEvent->addPayload(["custom_event_post_id" => $event->__get('post_id')]);
                 return $singleEvent;
             }
 

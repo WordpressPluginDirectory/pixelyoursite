@@ -491,7 +491,7 @@ final class PYS extends Settings implements Plugin {
                 'SeznamBot', 'oBot', 'C-T bot', 'Updownerbot', 'Snoopy', 'heritrix', 'Yeti', 'DomainVader',
                 'DCPbot', 'PaperLiBot', 'APIs-Google', 'AdsBot-Google-Mobile', 'AdsBot-Google-Mobile-Apps',
                 'FeedFetcher-Google', 'Google-Read-Aloud', 'DuplexWeb-Google', 'Storebot-Google', 'lscache_runner',
-                'ClaudeBot', 'SeekportBot', 'WP Rocket/Preload', 'WP-Rocket-Preload', 'GPTBot', 'Applebot',
+                'ClaudeBot', 'SeekportBot', 'GPTBot', 'Applebot',
                 'DuckDuckBot', 'Sogou', 'facebookexternalhit', 'Swiftbot', 'Slurp', 'CCBot', 'Go-http-client',
                 'Sogou Spider', 'Facebot', 'Alexa Crawler', 'Cốc Cốc Bot', 'Majestic-12', 'SemrushBot',
                 'DotBot', 'Qwantify', 'Pinterest', 'GrapeshotCrawler', 'archive.org_bot', 'LinkpadBot',
@@ -960,6 +960,15 @@ final class PYS extends Settings implements Plugin {
             return true;
         }
 
+        return false;
+    }
+    public function isWPRocketPreload() {
+        $options = array('WP Rocket/Preload', 'WP-Rocket-Preload', 'WP Rocket/Homepage_Preload');
+        foreach($options as $row) {
+            if (stripos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($row)) !== false) {
+                return true;
+            }
+        }
         return false;
     }
 }

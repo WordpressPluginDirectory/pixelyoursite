@@ -57,4 +57,9 @@ class SingleEvent extends PYSEvent{
 
         return $data;
     }
+    function getPayloadValue($key) {
+        if(isset($this->payload[$key]))
+            return $this->payload[$key];
+        return null;
+    }
 }

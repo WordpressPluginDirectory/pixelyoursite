@@ -58,7 +58,7 @@ if (!Array.prototype.includes) {
     if (options.debug) {
         console.log('PYS:', options);
     }
-
+    var uniqueId = {};
     var dummyPinterest = function () {
 
         /**
@@ -619,6 +619,22 @@ if (!Array.prototype.includes) {
                     }
                 } catch (e) {
                     console.error(e);
+                }
+            },
+            /**
+             * Generate unique ID
+             */
+            generateUniqueId : function (event) {
+                if(event.eventID.length == 0 || (event.type == "static" && options.ajaxForServerStaticEvent) || (event.type !== "static" && options.ajaxForServerEvent)) {
+                    let idKey = event.hasOwnProperty('custom_event_post_id') ? event.custom_event_post_id : event.e_id;
+                    if (!uniqueId.hasOwnProperty(idKey)) {
+                        uniqueId[idKey] = pys_generate_token();
+                    }
+                    return uniqueId[idKey];
+                }
+                else if(event.eventID.length !== 0)
+                {
+                    return event.eventID;
                 }
             },
             sendServerAjaxRequest : function(url, data) {
@@ -1461,9 +1477,7 @@ if (!Array.prototype.includes) {
                     allData.eventID = Facebook.getEventId(allData.name);
                 } else {
                     // send event from server if they was bloc by gdpr or need send with delay
-                    if(options.ajaxForServerStaticEvent || allData.type !== "static" || (!options.ajaxForServerStaticEvent && !allData.eventID)) {
-                        allData.eventID = pys_generate_token(36);
-                    }
+                    allData.eventID = Utils.generateUniqueId(allData);
 
                     if(Cookies.get('_fbp')){
                         params._fbp = Cookies.get('_fbp');
@@ -1519,7 +1533,6 @@ if (!Array.prototype.includes) {
             var params = {};
             var arg = {};
             Utils.copyProperties(data, params);
-
             let eventId = sendFbServerEvent(allData,name,params)
 
 
@@ -1916,7 +1929,6 @@ if (!Array.prototype.includes) {
                 gtag('event', name, params);
 
             };
-
             options.ga.trackingIds.forEach(function (tracking_id) {
                 var copyParams = Utils.copyProperties(eventParams, {}); // copy params because mapParamsTov4 can modify it
                 var params = mapParamsTov4(tracking_id,name,copyParams)
@@ -1989,7 +2001,7 @@ if (!Array.prototype.includes) {
                     var searchValue = "index_"+index;
                     var config_for_tag = Object.assign({}, options.config);
                     config_for_tag.debug_mode = false;
-
+                    config_for_tag.send_page_view = !options.ga.custom_page_view_event;
                     for (var key in obj) {
                         if (obj.hasOwnProperty(key) && obj[key] === searchValue) {
                             config_for_tag.debug_mode = true;
@@ -2057,7 +2069,7 @@ if (!Array.prototype.includes) {
 
                 data.delay = data.delay || 0;
                 data.params = data.params || {};
-
+                data.params.eventID = Utils.generateUniqueId(data);
                 if (data.delay === 0) {
 
                     fireEvent(name, data.params);
@@ -2825,15 +2837,10 @@ if (!Array.prototype.includes) {
 
 }(jQuery, pysOptions);
 
-function pys_generate_token(length){
-    //edit the token allowed characters
-    var a = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split("");
-    var b = [];
-    for (var i=0; i<length; i++) {
-        var j = (Math.random() * (a.length-1)).toFixed(0);
-        b[i] = a[j];
-    }
-    return b.join("");
+function pys_generate_token() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
 }
 
 function getBundlePriceOnSingleProduct(data) {

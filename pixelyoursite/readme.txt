@@ -4,7 +4,7 @@ Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent M
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.5
-Stable tag: 9.6.2
+Stable tag: 9.7.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -18,6 +18,8 @@ PixelYourSite's Automatic Events will track important actions and send them to a
 You can fire your own events with zero coding.
 
 Google Consent Mode V2 support: [check this dedicated page for more details](https://www.pixelyoursite.com/google-consent-mode-v2-wordpress)
+
+NEW: Google Tag Manager Server-Side Tagging BETA support: [more details here](https://www.pixelyoursite.com/google-server-side-tagging-with-pixelyoursite)
 
 **WooCommerce** and **Easy Digital Downloads** are fully supported, with Facebook Dynamic Ads pixel setup and Google Analytics Enhanced Ecommerce.
 
@@ -469,6 +471,21 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.7.0 =
+
+July 9, 2024
+
+* Unified event ID logic that can help with Google Tag Manager server-side integration when browser and APIs are used. 
+
+* Fixing possible  issues with WPRocket.
+
+* Fixing a possible issue with Fluent Form events. 
+
+* Declaring compatibility for the current WooCommerce version.
+
+* Other small code improvements.
+
 
 = PixelYourSite 9.6.2 =
 

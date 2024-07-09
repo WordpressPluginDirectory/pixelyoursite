@@ -116,7 +116,8 @@ class GA extends Settings implements Pixel {
             'additionalConfig'  => $this->getPixelAdditionalConfig(),
             'disableAdvertisingFeatures'    => $this->getOption( 'disable_advertising_features' ),
             'disableAdvertisingPersonalization' => $this->getOption( 'disable_advertising_personalization' ),
-            'wooVariableAsSimple' => GATags()->getOption( 'woo_variable_as_simple' )
+            'wooVariableAsSimple' => GATags()->getOption( 'woo_variable_as_simple' ),
+            'custom_page_view_event' => $this->getOption( 'custom_page_view_event' ),
         );
     }
     private function isGaV4($tag) {
@@ -193,6 +194,9 @@ class GA extends Settings implements Pixel {
 
 
             case 'init_event': {
+                    if ( ! $this->getOption( 'custom_page_view_event' ) ) {
+                        return;
+                    }
                     $eventData = $this->getPageViewEventParams();
                     if ($eventData) {
                         $isActive = true;
@@ -411,16 +415,10 @@ class GA extends Settings implements Pixel {
 	
 	private function getPageViewEventParams() {
 
-		if ( PYS()->getEventsManager()->doingAMP ) {
-
-			return array(
-				'name' => 'PageView',
-				'data' => array(),
-			);
-
-		} else {
-			return false; // PageView is fired by tag itself
-		}
+        return array(
+            'name' => 'page_view',
+            'data' => array(),
+        );
 
 	}
 

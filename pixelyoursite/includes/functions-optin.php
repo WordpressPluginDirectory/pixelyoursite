@@ -5,8 +5,36 @@ namespace PixelYourSite;
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
-
+add_action( 'wp_ajax_pys_optin_add',  'PixelYourSite\pys_optin_add' );
+add_action( 'wp_ajax_nopriv_pys_optin_add', 'PixelYourSite\pys_optin_add' );
 add_action( 'admin_notices', 'PixelYourSite\adminRenderOptinNotices', 9 );
+function pys_optin_add()
+{
+    $body = array(
+        'action'  => 'optin_add',
+        'data'  => $_POST
+    );
+
+    $response = wp_remote_post( 'https://www.pixelyoursite.com', array(
+        'timeout'   => 30,
+        'sslverify' => false,
+        'user-agent' => 'PixelYourSite/' . PYS_FREE_VERSION . '; ' . get_bloginfo( 'url' ),
+        'body'      => $body
+    ) );
+
+
+    if (is_wp_error($response)) {
+        wp_send_json_error(null, 420);
+    } else {
+        $body = wp_remote_retrieve_body($response);
+        $decoded_body = json_decode($body, true); // Decode the body to an array
+        if (isset($decoded_body['data'])) {
+            wp_send_json_success($decoded_body['data']); // Return only the 'data' part
+        } else {
+            wp_send_json_error('Invalid response format', 422);
+        }
+    }
+}
 function adminRenderOptinNotices() {
     
     if ( ! current_user_can( 'manage_pys' ) ) {
@@ -158,7 +186,7 @@ function adminRenderOptinNotices() {
             });
             
             jQuery.ajax({
-                url: 'https://pixelyoursite.com/wp-admin/admin-ajax.php',
+                url: ajaxurl,
                 method: 'POST',
                 crossDomain: true,
                 data: {

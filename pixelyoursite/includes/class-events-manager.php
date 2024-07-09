@@ -16,7 +16,7 @@ class EventsManager {
     private $dynamicEvents = array();
     private $triggerEvents = array();
     private $triggerEventTypes = array();
-
+    private $uniqueId = array();
 
     public function __construct() {
 
@@ -264,7 +264,7 @@ class EventsManager {
         }
 
 
-        if(count($this->facebookServerEvents)>0 && Facebook()->enabled() && Facebook()->isServerApiEnabled()) {
+        if(count($this->facebookServerEvents)>0 && Facebook()->enabled() && Facebook()->isServerApiEnabled() && !PYS()->isWPRocketPreload()) {
             FacebookServer()->sendEventsAsync($this->facebookServerEvents);
             $this->facebookServerEvents = array();
         }
@@ -288,6 +288,11 @@ class EventsManager {
             $pixel = PYS()->getRegisteredPixels()[$pixelSlug];
             foreach ($events as $event) {
                 // add standard params
+                if(!isset($this->uniqueId[$event->getId()])) {
+                    $this->uniqueId[$event->getId()] = EventIdGenerator::guidv4();
+                }
+                $event->addPayload(['eventID'=>$this->uniqueId[$event->getId()]]);
+
                 $event->addParams($this->standardParams);
                 //save different types of events
                 if($event->getType() == EventTypes::$STATIC) {
@@ -335,6 +340,13 @@ class EventsManager {
      * @param Event $event
      */
     function addStaticEvent($event,$pixel,$slug) {
+        $event_getId = $event->getId() == 'custom_event' ? $event->getPayloadValue('custom_event_post_id') : $event->getId();
+
+        if(!isset($this->uniqueId[$event_getId])) {
+            $this->uniqueId[$event_getId] = EventIdGenerator::guidv4();
+        }
+
+        $event->addPayload(['eventID'=>$this->uniqueId[$event_getId]]);
 
         $eventData = $event->getData();
         $eventData = $this::filterEventParams($eventData,$slug);
