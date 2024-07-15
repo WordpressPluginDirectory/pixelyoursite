@@ -963,10 +963,12 @@ final class PYS extends Settings implements Plugin {
         return false;
     }
     public function isWPRocketPreload() {
-        $options = array('WP Rocket/Preload', 'WP-Rocket-Preload', 'WP Rocket/Homepage_Preload');
-        foreach($options as $row) {
-            if (stripos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($row)) !== false) {
-                return true;
+        if(!empty($_SERVER['HTTP_USER_AGENT'])){
+            $options = array('WP Rocket/Preload', 'WP-Rocket-Preload', 'WP Rocket/Homepage_Preload');
+            foreach($options as $row) {
+                if (stripos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($row)) !== false) {
+                    return true;
+                }
             }
         }
         return false;

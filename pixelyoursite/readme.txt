@@ -4,7 +4,7 @@ Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent M
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.5
-Stable tag: 9.7.0
+Stable tag: 9.7.0.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -471,6 +471,18 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 9.7.0 =
+
+July 15, 2024
+
+* Fixing possible error, Uncaught Error: Call to a member function get_price() on bool
+
+* Fixing possible error, database error The SELECT would examine more than MAX_JOIN_SIZE rows
+
+* Fixing possible error, PHP Warning: Undefined array key "HTTP_USER_AGENT"
+
+* Declaring WooCommerce 9.1 compatibility.
 
 = PixelYourSite 9.7.0 =
 

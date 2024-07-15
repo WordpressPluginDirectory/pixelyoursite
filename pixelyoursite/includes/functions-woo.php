@@ -61,15 +61,21 @@ function getWooProductPriceToDisplay( $product_id, $qty = 1 ) {
         if(empty( $prices['price'] )) {
             $productPrice = $product->get_price();
         } else {
-            $variation_id = key($prices['price']); // Получаем ID вариации
-            $variation = wc_get_product($variation_id); // Создаем экземпляр вариации
+            $variation_id = key($prices['price']); // Getting the variation ID
+            $variation = wc_get_product($variation_id); // Creating a Variation Instance
 
-            $args = array(
-                'price' => $variation->get_price(),
-                'qty'   => 1
-            );
+            if ($variation && is_a($variation, 'WC_Product')) { // Check if $variation is a valid product object
+                $args = array(
+                    'price' => $variation->get_price(),
+                    'qty'   => 1
+                );
 
-            $productPrice = wc_get_price_excluding_tax($variation, $args);
+                $productPrice = wc_get_price_excluding_tax($variation, $args);
+            } else {
+                // Handle the case where no valid variation is found
+                // For example, fallback to the parent product's price or set a default price
+                $productPrice = $product->get_price(); // Fallback to the parent product's price
+            }
         }
 
     } else {
