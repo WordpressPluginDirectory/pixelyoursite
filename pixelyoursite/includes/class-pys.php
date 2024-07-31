@@ -239,26 +239,43 @@ final class PYS extends Settings implements Plugin {
     function get_pbid(){
         return $this->externalId;
     }
-    function set_pbid(){
+    function set_pbid() {
         $pbidCookieName = 'pbid';
         $isTrackExternalId = EventsManager::isTrackExternalId();
+        $user = wp_get_current_user();
 
-
-        if (empty($_COOKIE[$pbidCookieName]) && $isTrackExternalId) {
-            $uniqueId = bin2hex(random_bytes(16));
-            $encryptedUniqueId = hash('sha256', $uniqueId);
-            $this->externalId = $encryptedUniqueId;
+        if ($user && $isTrackExternalId) {
+            $userExternalId = $user->get('external_id');
+            if (!empty($userExternalId)) {
+                $this->externalId = $userExternalId;
+                return;
+            }
         }
-        elseif(!empty($_COOKIE[$pbidCookieName]) && $isTrackExternalId){
-            $this->externalId = $_COOKIE[$pbidCookieName];
+
+        if ($isTrackExternalId) {
+
+            if (!empty($_COOKIE[$pbidCookieName])) {
+                $this->externalId = $_COOKIE[$pbidCookieName];
+            } elseif ( PYS()->getOption('external_id_use_transient') && get_transient('externalId-' . PYS()->get_user_ip())) {
+                $this->externalId = get_transient('externalId-' . PYS()->get_user_ip());
+            }
+            else {
+                $uniqueId = bin2hex(random_bytes(16));
+                $encryptedUniqueId = hash('sha256', $uniqueId);
+                $this->externalId = $encryptedUniqueId;
+                if(PYS()->getOption('external_id_use_transient')){
+                    set_transient('externalId-' . PYS()->get_user_ip(), $this->externalId, 60 * 10);
+                }
+            }
         }
     }
 
     public function get_pbid_ajax(){
-        if(defined('DOING_AJAX') && wp_doing_ajax()){
+        if(defined('DOING_AJAX') && DOING_AJAX){
             $isTrackExternalId = EventsManager::isTrackExternalId();
             if ($isTrackExternalId && !empty($this->externalId)) {
-                wp_send_json_success( array('pbid'=> $this->externalId));
+                $transient = get_transient('externalId-'.PYS()->get_user_ip());
+                wp_send_json_success( array('pbid'=> $this->externalId, 'transient' => !empty($transient) ? $transient : false ));
             }
         }
     }
@@ -546,7 +563,8 @@ final class PYS extends Settings implements Plugin {
 
         add_menu_page( 'PixelYourSite', 'PixelYourSite', 'manage_pys', 'pixelyoursite',
             array( $this, 'adminPageMain' ), PYS_FREE_URL . '/dist/images/favicon.png' );
-
+        add_submenu_page( 'pixelyoursite', 'Global Settings', 'Global Settings',
+            'manage_pys', 'pixelyoursite_settings', array( $this, 'settingsTemplate' ) );
         $addons = $this->registeredPlugins;
 
         if ( $addons['head_footer'] ) {
@@ -577,6 +595,7 @@ final class PYS extends Settings implements Plugin {
         // core admin pages
         $this->adminPagesSlugs = array(
             'pixelyoursite',
+            'pixelyoursite_settings',
             'pixelyoursite_licenses',
             'pixelyoursite_report',
             'pixelyoursite_woo_reports',
@@ -643,7 +662,9 @@ final class PYS extends Settings implements Plugin {
 
 		include 'views/html-licenses.php';
 	}
-
+    public function settingsTemplate() {
+        include 'views/html-main-settings.php';
+    }
 
 
     public function updatePlugin() {

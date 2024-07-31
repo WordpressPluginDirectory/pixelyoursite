@@ -155,7 +155,9 @@ function getAdvancedMatchingParams() {
 
 	}
     if(PixelYourSite\EventsManager::isTrackExternalId()){
-        if (PixelYourSite\PYS()->get_pbid()) {
+        if($user && $user->get( 'external_id' )){
+            $params['external_id'] = $user->get( 'external_id' );
+        } elseif (PixelYourSite\PYS()->get_pbid()) {
             $params['external_id'] = PixelYourSite\PYS()->get_pbid();
         }
     }

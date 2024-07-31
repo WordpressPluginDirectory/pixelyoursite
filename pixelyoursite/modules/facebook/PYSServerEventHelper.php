@@ -363,8 +363,8 @@ class ServerEventHelper {
                 }
             }
             if(PixelYourSite\EventsManager::isTrackExternalId()){
-                if (isset($_COOKIE['pbid'])) {
-                    $userData->setExternalId($_COOKIE['pbid']);
+                if (!empty(PixelYourSite\PYS()->get_pbid())) {
+                    $userData->setExternalId(PixelYourSite\PYS()->get_pbid());
                 }
             }
         } else {

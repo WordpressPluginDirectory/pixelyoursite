@@ -783,7 +783,10 @@ function endsWith( $haystack, $needle ) {
 }
 
 function getCurrentPageUrl($removeQuery = false) {
-    if($removeQuery) {
+    if(!isset($_SERVER['HTTP_HOST']) || !isset($_SERVER['REQUEST_URI'])) {
+        return '';
+    }
+    if($removeQuery && isset($_SERVER['QUERY_STRING']) && isset($_SERVER['HTTP_HOST'])){
         return $_SERVER['HTTP_HOST'] . str_replace("?".$_SERVER['QUERY_STRING'],"",$_SERVER['REQUEST_URI']);
     }
     return  $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ;

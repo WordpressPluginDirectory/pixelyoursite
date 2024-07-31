@@ -3,8 +3,8 @@ Contributors: PixelYourSite
 Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, GA4, Google Consent Mode V2
 Requires at least: 3.0.1
 Requires PHP: 5.4
-Tested up to: 6.5
-Stable tag: 9.7.0.1
+Tested up to: 6.6
+Stable tag: 9.7.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -472,7 +472,23 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 == Changelog ==
 
-= PixelYourSite 9.7.0 =
+= PixelYourSite 9.7.1 =
+
+July 31, 2024
+
+* New Global Settings page. We move all the global settings from the dashboard to this dedicated page. 
+
+* New options regarding external IDs. We now store a temporary value for external IDs using transients for up to 10 minutes, creating the premises to detect returning traffic based on IP addresses even when it’s done from a different browser or device. This can be turned OFF on the Global Settings page.
+
+* Improved way to generate external IDs to fix missing values in some instances.
+
+* Possible improvements to the way we fire the Purhcase event for some particular WooCommerce setups. 
+
+* Various UI changes to reflect new features in the pro version, like the page view number trigger for events. 
+
+* Declaring compatibility with WordPress 6.6.
+
+= PixelYourSite 9.7.0.1 =
 
 July 15, 2024
 

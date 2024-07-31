@@ -66,16 +66,24 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
                 <div class="triger_post_type form-inline" style="display: none">
                     <?php Events\renderPostTypeSelect( $event, 'post_type_value' ); ?>
                 </div>
-                <div class="event-delay form-inline">
+                <div class="event-delay form-inline" >
                     <label>with delay</label>
                     <?php Events\renderNumberInput( $event, 'delay', '0' ); ?>
                     <label>seconds</label>
+                </div>
+                <div class="triger_number_page_visit form-inline">
+                    <?php renderDummySelectInput( '=', true ); ?>
+                </div>
+                <div class="triger_number_page_visit form-inline">
+                    <?php renderDummyNumberInput(3 ); ?>
+                    <label>visited page</label>
+                    <?php renderProBadge( 'https://www.pixelyoursite.com/?utm_source=pys-free-plugin&utm_medium=pro-badge&utm_campaign=pro-feature' ); ?>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="col form-inline">
+            <div class="col form-inline" id="fire_event_once">
                 <?php Events\renderSwitcherInput( $event, 'enable_time_window',true ); ?>
                 <label>Fire this event only once in</label>
                 <?php Events\renderNumberInput( $event, 'time_window', '24' ); ?>
@@ -143,7 +151,9 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
             <?php endforeach; ?>
 
             <div class="insert-marker"></div>
-
+            <div class="mt-3">
+                <small>You can also use <b>*</b> as the trigger URL on all pages</small>
+            </div>
             <div class="row mt-3">
                 <div class="col-4">
                     <button class="btn btn-sm btn-block btn-primary add-event-trigger" type="button">Add another
@@ -151,7 +161,34 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
                 </div>
             </div>
         </div>
+        <div id="number_page_visit_panel" class="event_triggers_panel" data-trigger_type="number_page_visit" style="display: none;">
+            <div class="row mt-3 event_trigger" data-trigger_id="0" style="display: none;">
+                <div class="col">
+                    <div class="row">
+                        <div class="col-4">
+                            <?php renderDummySelectInput( 'Any URL`s', true ); ?>
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="btn btn-sm remove-row">
+                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <div class="insert-marker"></div>
+            <div class="mt-3">
+                <small>You can also use <b>*</b> as the trigger URL on all pages</small>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-4">
+                    <button class="btn btn-sm btn-block btn-disabled" type="button">Add another
+                        URL</button>
+                </div>
+            </div>
+        </div>
         <div id="url_click_panel" class="event_triggers_panel" style="display: none;">
             <div class="row mt-3">
                 <div class="col">

@@ -236,6 +236,7 @@ function renderTriggerTypeInput( &$event, $key ) {
 
 	$options = array(
         'page_visit'    => 'Page visit',
+        'number_page_visit'    => 'Number of Page Visits - PRO',
         'url_click'     => 'Click on HTML link - PRO',
         'css_click'     => 'Click on CSS selector - PRO',
         'css_mouseover' => 'Mouse over CSS selector - PRO',
