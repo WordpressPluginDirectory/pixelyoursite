@@ -133,21 +133,11 @@ class AjaxHookEventManager {
             $dataList[$pixel->getSlug()] = $eventData;
 
             if($pixel->getSlug() == "facebook" && Facebook()->isServerApiEnabled()) {
-
-                if($is_ajax_request) {
-                    FacebookServer()->sendEventsNow([$event]);
-                } else {
-                    FacebookServer()->sendEventsAsync([$event]);
-                }
+                FacebookServer()->sendEventsNow([$event]);
             }
 
 			if($pixel->getSlug() == "pinterest" && Pinterest()->isServerApiEnabled()) {
-
-				if($is_ajax_request) {
-					PinterestServer()->sendEventsNow(array($event));
-				} else {
-					PinterestServer()->sendEventsAsync(array($event));
-				}
+                PinterestServer()->sendEventsNow(array($event));
 			}
         }
         AjaxHookEventManager::addPendingEvent("woo_add_to_cart_on_button_click",$dataList);

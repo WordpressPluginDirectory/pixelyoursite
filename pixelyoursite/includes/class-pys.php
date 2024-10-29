@@ -1,6 +1,7 @@
 <?php
 
 namespace PixelYourSite;
+use Jaybizzle\CrawlerDetect\CrawlerDetect;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
@@ -28,6 +29,8 @@ final class PYS extends Settings implements Plugin {
      * @var PYS_Logger
      */
     private $logger;
+    private $containers;
+    private $crawlerDetect;
 	
 	public static function instance() {
 
@@ -98,30 +101,66 @@ final class PYS extends Settings implements Plugin {
         add_action( 'deactivate_pixel-cost-of-goods/pixel-cost-of-goods.php',array($this,"restoreSettingsAfterCog"));
         add_action( 'woocommerce_checkout_create_order', array( $this,'add_order_external_meta_data'), 10, 2 );
 
-        $this->logger = new PYS_Logger();
+		/**
+		 * For Woo
+		 */
+		add_action( 'woocommerce_checkout_order_processed', array( $this, 'woo_checkout_process' ), 10, 3 );
 
+		/**
+		 * For EDD
+		 */
+		if(!$this->isCachePreload()){
+			add_action( 'edd_recurring_record_payment', array( $this, 'edd_recurring_payment' ), 10, 1 );
+		}
+
+        $this->logger = new PYS_Logger();
+        $this->containers = new gtmContainers();
+        $this->crawlerDetect = new CrawlerDetect();
     }
 
     public function init() {
 
-        if ( isset( $_GET[ 'download_logs' ] ) && $_GET['download_logs'] == 'meta' ) {
-            PYS()->getLog()->downloadLogFile();
-        }
-        elseif (isset( $_GET[ 'download_logs' ] ) && $_GET['download_logs'] == 'pinterest' && method_exists(Pinterest(), 'getLog')){
-            Pinterest()->getLog()->downloadLogFile();
+        $this->logger->init();
+
+        $loggers = [
+            'meta' => [$this->logger, 'downloadLogFile'],
+        ];
+
+        $clearLoggers = [
+            'clear_plugin_logs' => [$this->logger, 'remove'],
+        ];
+
+        if (isPinterestActive()) {
+            $loggers['pinterest'] = [Pinterest()->getLog(), 'downloadLogFile'];
+            $clearLoggers['clear_pinterest_logs'] = [Pinterest()->getLog(), 'remove'];
         }
 
-        if ( isset( $_GET[ 'clear_plugin_logs' ] ) ) {
-            PYS()->getLog()->remove();
-            $actual_link = ( isset( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] === 'on' ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-            wp_redirect( remove_query_arg( 'clear_plugin_logs', $actual_link ) );
-            exit;
-        } elseif ( isset( $_GET[ 'clear_pinterest_logs' ] ) ) {
-            Pinterest()->getLog()->remove();
-            $actual_link = ( isset( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] === 'on' ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-            wp_redirect( remove_query_arg( 'clear_pinterest_logs', $actual_link ) );
-            exit;
+        if (isset($_GET['download_logs']) && array_key_exists($_GET['download_logs'], $loggers)) {
+            $logger = $loggers[$_GET['download_logs']];
+            if (is_callable($logger)) {
+                call_user_func($logger);
+            } elseif (is_callable([$logger[0], $logger[1]])) {
+                call_user_func([$logger[0], $logger[1]]);
+            }
         }
+
+        foreach ($clearLoggers as $key => $logger) {
+            if (isset($_GET[$key]) && (is_callable($logger) || (is_callable([$logger[0], $logger[1]]) && method_exists($logger[0], $logger[1])))) {
+                if (is_callable($logger)) {
+                    call_user_func($logger);
+                } else {
+                    call_user_func([$logger[0], $logger[1]]);
+                }
+                $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+                wp_redirect(remove_query_arg($key, $actual_link));
+                exit;
+            }
+        }
+
+        if ( isset( $_GET[ 'download_container' ] )) {
+            $this->containers->downloadLogFile($_GET[ 'download_container' ]);
+        }
+
         register_post_type( 'pys_event', array(
             'public' => false,
             'supports' => array( 'title' )
@@ -155,7 +194,7 @@ final class PYS extends Settings implements Plugin {
 		    add_filter( 'facebook_for_woocommerce_integration_pixel_enabled', '__return_false' );
 	    }
 
-        $this->logger->init();
+
         if(Facebook()->getOption('test_api_event_code_expiration_at'))
         {
             foreach (Facebook()->getOption('test_api_event_code_expiration_at') as $key => $test_code_expiration_at)
@@ -335,6 +374,9 @@ final class PYS extends Settings implements Plugin {
 	 * @param Pixel|Settings $pixel
 	 */
     public function registerPixel( &$pixel ) {
+        if(!is_admin() && !PYS()->getOption('enable_all_tracking_ids') && $pixel->getSlug() != 'gtm'){
+            return;
+        }
         switch ($pixel->getSlug()) {
             case 'pinterest':
                 if(!isPinterestVersionIncompatible()){
@@ -371,6 +413,17 @@ final class PYS extends Settings implements Plugin {
      */
     function userLogin($user_login, $user) {
         update_user_meta($user->ID,'pys_just_login',true);
+
+		if ( !apply_filters( 'pys_disable_advanced_form_data_cookie', false ) && !apply_filters( 'pys_disable_advance_data_cookie', false ) ) {
+			$user_persistence_data = get_persistence_user_data( $user->user_email, $user->first_name, $user->last_name, '' );
+			$userData = array(
+				'first_name' => $user_persistence_data[ 'fn' ],
+				'last_name'  => $user_persistence_data[ 'ln' ],
+				'email'      => $user_persistence_data[ 'em' ],
+				'phone'      => $user_persistence_data[ 'tel' ]
+			);
+			setcookie( "pys_advanced_form_data", json_encode( $userData ), 2147483647, '/' );
+		}
     }
 
     public function userRegisterHandler( $user_id ) {
@@ -491,7 +544,22 @@ final class PYS extends Settings implements Plugin {
     }
 
     function is_user_agent_bot(){
+        if (!PYS()->getOption('block_robot_enabled')) {
+            return false;
+        }
         if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+
+            $userAgent = strtolower($_SERVER['HTTP_USER_AGENT']);
+            $excludedRobots = PYS()->getOption('exclude_blocked_robots');
+
+            if (!empty($excludedRobots)) {
+                foreach ($excludedRobots as $robot) {
+                    if (stripos($userAgent, strtolower($robot)) !== false) {
+                        return false;
+                    }
+                }
+            }
+
             $options = array(
                 'YandexBot', 'YandexAccessibilityBot', 'YandexMobileBot', 'YandexDirectDyn', 'YandexScreenshotBot',
                 'YandexImages', 'YandexVideo', 'YandexVideoParser', 'YandexMedia', 'YandexBlogs',
@@ -507,7 +575,7 @@ final class PYS extends Settings implements Plugin {
                 'AcoonBot', 'findlinks', 'proximic', 'OpenindexSpider', 'statdom.ru', 'Exabot', 'Spider',
                 'SeznamBot', 'oBot', 'C-T bot', 'Updownerbot', 'Snoopy', 'heritrix', 'Yeti', 'DomainVader',
                 'DCPbot', 'PaperLiBot', 'APIs-Google', 'AdsBot-Google-Mobile', 'AdsBot-Google-Mobile-Apps',
-                'FeedFetcher-Google', 'Google-Read-Aloud', 'DuplexWeb-Google', 'Storebot-Google', 'lscache_runner',
+                'FeedFetcher-Google', 'Google-Read-Aloud', 'DuplexWeb-Google', 'Storebot-Google',
                 'ClaudeBot', 'SeekportBot', 'GPTBot', 'Applebot',
                 'DuckDuckBot', 'Sogou', 'facebookexternalhit', 'Swiftbot', 'Slurp', 'CCBot', 'Go-http-client',
                 'Sogou Spider', 'Facebot', 'Alexa Crawler', 'Cốc Cốc Bot', 'Majestic-12', 'SemrushBot',
@@ -520,17 +588,17 @@ final class PYS extends Settings implements Plugin {
                 'Seomoz', 'BLEXBot', 'YisouSpider', '360Spider', 'AddThis', 'TweetmemeBot', 'ContextAd Bot',
                 'Screaming Frog SEO Spider', 'Nutch', 'Baiduspider-image', 'Panscient.com', 'Twitterbot',
                 'YoudaoBot', 'OpenSiteExplorer', 'Linkfluence', 'YaK', 'ContentKing', 'Spinn3r', 'PhantomJS',
-                'HeadlessChrome', 'Snapchat', 'Pingdom', 'Googlebot-Mobile'
+                'HeadlessChrome', 'Snapchat', 'Pingdom', 'Googlebot-Mobile', 'Barkrowler'
             );
 
             foreach($options as $row) {
-                if (stripos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($row)) !== false) {
+                if (stripos($userAgent, strtolower($row)) !== false) {
                     return true;
                 }
             }
         }
 
-        return false;
+        return $this->crawlerDetect->isCrawler();
     }
 
     public function ajaxGetGdprFiltersValues() {
@@ -544,7 +612,7 @@ final class PYS extends Settings implements Plugin {
                 'externalID_disabled_by_api' => apply_filters( 'pys_disable_externalID_by_gdpr', false ),
                 'disabled_all_cookie'       => apply_filters( 'pys_disable_all_cookie', false ),
                 'disabled_start_session_cookie' => apply_filters( 'pys_disabled_start_session_cookie', false ),
-                'disabled_advanced_form_data_cookie' => apply_filters( 'pys_disable_advanced_form_data_cookie', false ),
+                'disabled_advanced_form_data_cookie' => apply_filters( 'pys_disable_advanced_form_data_cookie', false ) || apply_filters( 'pys_disable_advance_data_cookie', false ),
                 'disabled_landing_page_cookie'  => apply_filters( 'pys_disable_landing_page_cookie', false ),
                 'disabled_first_visit_cookie'  => apply_filters( 'pys_disable_first_visit_cookie', false ),
                 'disabled_trafficsource_cookie' => apply_filters( 'pys_disable_trafficsource_cookie', false ),
@@ -983,17 +1051,47 @@ final class PYS extends Settings implements Plugin {
 
         return false;
     }
-    public function isWPRocketPreload() {
-        if(!empty($_SERVER['HTTP_USER_AGENT'])){
-            $options = array('WP Rocket/Preload', 'WP-Rocket-Preload', 'WP Rocket/Homepage_Preload');
-            foreach($options as $row) {
-                if (stripos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($row)) !== false) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+	public function isCachePreload() {
+		if(!empty($_SERVER['HTTP_USER_AGENT'])){
+			$options = array('WP Rocket/Preload', 'WP-Rocket-Preload', 'WP Rocket/Homepage_Preload', 'lscache_runner', 'LiteSpeed Cache', 'LiteSpeed-Cache');
+			foreach($options as $row) {
+				if (stripos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($row)) !== false) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param $order_id
+	 * @param $posted_data
+	 * @param \WC_Order $order
+	 */
+	public function woo_checkout_process( $order_id, $posted_data, $order ) {
+		if ( !apply_filters( 'pys_disable_advanced_form_data_cookie', false ) && !apply_filters( 'pys_disable_advance_data_cookie', false ) ) {
+			$first_name = $order->get_billing_first_name();
+			$last_name = $order->get_billing_last_name();
+			$email = $order->get_billing_email();
+			$phone = $order->get_billing_phone();
+			$phone = preg_replace( '/[^0-9.]+/', '', $phone );
+
+			$user_persistence_data = get_persistence_user_data( $email, $first_name, $last_name, $phone );
+			$userData = array(
+				'first_name' => $user_persistence_data[ 'fn' ],
+				'last_name'  => $user_persistence_data[ 'ln' ],
+				'email'      => $user_persistence_data[ 'em' ],
+				'phone'      => $user_persistence_data[ 'tel' ]
+			);
+
+			setcookie( "pys_advanced_form_data", json_encode( $userData ), 2147483647, '/' );
+		}
+	}
+
+	function edd_recurring_payment( $payment_id ) {
+		EnrichOrder()->edd_save_subscription_meta( $payment_id );
+	}
+
 }
 
 /**

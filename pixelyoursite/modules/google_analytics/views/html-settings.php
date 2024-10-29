@@ -52,7 +52,10 @@ use PixelYourSite\GA\Helpers;
         <div class="row mb-3">
             <div class="col col-offset-left">
                 <div class="mb-1">
-                    <?php GA()->renderDummyCheckbox("Use encoding"); ?> <?php renderProBadge(); ?>
+					<?php GA()->renderDummyCheckbox("Send multiple values when possible (up to 3 emails and phone numbers, up to 2 address fields)", true); ?>
+                </div>
+                <div class="mb-1">
+                    <?php GA()->renderDummyCheckbox("Use encoding", true); ?>
                 </div>
                 <p>
                     <?php _e('Learn how to configure it: ', 'pys');?>

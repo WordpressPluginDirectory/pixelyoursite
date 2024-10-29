@@ -124,10 +124,12 @@ class PYS_Logger
     }
 
     public function downloadLogFile() {
+        if ( ! current_user_can( 'manage_pys' ) ) {
+            return;
+        }
         $file = static::get_log_file_path();
-        error_log(print_r($file, true));
         if ($file) {
-            // Устанавливаем заголовки для скачивания файла
+
             header('Content-Description: File Transfer');
             header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename="'.basename($file).'"');
@@ -136,11 +138,13 @@ class PYS_Logger
             header('Pragma: public');
             header('Content-Length: ' . filesize($file));
 
-            // Читаем файл и отправляем его пользователю
-            readfile($file);
+            if (file_exists($file)) {
+                readfile($file);
+            } else {
+                error_log("File not found: " . $file);
+            }
             exit;
         } else {
-            // Если файл не найден, отправляем соответствующий ответ
             http_response_code(404);
             echo "File not found.";
         }
@@ -212,6 +216,9 @@ class PYS_Logger
      */
     public function remove( )
     {
+        if ( ! current_user_can( 'manage_pys' ) ) {
+            return;
+        }
         $removed = false;
         $file = realpath($this::get_log_file_path());
         if (is_file($file) && is_writable($file)) { // phpcs:ignore WordPress.VIP.FileSystemWritesDisallow.file_ops_is_writable

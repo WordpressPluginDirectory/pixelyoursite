@@ -320,7 +320,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <p><code>pys_disable_trafficsource_cookie</code> - disable pysTrafficSource & last_pysTrafficSource cookies</p>
                 <p><code>pys_disable_utmTerms_cookie</code> - disable ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content' ,'utm_term'] with prefix <code>pys_</code> and <code>last_pys_</code> cookies</p>
                 <p><code>pys_disable_utmId_cookie</code> - disable ['fbadid', 'gadid', 'padid', 'bingid'] with prefix <code>pys_</code> and <code>last_pys_</code> cookies</p>
-                <p><code>pys_disable_advanced_form_data_cookie</code> - disable pys_advanced_form_data cookies</p>
+                <p><code>pys_disable_advance_data_cookie</code> - disable pys_advanced_data cookies</p>
                 <p><code>pys_disable_externalID_by_gdpr</code> - disable pbid(external_id) cookie</p>
                 </p>
                 <p class="mb-0">
@@ -330,7 +330,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </p>
                 <p>
                     Example:<br>
-                    <code>add_filter( 'pys_disable_advanced_form_data_cookie', '__return_true', 10, 2 );</code>
+                    <code>add_filter( 'pys_disable_advance_data_cookie', '__return_true', 10, 2 );</code>
                 </p>
 
                 <p>Use these filters to add Google Consent Mode V2 support:</p>

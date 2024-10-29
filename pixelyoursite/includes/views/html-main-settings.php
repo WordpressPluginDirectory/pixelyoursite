@@ -42,16 +42,16 @@ include "html-popovers.php";
                             <div class="col">
                                 <div class="form-inline">
                                     <?php PYS()->render_switcher_input( 'send_external_id' ); ?>
-                                    <h4 class="switcher-label">Use external_id.</h4>
+                                    <h4 class="switcher-label">Use external_id</h4>
                                 </div>
-                                <small class="mt-1">We will store it in a cookie called pbid.</small>
+                                <small class="mt-1">We will store it in cookie called pbid</small>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col">
                                 <div class="form-inline">
                                     <?php PYS()->render_switcher_input( 'external_id_use_transient' ); ?>
-                                    <h4 class="switcher-label">Use transient WP for storage external_id.</h4>
+                                    <h4 class="switcher-label">Use transient WP for storage external_id</h4>
                                 </div>
                                 <small class="mt-1">With this storage method, the data is saved in the WordPress database, for 10 minutes. After the lifetime expires, the data will be deleted or overwritten (the row in the database will be removed).</small>
                             </div>
@@ -117,15 +117,56 @@ include "html-popovers.php";
                                 <small class="mt-1">Once ON, we remove all mentions about the plugin or add-ons from the console.</small>
                             </div>
                         </div>
+
+                        <hr>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <h4 class="switcher-label">Advanced user-data detection</h4>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <?php renderDummySwitcher(false); ?>
+                                <h4 class="switcher-label">Forms <a href="https://www.youtube.com/watch?v=snUKcsTbvCk" target="_blank">Watch video</a></h4>
+                                <?php renderProBadge(); ?>
+                                <small class="mt-1 d-block">
+                                    You can define the form's fields we can use by adding their names in these fields.
+                                </small>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col">
                                 <?php renderDummySwitcher(false); ?>
-                                <h4 class="switcher-label">Advanced user-data detection <a href="https://www.youtube.com/watch?v=snUKcsTbvCk" target="_blank">Watch video</a></h4>
+                                <h4 class="switcher-label">URL Parameters <a href="https://www.youtube.com/watch?v=7kigOV2-tAI" target="_blank">Watch video</a></h4>
                                 <?php renderProBadge(); ?>
                                 <small class="mt-1 d-block">
-                                    The plugin will try to detect user-related data like email, phone, first name, or last name and use it for subsequent Meta CAPI events personal parameters, and Meta browser events Advanced Matching. This data is also used for Google Ads enhanced converions, Pinterest and TikTok events.</small>
+                                    You can define URL parameters using this format: [url_parameter-name-here]. Example: [url_utm_term] will take the value from a utm_term parameter if it's present.
                                 </small>
-                                <hr>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row align-items-center mb-2">
+                            <div class="col-12">
+                                <div class="custom-controls-stacked">
+                                    <label>Data persistency</label>
+                                    <?php PYS()->render_radio_input( 'data_persistency', 'keep_data',
+                                        'Keep the data in the browser for as long as possible' ); ?>
+                                    <?php PYS()->render_radio_input( 'data_persistency', 'recent_data',
+                                        'Use the most recent data' ); ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row align-items-center mb-2">
+                            <div class="col-12">
+                                <h4 class="switcher-label">Reports attribution</h4>
                             </div>
                         </div>
 
@@ -169,8 +210,17 @@ include "html-popovers.php";
                         </div>
                         <div class="row mb-3">
                             <div class="col">
-                                <?php PYS()->render_switcher_input('block_robot_enabled', false, true, true); ?>
+                                <?php PYS()->render_switcher_input('block_robot_enabled', false); ?>
                                 <h4 class="switcher-label">Disable the plugin for known web crawlers</h4>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <h4 class="label">Exclude these robots from blocking</h4>
+	                            <?php PYS()->render_tags_select_input('exclude_blocked_robots',false); ?>
+                                <small class="mt-2 d-block">
+                                    You can exclude robots by their user-agent. You can use either the full name or part of it.
+                                </small>
                             </div>
                         </div>
                         <div class="row mb-3">

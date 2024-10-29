@@ -159,7 +159,7 @@ class EventsManager {
 		$options[ 'cookie' ] = array(
 			'disabled_all_cookie'                => apply_filters( 'pys_disable_all_cookie', false ),
 			'disabled_start_session_cookie'      => apply_filters( 'pys_disabled_start_session_cookie', false ),
-			'disabled_advanced_form_data_cookie' => apply_filters( 'pys_disable_advanced_form_data_cookie', false ),
+			'disabled_advanced_form_data_cookie' => apply_filters( 'pys_disable_advanced_form_data_cookie', false ) || apply_filters( 'pys_disable_advance_data_cookie', false ),
 			'disabled_landing_page_cookie'       => apply_filters( 'pys_disable_landing_page_cookie', false ),
 			'disabled_first_visit_cookie'        => apply_filters( 'pys_disable_first_visit_cookie', false ),
 			'disabled_trafficsource_cookie'      => apply_filters( 'pys_disable_trafficsource_cookie', false ),
@@ -264,7 +264,7 @@ class EventsManager {
         }
 
 
-        if(count($this->facebookServerEvents)>0 && Facebook()->enabled() && Facebook()->isServerApiEnabled() && !PYS()->isWPRocketPreload()) {
+        if(count($this->facebookServerEvents)>0 && Facebook()->enabled() && Facebook()->isServerApiEnabled() && !PYS()->isCachePreload()) {
             FacebookServer()->sendEventsAsync($this->facebookServerEvents);
             $this->facebookServerEvents = array();
         }
