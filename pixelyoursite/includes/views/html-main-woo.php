@@ -98,7 +98,29 @@ use PixelYourSite\Facebook\Helpers;
                 <small class="form-check">Show the tracking type in the orders table and on the on the order's page.</small>
             </div>
         </div>
+        <hr>
+        <div class="row mt-3">
+            <div class="col-11">
+                <label class="label-inline">New customer parameter</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <small>The new_customer parameter is added to the purchase event for our Google native tags and for GTM. It's use by Google for new customer acquisition. We always send it with true or false values for logged-in users. We will use these options for guest checkout.</small>
+                <div>
+                    <div class="collapse-inner">
+                        <div class="custom-controls-stacked">
+                            <?php PYS()->render_radio_input( 'woo_purchase_new_customer_guest', 'yes',
+                                'Send it for guest checkout', true, true ); ?>
+                            <?php PYS()->render_radio_input( 'woo_purchase_new_customer_guest', 'no',
+                                'Don\'t send it for guest checkout', true, true ); ?>
 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
         <div class="row mt-2">
             <div class="col">
                 <label class="mb-2">If the Purchase event doesn't work correctly, add your Checkout page(s) ID(s) here: <?php renderProBadge(); ?></label>
@@ -575,7 +597,7 @@ use PixelYourSite\Facebook\Helpers;
 <!-- Event Value -->
 <div class="card card-static card-disabled">
     <div class="card-header">
-        Event Value Settings <?php renderProBadge(); ?>
+        Value Settings <?php renderProBadge(); ?>
     </div>
     <div class="card-body">
         <div class="row mb-3">
@@ -613,6 +635,8 @@ use PixelYourSite\Facebook\Helpers;
         <?php PYS()->render_switcher_input('woo_purchase_enabled'); ?>Track Purchases <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
+        <?php PYS()->renderValueOptionsBlock('woo_purchase', false);?>
+        <hr>
         <div class="row mb-1">
             <div class="col-11">
                 <?php renderDummyCheckbox( 'Fire the event on transaction only', true ); ?>
@@ -677,43 +701,6 @@ use PixelYourSite\Facebook\Helpers;
             </div>
         <?php endif; ?>
 
-        <div class="row mt-3">
-            <div class="col-11 col-offset-left">
-                <label class="label-inline">Facebook and Pinterest value parameter settings:</label>
-            </div>
-            <div class="col-1">
-                <?php renderPopoverButton( 'woo_purchase_event_value' ); ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <div>
-                    <div class="collapse-inner">
-                        <div class="custom-controls-stacked">
-                            <?php PYS()->render_radio_input( 'woo_purchase_value_option', 'price',
-                                'Products price (subtotal)' ); ?>
-	                        <?php  if ( !isPixelCogActive() ) { ?>
-		                        <?php PYS()->render_radio_input( 'woo_purchase_value_option', 'cog',
-			                        'Price minus Cost of Goods', true, true ); ?>
-	                        <?php } else { ?>
-		                        <?php PYS()->render_radio_input( 'woo_purchase_value_option', 'cog',
-			                        'Price minus Cost of Goods', false ); ?>
-							<?php } ?>
-                            <?php renderDummyRadioInput( 'Percent of products value (subtotal)' ); ?>
-                            <div class="form-inline">
-                                <?php renderDummyTextInput( 0 ); ?>
-                            </div>
-                            <?php PYS()->render_radio_input( 'woo_purchase_value_option', 'global',
-                                'Use Global value' ); ?>
-                            <div class="form-inline">
-                                <?php PYS()->render_number_input( 'woo_purchase_value_global' ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <?php if ( GA()->enabled() ) : ?>
             <div class="row mb-1">
                 <div class="col">
@@ -760,7 +747,8 @@ use PixelYourSite\Facebook\Helpers;
         <?php PYS()->render_switcher_input('woo_initiate_checkout_enabled'); ?>Track the Checkout Page <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
-
+        <?php PYS()->renderValueOptionsBlock('woo_initiate_checkout', false);?>
+        <hr>
         <?php if ( Facebook()->enabled() ) : ?>
             <div class="row">
                 <div class="col">
@@ -790,44 +778,6 @@ use PixelYourSite\Facebook\Helpers;
             </div>
         <?php endif; ?>
 
-        <div class="row my-3">
-            <div class="col-11 col-offset-left">
-                <?php PYS()->render_switcher_input( 'woo_initiate_checkout_value_enabled', true ); ?>
-                <h4 class="indicator-label">Event value on Facebook and Pinterest</h4>
-            </div>
-            <div class="col-1">
-                <?php renderPopoverButton( 'woo_initiate_checkout_event_value' ); ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <div <?php renderCollapseTargetAttributes( 'woo_initiate_checkout_value_enabled', PYS() ); ?>>
-                    <div class="collapse-inner pt-0">
-                        <label class="label-inline">Facebook and Pinterest value parameter settings:</label>
-                        <div class="custom-controls-stacked">
-                            <?php PYS()->render_radio_input( 'woo_initiate_checkout_value_option', 'price',
-                                'Products price (subtotal)' ); ?>
-	                        <?php  if ( !isPixelCogActive() ) { ?>
-		                        <?php PYS()->render_radio_input( 'woo_initiate_checkout_value_option', 'cog',
-			                        'Price minus Cost of Goods', true, true ); ?>
-	                        <?php } else { ?>
-		                        <?php PYS()->render_radio_input( 'woo_initiate_checkout_value_option', 'cog',
-			                        'Price minus Cost of Goods', false ); ?>
-	                        <?php } ?>
-                            <?php renderDummyRadioInput( 'Percent of products value (subtotal)' ); ?>
-                            <div class="form-inline">
-                                <?php renderDummyTextInput( 0 ); ?>
-                            </div>
-                            <?php PYS()->render_radio_input( 'woo_initiate_checkout_value_option', 'global',
-                                'Use Global value' ); ?>
-                            <div class="form-inline">
-                                <?php PYS()->render_number_input( 'woo_initiate_checkout_value_global' ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <?php if ( GA()->enabled() ) : ?>
             <div class="row mb-1">
@@ -925,7 +875,8 @@ use PixelYourSite\Facebook\Helpers;
         <?php PYS()->render_switcher_input('woo_add_to_cart_enabled'); ?>Track add to cart <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
-
+        <?php PYS()->renderValueOptionsBlock('woo_add_to_cart', false);?>
+        <hr>
         <?php if ( Facebook()->enabled() ) : ?>
             <div class="row">
                 <div class="col">
@@ -954,45 +905,6 @@ use PixelYourSite\Facebook\Helpers;
                 </div>
             </div>
         <?php endif; ?>
-
-        <div class="row my-3">
-            <div class="col-11 col-offset-left">
-                <?php PYS()->render_switcher_input( 'woo_add_to_cart_value_enabled', true ); ?>
-                <h4 class="indicator-label">Tracking Value</h4>
-            </div>
-            <div class="col-1">
-                <?php renderPopoverButton( 'woo_add_to_cart_event_value' ); ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <div <?php renderCollapseTargetAttributes( 'woo_add_to_cart_value_enabled', PYS() ); ?>>
-                    <div class="collapse-inner pt-0">
-                        <label class="label-inline">Facebook and Pinterest value parameter settings:</label>
-                        <div class="custom-controls-stacked">
-                            <?php PYS()->render_radio_input( 'woo_add_to_cart_value_option', 'price',
-                                'Products price (subtotal)' ); ?>
-	                        <?php  if ( !isPixelCogActive() ) { ?>
-		                        <?php PYS()->render_radio_input( 'woo_add_to_cart_value_option', 'cog',
-			                        'Price minus Cost of Goods', true, true ); ?>
-	                        <?php } else { ?>
-		                        <?php PYS()->render_radio_input( 'woo_add_to_cart_value_option', 'cog',
-			                        'Price minus Cost of Goods', false ); ?>
-	                        <?php } ?>
-                            <?php renderDummyRadioInput( 'Percent of products value (subtotal)' ) ?>
-                            <div class="form-inline">
-                                <?php renderDummyTextInput( 0 ); ?>
-                            </div>
-                            <?php PYS()->render_radio_input( 'woo_add_to_cart_value_option', 'global',
-                                'Use Global value' ); ?>
-                            <div class="form-inline">
-                                <?php PYS()->render_number_input( 'woo_add_to_cart_value_global' ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <?php if ( GA()->enabled() ) : ?>
             <div class="row mb-1">
@@ -1031,7 +943,8 @@ use PixelYourSite\Facebook\Helpers;
         <?php PYS()->render_switcher_input('woo_view_content_enabled'); ?>Track product pages <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
-
+        <?php PYS()->renderValueOptionsBlock('woo_view_content', false);?>
+        <hr>
         <?php if ( Facebook()->enabled() ) : ?>
             <div class="row">
                 <div class="col">
@@ -1061,51 +974,6 @@ use PixelYourSite\Facebook\Helpers;
             </div>
         <?php endif; ?>
 
-        <div class="row my-3">
-            <div class="col col-offset-left form-inline">
-                <label>Delay</label>
-                <?php PYS()->render_number_input( 'woo_view_content_delay' ); ?>
-                <label>seconds</label>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-11 col-offset-left">
-                <?php PYS()->render_switcher_input( 'woo_view_content_value_enabled', true ); ?>
-                <h4 class="indicator-label">Tracking Value</h4>
-            </div>
-            <div class="col-1">
-                <?php renderPopoverButton( 'woo_view_content_event_value' ); ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <div <?php renderCollapseTargetAttributes( 'woo_view_content_value_enabled', PYS() ); ?>>
-                    <div class="collapse-inner pt-0">
-                        <label class="label-inline">Facebook and Pinterest value parameter settings:</label>
-                        <div class="custom-controls-stacked">
-                            <?php PYS()->render_radio_input( 'woo_view_content_value_option', 'price',
-                                'Product price' ); ?>
-	                        <?php  if ( !isPixelCogActive() ) { ?>
-		                        <?php PYS()->render_radio_input( 'woo_view_content_value_option', 'cog',
-			                        'Price minus Cost of Goods', true, true ); ?>
-	                        <?php } else { ?>
-		                        <?php PYS()->render_radio_input( 'woo_view_content_value_option', 'cog',
-			                        'Price minus Cost of Goods', false ); ?>
-	                        <?php } ?>
-                            <?php renderDummyRadioInput( 'Percent of product price' ); ?>
-                            <div class="form-inline">
-                                <?php renderDummyTextInput( 0 ); ?>
-                            </div>
-                            <?php PYS()->render_radio_input( 'woo_view_content_value_option', 'global',
-                                'Use Global value' ); ?>
-                            <div class="form-inline">
-                                <?php PYS()->render_number_input( 'woo_view_content_value_global' ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <?php if ( GA()->enabled() ) : ?>
             <div class="row mb-1">
@@ -1239,47 +1107,8 @@ use PixelYourSite\Facebook\Helpers;
     </div>
     <div class="card-body">
         <?php if ( Facebook()->enabled() ) : ?>
-            <div class="row mb-1">
-                <div class="col">
-                    <?php Facebook()->render_checkbox_input( 'woo_complete_registration_fire_every_time',
-                        "Fire this event every time a transaction takes place"); ?>
-                </div>
-            </div>
-
-            <div class="row mb-1">
-                <div class="col col-offset-left">
-                    <?php Facebook()->render_switcher_input( 'woo_complete_registration_use_custom_value'); ?>
-                    <h4 class="switcher-label">Event value on Facebook</h4>
-                    <div class="row mt-2">
-                        <div class="col col-offset-left">
-                            <div class="collapse-inner pt-0">
-                                <div class="custom-controls-stacked">
-                                    <?php Facebook()->render_radio_input("woo_complete_registration_custom_value","price",
-                                        "Order's total") ?>
-                                    <?php  if ( !isPixelCogActive() ) { ?>
-                                        <?php Facebook()->render_radio_input( 'woo_complete_registration_custom_value', 'cog',
-                                            'Price minus Cost of Goods', true, true ); ?>
-                                    <?php } else { ?>
-                                        <?php Facebook()->render_radio_input( 'woo_complete_registration_custom_value', 'cog',
-                                            'Price minus Cost of Goods', false ); ?>
-                                    <?php } ?>
-                                    <?php Facebook()->render_radio_input("woo_complete_registration_custom_value","percent",
-                                        "Percent of the order's total") ?>
-                                    <div class="form-inline">
-                                        <?php Facebook()->render_number_input( 'woo_complete_registration_percent_value' ); ?>
-                                    </div>
-                                    <?php Facebook()->render_radio_input("woo_complete_registration_custom_value","global",
-                                        "Use global value") ?>
-                                    <div class="form-inline">
-                                        <?php Facebook()->render_number_input( 'woo_complete_registration_global_value' ); ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <?php PYS()->renderValueOptionsBlock('woo_complete_registration', false);?>
+            <hr>
             <div class="row mb-1">
                 <div class="col">
                     <?php Facebook()->render_switcher_input( 'woo_complete_registration_send_from_server'); ?>

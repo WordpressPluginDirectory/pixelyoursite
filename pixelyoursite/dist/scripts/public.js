@@ -82,6 +82,7 @@ if (!String.prototype.trim) {
     let gtm_variables = {};
     let gtm_datalayername = "dynamicVariable";
 
+
     var dummyPinterest = function () {
 
         /**
@@ -933,18 +934,31 @@ if (!String.prototype.trim) {
             loadGoogleTag: function (id) {
 
                 if (!gtag_loaded) {
-
+                    let dataLayerName = this.dataLayerName;
+                    if(options.hasOwnProperty('GATags')){
+                        switch (options.GATags.ga_datalayer_type) {
+                            case 'default':
+                                dataLayerName = 'dataLayerPYS';
+                                break;
+                            case 'custom':
+                                dataLayerName = options.GATags.ga_datalayer_name;
+                                break;
+                            default:
+                                dataLayerName = 'dataLayer';
+                        }
+                    }
+                    this.dataLayerName = dataLayerName;
                     (function (window, document, src) {
                         var a = document.createElement('script'),
                             m = document.getElementsByTagName('script')[0];
                         a.async = 1;
                         a.src = src;
                         m.parentNode.insertBefore(a, m);
-                    })(window, document, '//www.googletagmanager.com/gtag/js?id=' + id+'&l=dataLayerPYS');
+                    })(window, document, '//www.googletagmanager.com/gtag/js?id=' + id+'&l='+this.dataLayerName);
 
-                    window.dataLayerPYS = window.dataLayerPYS || [];
+                    window[dataLayerName] = window[dataLayerName] || [];
                     window.gtag = window.gtag || function gtag() {
-                        dataLayerPYS.push(arguments);
+                        window[dataLayerName].push(arguments);
                     };
 
                     if ( options.google_consent_mode ) {
@@ -954,7 +968,6 @@ if (!String.prototype.trim) {
                         data[ 'ad_user_data' ] = options.gdpr.ad_user_data.enabled ? options.gdpr.ad_user_data.value : 'granted';
                         data[ 'ad_personalization' ] = options.gdpr.ad_personalization.enabled ? options.gdpr.ad_personalization.value : 'granted';
 
-                        this.dataLayerName = 'dataLayerPYS';
                         this.loadDefaultConsent( 'consent', 'default', data );
                     }
 
@@ -976,6 +989,22 @@ if (!String.prototype.trim) {
                 const gtm_preview = options.gtm.gtm_preview ?? ''; // Set this if needed
                 const datalayer_name = options.gtm.gtm_dataLayer_name ?? 'dataLayer';
 
+                window[ datalayer_name ] = window[ datalayer_name ] || [];
+                window.gtag = window.gtag || function gtag() {
+                    window[ datalayer_name ].push( arguments );
+                };
+
+                if ( options.google_consent_mode ) {
+                    let data = {};
+                    data[ 'analytics_storage' ] = options.gdpr.analytics_storage.enabled ? options.gdpr.analytics_storage.value : 'granted';
+                    data[ 'ad_storage' ] = options.gdpr.ad_storage.enabled ? options.gdpr.ad_storage.value : 'granted';
+                    data[ 'ad_user_data' ] = options.gdpr.ad_user_data.enabled ? options.gdpr.ad_user_data.value : 'granted';
+                    data[ 'ad_personalization' ] = options.gdpr.ad_personalization.enabled ? options.gdpr.ad_personalization.value : 'granted';
+
+                    this.GTMdataLayerName = datalayer_name;
+                    this.loadDefaultGTMConsent( 'consent', 'default', data );
+                }
+
                 (function(w, d, s, l, i) {
                     w[l] = w[l] || [];
                     w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
@@ -990,16 +1019,6 @@ if (!String.prototype.trim) {
                     f.parentNode.insertBefore(j, f);
                 })(window, document, 'script', datalayer_name, id);
 
-                if ( options.google_consent_mode ) {
-                    let data = {};
-                    data[ 'analytics_storage' ] = options.gdpr.analytics_storage.enabled ? options.gdpr.analytics_storage.value : 'granted';
-                    data[ 'ad_storage' ] = options.gdpr.ad_storage.enabled ? options.gdpr.ad_storage.value : 'granted';
-                    data[ 'ad_user_data' ] = options.gdpr.ad_user_data.enabled ? options.gdpr.ad_user_data.value : 'granted';
-                    data[ 'ad_personalization' ] = options.gdpr.ad_personalization.enabled ? options.gdpr.ad_personalization.value : 'granted';
-
-                    this.GTMdataLayerName = datalayer_name;
-                    this.loadDefaultGTMConsent( 'consent', 'default', data );
-                }
             },
 
             loadDefaultGTMConsent: function() {
@@ -1815,7 +1834,7 @@ if (!String.prototype.trim) {
                 if(!options.dynamicEvents.woo_add_to_cart_on_button_click.hasOwnProperty(this.tag()))
                     return;
                 var event = options.dynamicEvents.woo_add_to_cart_on_button_click[this.tag()];
-
+                window.pysWooProductData = window.pysWooProductData || [];
                 if (window.pysWooProductData.hasOwnProperty(product_id)) {
                     if (window.pysWooProductData[product_id].hasOwnProperty('facebook')) {
                         event = Utils.copyProperties(event, {})
@@ -2009,7 +2028,6 @@ if (!String.prototype.trim) {
             }
 
             var eventParams = Utils.copyProperties(data, {});
-
             var _fireEvent = function (tracking_id,name,params) {
 
                 params['send_to'] = tracking_id;
@@ -2084,11 +2102,9 @@ if (!String.prototype.trim) {
                         domains: options.ga.crossDomainDomains
                     };
                 }
-
-
-
+                var ids = options.ga.trackingIds;
                 // configure tracking ids
-                options.ga.trackingIds.forEach(function (trackingId,index) {
+                ids.forEach(function (trackingId,index) {
                     var obj = options.ga.isDebugEnabled;
                     var searchValue = "index_"+index;
                     var config_for_tag = Object.assign({}, options.config);
@@ -2346,11 +2362,14 @@ if (!String.prototype.trim) {
             var valuesArray = Object.values(event.trackingIds);
             var ids = valuesArray;
             Utils.copyProperties(Utils.getRequestParams(), eventParams);
-            var _fireEvent = function (tracking_id,name,params) {
+            var _fireEvent = function (tracking_id,name,params, event=null) {
                 var eventData = {};
-                var ContainerCodeHasTag = options.gtm.container_code && tracking_id.length > 0;
+                var ContainerCodeHasTag = !options.gtm.gtm_just_data_layer && tracking_id.length > 0;
                 if(ContainerCodeHasTag) {
                     params['send_to'] = tracking_id;
+                }
+                else if(!options.gtm.gtm_just_data_layer){
+                    return
                 }
 
                 if (params.hasOwnProperty('ecommerce')) {
@@ -2359,14 +2378,16 @@ if (!String.prototype.trim) {
                 }
 
                 var automatedParams = { ...params };
-                ['customParameters', 'manualName', 'triggerType'].forEach(key => delete automatedParams[key]);
-                eventData.automatedParameters = automatedParams;
+                [params['manualName'], 'manualName', 'triggerType'].forEach(key => delete automatedParams[key]);
+                if(event && (!event.hasOwnProperty('hasAutoParam') || (event.hasOwnProperty('hasAutoParam') && event.hasAutoParam))) {
+                    eventData.automatedParameters = automatedParams;
+                }
 
 // Move custom parameters to eventData
 
-                if (params.hasOwnProperty('customParameters')) {
-                    eventData[`manual_${params['manualName']}`] = params.customParameters;
-                    delete params.customParameters;
+                if (params.hasOwnProperty(params['manualName'])) {
+                    eventData[params['manualName']] = params[params['manualName']];
+                    delete params[params['manualName']];
                 }
 
                 ['manualName','triggerType'].forEach(key => {
@@ -2398,7 +2419,7 @@ if (!String.prototype.trim) {
 
             params.event_id = Utils.generateUniqueId(event);
 
-            _fireEvent(ids, name, params);
+            _fireEvent(ids, name, params, event);
         }
 
         function normalizeEventName(eventName) {
@@ -2487,12 +2508,13 @@ if (!String.prototype.trim) {
 
                 for (var i = 0; i < options.gtm.trackingIds.length; i++) {
                     var trackingId = options.gtm.trackingIds[i];
-                    if (options.gtm.container_code) {
+                    if (!options.gtm.gtm_just_data_layer) {
+                        console.log('[PYS] Google Tag Manager container code loaded');
                         Utils.loadGTMScript(trackingId);
                         break;
                     }
                 }
-                if(!options.gtm.container_code) {
+                if(options.gtm.gtm_just_data_layer) {
                     console.warn && console.warn("[PYS] Google Tag Manager container code placement set to OFF !!!");
                     console.warn && console.warn("[PYS] Data layer codes are active but GTM container must be loaded using custom coding !!!");
                 }
@@ -2668,9 +2690,9 @@ if (!String.prototype.trim) {
                         if (window.pysEddProductData[download_id][index].hasOwnProperty('gtm')) {
 
                             Utils.copyProperties(window.pysEddProductData[download_id][index]['gtm'].params, event.params);
-
+                            item = event.params.hasOwnProperty('ecommerce') ? event.params.ecommerce.items[0] : event.params.items[0];
                             // update items qty param
-                            event.params.items[0].quantity = qty;
+                            item.quantity = qty;
 
                             this.fireEvent(event.name,event);
 

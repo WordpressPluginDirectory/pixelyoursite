@@ -2,6 +2,8 @@
 
 namespace PixelYourSite;
 
+use Behat\Transliterator\Transliterator;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -57,6 +59,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string gtm_conversion_label
  * @property string gtm_event_category
  * @property string gtm_event_label
+ * @property bool gtm_automated_param
+ * @property bool gtm_remove_customTrigger
+ * @property bool gtm_use_custom_object_name
+ * @property string gtm_custom_object_name
  *
  * @property bool   bing_enabled
  * @property string bing_event_action
@@ -152,6 +158,38 @@ class CustomEvent {
             'unlock_achievement'  => array('achievement_id'),
         )
     );
+    private $ecommerceParamArray = array(
+        'currency',
+        'value',
+        'items',
+        'tax',
+        'shipping',
+        'coupon',
+        'affiliation',
+        'transaction_id',
+        'total_value',
+        'ecomm_prodid',
+        'ecomm_pagetype',
+        'ecomm_totalvalue'
+    );
+
+    private $ecommerceEventNames = array(
+        'add_payment_info',
+        'add_shipping_info',
+        'add_to_cart',
+        'add_to_wishlist',
+        'begin_checkout',
+        'generate_lead',
+        'purchase',
+        'refund',
+        'remove_from_cart',
+        'select_item',
+        'select_promotion',
+        'view_cart',
+        'view_item',
+        'view_item_list',
+        'view_promotion'
+    );
 
 	private $data = array(
 		'delay'        => null,
@@ -200,7 +238,10 @@ class CustomEvent {
         'gtm_custom_params'      => array(),
         'gtm_custom_params_enabled'    => false,
         'gtm_conversion_label'    => null,
-
+        'gtm_automated_param'   => true,
+        'gtm_remove_customTrigger' => false,
+        'gtm_use_custom_object_name' => false,
+        'gtm_custom_object_name' => null,
 
         'bing_enabled' => false,
         'bing_event_action' => null,
@@ -527,12 +568,24 @@ class CustomEvent {
 		return $this->title;
 	}
 
-    public function transformTitle() {
-        $cleaned = preg_replace('/[^A-Za-z0-9]+/', ' ', $this->title);
+    public function transformTitle($title = null) {
+
+        if(!is_null($title)){
+            $title_pre_transform = $title;
+        }
+        else{
+            $title_pre_transform = $this->title;
+        }
+        $textLat = Transliterator::transliterate($title_pre_transform);
+        $cleaned = preg_replace('/[^A-Za-z0-9]+/', ' ', $textLat);
         $result = ucwords(trim($cleaned));
         return str_replace(' ', '', $result);
     }
 
+    public function getManualCustomObjectName()
+    {
+        return $this->gtm_use_custom_object_name && $this->gtm_custom_object_name ? $this->gtm_custom_object_name : 'manual_'.$this->transformTitle();
+    }
 	public function isEnabled() {
 		return $this->enabled;
 	}
@@ -781,6 +834,18 @@ class CustomEvent {
     public function isGTMEnabled(){
         return (bool) $this->gtm_enabled;
     }
+
+    public function hasAutomatedParam(){
+        return (bool) $this->gtm_automated_param;
+    }
+
+    public function removeGTMCustomTrigger(){
+        return $this->gtm_remove_customTrigger;
+    }
+
+    public function useCustomNameObject(){
+        return (bool) $this->gtm_use_custom_object_name;
+    }
     public function isGTMPresent(){
         $allValues = GTM()->getAllPixels();
         $selectedValues = (array) $this->gtm_pixel_id;
@@ -805,12 +870,46 @@ class CustomEvent {
         }
     }
 
+    public function getAllGTMParams(){
+        $params = [];
+        if(is_array($this->getGTMParams())){
+            if(in_array($this->getGTMAction(), $this->ecommerceEventNames)){
+                foreach ($this->getGTMParams() as $key => $param){
+                    if ( in_array( $key, $this->ecommerceParamArray ) ) {
+                        $params['ecommerce'][ $key ] = $param;
+                    } else {
+                        $params[ $this->getManualCustomObjectName() ][ $key ] = $param;
+                    }
+                }
+            }
+            else{
+                foreach ($this->getGTMParams() as $key => $param){
+                    $params[ $this->getManualCustomObjectName() ][ $key ] = $param;
+                }
+            }
+        }
+
+        if(is_array($this->getGTMCustomParams())){
+            foreach ($this->getGTMCustomParams() as $param){
+                $params[ $this->getManualCustomObjectName() ][ $param['name'] ] = $param['value'];
+            }
+        }
+
+        return $params;
+    }
     public function getGTMAction(){
         return $this->gtm_event_action == '_custom' || $this->gtm_event_action ==  'CustomEvent' ? $this->gtm_custom_event_action : $this->gtm_event_action;
     }
 
+    public function getGTMCustomParamsAdmin() {
+        return  $this->gtm_custom_params;
+    }
     public function getGTMCustomParams() {
-        return  (array)$this->gtm_custom_params;
+        $params = [];
+        foreach ($this->gtm_custom_params as $param){
+            $params[] = apply_filters( 'pys_superpack_dynamic_params', $param, 'gtm' );
+        }
+        return  $params;
     }
 
     private function clearGTM() {
@@ -838,6 +937,17 @@ class CustomEvent {
 
         $this->data['gtm_enabled'] = isset( $args['gtm_enabled']  )
             && $args['gtm_enabled'];
+
+        $this->data['gtm_automated_param'] = isset( $args['gtm_automated_param']  )
+            && $args['gtm_automated_param'];
+
+        $this->data['gtm_remove_customTrigger'] = isset( $args['gtm_remove_customTrigger']  )
+            && $args['gtm_remove_customTrigger'];
+
+        $this->data['gtm_use_custom_object_name'] = isset( $args['gtm_use_custom_object_name']  )
+            && $args['gtm_use_custom_object_name'];
+
+        $this->data['gtm_custom_object_name'] = !empty($args['gtm_custom_object_name']) ? sanitize_text_field( $args['gtm_custom_object_name'] ) : 'manual_'.$this->transformTitle();
 
         $this->data['gtm_event_action'] = isset( $args['gtm_event_action'] )
             ? sanitize_text_field( $args['gtm_event_action'] )

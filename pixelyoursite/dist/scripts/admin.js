@@ -326,5 +326,66 @@ jQuery( document ).ready(function($) {
 
     updateBuilderUrl()
 
+    const inputWrapperList = document.getElementsByClassName('input-number-wrapper');
+
+    for(let wrapper of inputWrapperList) {
+        const input = wrapper.querySelector('input');
+        const incrementation = +input.step || 1;
+
+        wrapper.querySelector('.increase').addEventListener('click', function(e) {
+            e.preventDefault();
+            incInputNumber(input, incrementation);
+        });
+
+        wrapper.querySelector('.decrease').addEventListener('click', function(e) {
+            e.preventDefault();
+            incInputNumber(input, "-" + incrementation);
+        });
+    }
+
+    function incInputNumber(input, step) {
+        if(!input.disabled) {
+            let val = +input.value;
+
+            if (isNaN(val)) val = 0
+            val += +step;
+
+            if(input.max && val > input.max) {
+                val = input.max;
+            } else if (input.min && val < input.min) {
+                val = input.min;
+            } else if (val < 0) {
+                val = 0;
+            }
+
+            input.value = val;
+            input.setAttribute("value", val);
+        }
+    }
+
+    $('#pys_event_title').on( "change", function ( e ) {
+        const value = $(this).val();
+        $.ajax( {
+            url: ajaxurl,
+            data: {
+                action: 'get_transform_title',
+                _wpnonce: $( '#get_transform_title_wpnonce' ).val(),
+                title: value
+            },
+            type: 'POST',
+            success: function ( data ) {
+                $('#manual_custom_object_name').text(data.data.title);
+                $('input#pys_event_gtm_custom_object_name').val(data.data.title);
+            }, error: function ( data ) {
+                console.log( data );
+            }
+        } );
+
+    });
+
+    $('input#pys_event_gtm_custom_object_name').on( "input", function ( e ) {
+        const value = $(this).val();
+        $('#manual_custom_object_name').text(value);
+    });
 });
 

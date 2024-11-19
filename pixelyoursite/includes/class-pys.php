@@ -99,7 +99,6 @@ final class PYS extends Settings implements Plugin {
          * Restore settings after COG plugin
          * */
         add_action( 'deactivate_pixel-cost-of-goods/pixel-cost-of-goods.php',array($this,"restoreSettingsAfterCog"));
-        add_action( 'woocommerce_checkout_create_order', array( $this,'add_order_external_meta_data'), 10, 2 );
 
 		/**
 		 * For Woo
@@ -317,29 +316,6 @@ final class PYS extends Settings implements Plugin {
                 wp_send_json_success( array('pbid'=> $this->externalId, 'transient' => !empty($transient) ? $transient : false ));
             }
         }
-    }
-    public function add_order_external_meta_data($order, $posted_data){
-
-        $pbidCookieName = 'pbid';
-        $pbid = false;
-        if (isset($_COOKIE[$pbidCookieName])) {
-            $pbid = $_COOKIE[$pbidCookieName];
-        }
-        // Добавляем мета-информацию в заказ
-        if(!empty($pbid)){
-            if ( isWooCommerceVersionGte('3.0.0') ) {
-                // WooCommerce версия >= 3.0
-                if($order) {
-                    $order->update_meta_data( 'external_id', $pbid );
-                    $order->save();
-                }
-
-            } else {
-                // WooCommerce версия < 3.0
-                update_post_meta( $order->get_id(), 'external_id', $pbid );
-            }
-        }
-
     }
     public function utmTemplate() {
         include 'views/html-utm-templates.php';
@@ -791,18 +767,25 @@ final class PYS extends Settings implements Plugin {
 
 
 			if ( $action == 'update' && wp_verify_nonce( $nonce, 'pys_update_event' ) ) {
-
+                $pys_event = $_REQUEST['pys']['event'];
 				if ( $post_id ) {
 					$event = CustomEventFactory::getById( $post_id );
-					$event->update( $_REQUEST['pys']['event'] );
+					$event->update( $pys_event );
 				} else {
-				    if(isset( $_REQUEST['pys']['event']) && is_array($_REQUEST['pys']['event'])) {
-                        CustomEventFactory::create( $_REQUEST['pys']['event'] );
+				    if(isset( $pys_event) && is_array($pys_event)) {
+                        $event = CustomEventFactory::create( $pys_event );
                     } else {
-                        CustomEventFactory::create( [] );
+                        $event = CustomEventFactory::create( [] );
                     }
-
 				}
+
+                purgeCache();
+
+                // redirect to events tab
+                wp_safe_redirect( buildAdminUrl( 'pixelyoursite', 'events', 'edit', array(
+                    'id' => $event->getPostId()
+                ) ));
+                exit;
 
 			} elseif ( $action == 'enable' && $post_id && wp_verify_nonce( $nonce, 'pys_enable_event' ) ) {
 

@@ -124,7 +124,41 @@ function renderGAParamInput( $key, $val ) {
     <?php
 
 }
+/**
+ * Output checkbox input
+ *
+ * @param      $key
+ * @param      $label
+ * @param bool $disabled
+ */
+function render_checkbox_input( &$event, $key, $label, $disabled = false ) {
 
+    $attr_name  = "pys[event][$key]";
+    $attr_value = $event->$key;
+
+    $classes = array( 'custom-control', 'custom-checkbox' );
+
+    if ( $disabled ) {
+        $attr_value = false;
+        $classes[] = 'disabled';
+    }
+
+    $classes = implode( ' ', $classes );
+
+    ?>
+
+    <label class="<?php esc_attr_e( $classes ); ?>">
+        <input type="hidden" name="<?php esc_attr_e( $attr_name ); ?>" value="0">
+        <input type="checkbox" name="<?php esc_attr_e( $attr_name ); ?>" value="1"
+               class="custom-control-input" <?php disabled( $disabled, true ); ?> <?php checked( $attr_value,
+            true ); ?> >
+        <span class="custom-control-indicator"></span>
+        <span class="custom-control-description"><?php echo wp_kses_post( $label ); ?></span>
+    </label>
+
+    <?php
+
+}
 /**
  * @param CustomEvent $event
  * @param string      $key

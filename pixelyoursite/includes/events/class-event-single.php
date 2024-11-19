@@ -15,6 +15,8 @@ class SingleEvent extends PYSEvent{
         'shipping',
         'coupon',
         'affiliation',
+        'fees',
+        'new_customer',
         'transaction_id',
         'total_value',
         'ecomm_prodid',
@@ -22,23 +24,6 @@ class SingleEvent extends PYSEvent{
         'ecomm_totalvalue'
     );
 
-    private $ecommerceEventNames = array(
-        'add_payment_info',
-        'add_shipping_info',
-        'add_to_cart',
-        'add_to_wishlist',
-        'begin_checkout',
-        'generate_lead',
-        'purchase',
-        'refund',
-        'remove_from_cart',
-        'select_item',
-        'select_promotion',
-        'view_cart',
-        'view_item',
-        'view_item_list',
-        'view_promotion'
-    );
 
     public function __construct($id,$type,$category=''){
         parent::__construct($id,$type,$category);
@@ -53,9 +38,7 @@ class SingleEvent extends PYSEvent{
     function addParams($data) {
 
         if(is_array($data)) {
-            if (isset($this->params['triggerType']['type']) &&
-                ($this->params['triggerType']['type'] === 'ecommerce' ||
-                    ( $this->params['triggerType']['type'] === 'manual' && isset($this->payload['name']) && in_array($this->payload['name'], $this->ecommerceEventNames)))) {
+            if (isset($this->params['triggerType']['type']) && $this->params['triggerType']['type'] === 'ecommerce') {
                 foreach ( $data as $key => $value ) {
                     if ( in_array( $key, $this->ecommerceParamArray ) ) {
                         $this->params['ecommerce'][ $key ] = $data[ $key ];
@@ -106,5 +89,16 @@ class SingleEvent extends PYSEvent{
         if(isset($this->payload[$key]))
             return $this->payload[$key];
         return null;
+    }
+    function removeParam($key) {
+        if (isset($this->params[$key])) {
+            unset($this->params[$key]);
+        }
+    }
+
+    function removePayload($key) {
+        if (isset($this->payload[$key])) {
+            unset($this->payload[$key]);
+        }
     }
 }

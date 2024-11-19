@@ -48,6 +48,7 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
 		<div class="row">
 			<div class="col">
 				<?php Events\renderTextInput( $event, 'title', 'Enter event title' ); ?>
+                <input type="hidden" id="get_transform_title_wpnonce" value="<?=wp_create_nonce("get_transform_title_wpnonce")?>"/>
                 <small class="form-text">This name will be used in the GTM data layer for the custom parameters object.</small>
 			</div>
 		</div>
@@ -895,8 +896,21 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
                     <h4 class="switcher-label">Enable on GTM</h4>
                 </div>
             </div>
-            <div id="gtm_panel">
-                <div class="row align-items-center mt-3 mb-2">
+
+            <div id="gtm_panel" class="mt-3">
+                <hr>
+                <div class="row mt-4 mb-3">
+                    <div class="col">
+                        <?php Events\render_checkbox_input( $event, 'gtm_automated_param', 'Add the automated parameters in the dataLayer' ); ?>
+                    </div>
+                </div>
+                <div class="row mt-4 mb-3">
+                    <div class="col">
+                        <?php Events\render_checkbox_input( $event, 'gtm_remove_customTrigger', 'Remove the customTrigger object' ); ?>
+                    </div>
+                </div>
+                <hr>
+                <div class="row align-items-center mb-2">
                     <label class="col-5 control-label" style="padding-top:0;">Fire for:</label>
                     <div class="col-4">
                         <?php
@@ -956,7 +970,7 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
 
                             <div class="gtm-custom-param-list">
                                 <?php
-                                foreach ( $event->getGTMCustomParams() as $key => $custom_param ) : ?>
+                                foreach ( $event->getGTMCustomParamsAdmin() as $key => $custom_param ) : ?>
                                     <?php $param_id = $key + 1; ?>
 
                                     <div class="row mt-3 gtm-custom-param" data-param_id="<?php echo $param_id; ?>">
@@ -992,9 +1006,23 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
                                         Custom Parameter</button>
                                 </div>
                             </div>
+
+                            <hr>
+                            <div class="row mt-4 mb-2 gtm_use_custom_object_name">
+                                <div class="col">
+                                    <?php Events\render_checkbox_input( $event, 'gtm_use_custom_object_name', 'Use a custom value for the custom paramers object' ); ?>
+                                </div>
+                            </div>
+                            <div class="row mt-2 mb-2">
+                                <div class="col">
+                                    <?php Events\renderTextInput( $event, 'gtm_custom_object_name', $event->getManualCustomObjectName() );?>
+                                </div>
+                            </div>
+                            <hr>
+
                             <div class="row mt-3">
                                 <div class="col-12">
-                                    When configuring GTM variables for these parameters, use this key: manual_<?= $event->transformTitle(); ?>
+                                    When configuring GTM variables for these parameters, use this key: <span id="manual_custom_object_name"><?= $event->getManualCustomObjectName(); ?></span>
                                 </div>
                             </div>
                             <div class="row mt-3 gtm_woo_info" style="display: none">

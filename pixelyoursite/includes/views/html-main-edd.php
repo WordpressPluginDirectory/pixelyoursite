@@ -79,6 +79,28 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <small class="form-text">Display <i>the number of orders, lifetime value, and average order</i>.</small>
             </div>
         </div>
+        <hr>
+        <div class="row mt-3">
+            <div class="col-11">
+                <label class="label-inline">New customer parameter</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <small>The new_customer parameter is added to the purchase event for our Google native tags and for GTM. It's use by Google for new customer acquisition. We always send it with true or false values for logged-in users. We will use these options for guest checkout.</small>
+                <div>
+                    <div class="collapse-inner">
+                        <div class="custom-controls-stacked">
+                            <?php PYS()->render_radio_input( 'edd_purchase_new_customer_guest', 'yes',
+                                'Send it for guest checkout', true, true ); ?>
+                            <?php PYS()->render_radio_input( 'edd_purchase_new_customer_guest', 'no',
+                                'Don\'t send it for guest checkout', true, true ); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
     </div>
 </div>
 
@@ -385,7 +407,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php PYS()->render_switcher_input('edd_purchase_enabled'); ?>Track Purchases <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
-
+        <?php PYS()->renderValueOptionsBlock('edd_purchase', false);?>
+        <hr>
         <div class="row mb-1">
             <div class="col-11">
                 <?php renderDummyCheckbox( 'Fire the event on transaction only', true ); ?>
@@ -433,36 +456,6 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
         <?php endif; ?>
 
-        <div class="row mt-3">
-            <div class="col-11 col-offset-left">
-                <label class="label-inline">Facebook and Pinterest value parameter settings:</label>
-            </div>
-            <div class="col-1">
-                <?php renderPopoverButton( 'edd_purchase_event_value' ); ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <div>
-                    <div class="collapse-inner">
-                        <div class="custom-controls-stacked">
-                            <?php PYS()->render_radio_input( 'edd_purchase_value_option', 'price',
-                                'Downloads price (total)' ); ?>
-                            <?php renderDummyRadioInput( 'Percent of downloads value (total)' ); ?>
-                            <div class="form-inline">
-                                <?php renderDummyTextInput( 0 ); ?>
-                            </div>
-                            <?php PYS()->render_radio_input( 'edd_purchase_value_option', 'global',
-                                'Use Global value' ); ?>
-                            <div class="form-inline">
-                                <?php PYS()->render_number_input( 'edd_purchase_value_global' ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <?php if ( GA()->enabled() ) : ?>
             <div class="row mb-1">
                 <div class="col">
@@ -509,7 +502,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php PYS()->render_switcher_input('edd_initiate_checkout_enabled'); ?>Track the Checkout Page <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
-
+        <?php PYS()->renderValueOptionsBlock('edd_initiate_checkout', false);?>
+        <hr>
         <?php if ( Facebook()->enabled() ) : ?>
             <div class="row">
                 <div class="col">
@@ -538,38 +532,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
             </div>
         <?php endif; ?>
-
-        <div class="row my-3">
-            <div class="col-11 col-offset-left">
-                <?php PYS()->render_switcher_input( 'edd_initiate_checkout_value_enabled', true ); ?>
-                <h4 class="indicator-label">Event value on Facebook and Pinterest</h4>
-            </div>
-            <div class="col-1">
-                <?php renderPopoverButton( 'edd_initiate_checkout_event_value' ); ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <div <?php renderCollapseTargetAttributes( 'edd_initiate_checkout_value_enabled', PYS() ); ?>>
-                    <div class="collapse-inner pt-0">
-                        <label class="label-inline">Facebook and Pinterest value parameter settings:</label>
-                        <div class="custom-controls-stacked">
-                            <?php PYS()->render_radio_input( 'edd_initiate_checkout_value_option', 'price',
-                                'Downloads price (subtotal)' ); ?>
-                            <?php renderDummyRadioInput( 'Percent of downloads value (subtotal)' ); ?>
-                            <div class="form-inline">
-                                <?php renderDummyTextInput( 0 ); ?>
-                            </div>
-                            <?php PYS()->render_radio_input( 'edd_initiate_checkout_value_option', 'global',
-                                'Use Global value' ); ?>
-                            <div class="form-inline">
-                                <?php PYS()->render_number_input( 'edd_initiate_checkout_value_global' ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <?php if ( GA()->enabled() ) : ?>
             <div class="row mb-1">
@@ -608,7 +570,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php PYS()->render_switcher_input('edd_add_to_cart_enabled'); ?>Track add to cart <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
-
+        <?php PYS()->renderValueOptionsBlock('edd_add_to_cart', false);?>
+        <hr>
         <?php if ( Facebook()->enabled() ) : ?>
             <div class="row">
                 <div class="col">
@@ -637,38 +600,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
             </div>
         <?php endif; ?>
-
-        <div class="row my-3">
-            <div class="col-11 col-offset-left">
-                <?php PYS()->render_switcher_input( 'edd_add_to_cart_value_enabled', true ); ?>
-                <h4 class="indicator-label">Tracking Value</h4>
-            </div>
-            <div class="col-1">
-                <?php renderPopoverButton( 'edd_add_to_cart_event_value' ); ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <div <?php renderCollapseTargetAttributes( 'edd_add_to_cart_value_enabled', PYS() ); ?>>
-                    <div class="collapse-inner pt-0">
-                        <label class="label-inline">Facebook and Pinterest value parameter settings:</label>
-                        <div class="custom-controls-stacked">
-                            <?php PYS()->render_radio_input( 'edd_add_to_cart_value_option', 'price',
-                                'Downloads price (subtotal)' ); ?>
-                            <?php renderDummyRadioInput( 'Percent of downloads value (subtotal)' ); ?>
-                            <div class="form-inline">
-                                <?php renderDummyTextInput( 0 ); ?>
-                            </div>
-                            <?php PYS()->render_radio_input( 'edd_add_to_cart_value_option', 'global',
-                                'Use Global value' ); ?>
-                            <div class="form-inline">
-                                <?php PYS()->render_number_input( 'edd_add_to_cart_value_global' ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <?php if ( GA()->enabled() ) : ?>
             <div class="row mb-1">
@@ -707,7 +638,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php PYS()->render_switcher_input('edd_view_content_enabled'); ?>Track product pages <?php cardCollapseBtn(); ?>
     </div>
     <div class="card-body">
-
+        <?php PYS()->renderValueOptionsBlock('edd_view_content', false);?>
+        <hr>
         <?php if ( Facebook()->enabled() ) : ?>
             <div class="row">
                 <div class="col">
@@ -742,37 +674,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <label>Delay</label>
                 <?php PYS()->render_number_input( 'edd_view_content_delay' ); ?>
                 <label>seconds</label>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-11 col-offset-left">
-                <?php PYS()->render_switcher_input( 'edd_view_content_value_enabled', true ); ?>
-                <h4 class="indicator-label">Tracking Value</h4>
-            </div>
-            <div class="col-1">
-                <?php renderPopoverButton( 'edd_view_content_event_value' ); ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-offset-left">
-                <div <?php renderCollapseTargetAttributes( 'edd_view_content_value_enabled', PYS() ); ?>>
-                    <div class="collapse-inner pt-0">
-                        <label class="label-inline">Facebook and Pinterest value parameter settings:</label>
-                        <div class="custom-controls-stacked">
-                            <?php PYS()->render_radio_input( 'edd_view_content_value_option', 'price', 'Download price'
-                            ); ?>
-                            <?php renderDummyRadioInput( 'Percent of downloads price' ); ?>
-                            <div class="form-inline">
-                                <?php renderDummyTextInput( 0 ); ?>
-                            </div>
-                            <?php PYS()->render_radio_input( 'edd_view_content_value_option', 'global',
-                                'Use Global value' ); ?>
-                            <div class="form-inline">
-                                <?php PYS()->render_number_input( 'edd_view_content_value_global' ); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
