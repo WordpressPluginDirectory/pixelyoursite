@@ -46,13 +46,11 @@ class TriggerEvent {
 
     public function __construct( $trigger_type = 'page_visit', $index = null ) {
         $this->trigger_type = $trigger_type;
-
         if ( $index === null ) {
             $this->index = rand( 100, 200 );
         } else {
             $this->index = $index;
         }
-
         $eventsFormFactory = apply_filters( "pys_form_event_factory", array() );
         foreach ( $eventsFormFactory as $activeFormPlugin ) {
             self::$allowedTriggers[] = $activeFormPlugin->getSlug();
