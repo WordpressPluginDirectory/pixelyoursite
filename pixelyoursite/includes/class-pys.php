@@ -133,7 +133,7 @@ final class PYS extends Settings implements Plugin {
                 'clear_plugin_logs' => [$this->logger, 'remove'],
             ];
 
-            if (isPinterestActive()) {
+            if (isPinterestActive() && class_exists('Pinterest')){
                 $loggers['pinterest'] = [Pinterest()->getLog(), 'downloadLogFile'];
                 $clearLoggers['clear_pinterest_logs'] = [Pinterest()->getLog(), 'remove'];
             }
@@ -687,6 +687,15 @@ final class PYS extends Settings implements Plugin {
             wp_enqueue_style( 'pys_css', PYS_FREE_URL . '/dist/styles/admin.css', array( 'select2_css' ), PYS_FREE_VERSION );
             wp_enqueue_script( 'pys_js', PYS_FREE_URL . '/dist/scripts/admin.js', array( 'jquery', 'select2_js', 'popper',
                                                                                  'bootstrap' ), PYS_FREE_VERSION );
+
+            if( (isset($_GET['page']) && $_GET['page'] == "pixelyoursite" && isset($_GET['tab']) && ($_GET['tab'] == 'events')) ||
+                ( $_GET['page'] && (( $_GET['page'] == "pixelyoursite_woo_reports" ) || $_GET['page'] == "pixelyoursite_edd_reports" ))
+            ) {
+                wp_enqueue_style( 'pys_confirm_style', PYS_FREE_URL . '/dist/scripts/confirm/jquery-confirm.min.css', array(  ), PYS_FREE_VERSION );
+                wp_enqueue_style( 'pys_confirm_style_theme', PYS_FREE_URL . '/dist/scripts/confirm/bs3.css', array(  ), PYS_FREE_VERSION );
+                wp_enqueue_script( 'pys_confirm_script', PYS_FREE_URL . '/dist/scripts/confirm/jquery-confirm.min.js', array( 'pys_js' ), PYS_FREE_VERSION );
+                wp_enqueue_script( 'pys_custom_confirm_script', PYS_FREE_URL . '/dist/scripts/confirm/custom-confirm.js', array( 'pys_js' ), PYS_FREE_VERSION );
+            }
 
         }
 
