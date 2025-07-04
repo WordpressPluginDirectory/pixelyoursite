@@ -91,9 +91,9 @@ function isCookieLawInfoPluginActivated() {
 	if ( ! function_exists( 'is_plugin_active' ) ) {
 		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 	}
-	
-	return is_plugin_active( 'cookie-law-info/cookie-law-info.php' )
-	       || is_plugin_active( 'webtoffee-gdpr-cookie-consent/cookie-law-info.php' ) ;
+
+    return is_plugin_active( 'cookie-law-info/cookie-law-info.php' )
+        || is_plugin_active( 'webtoffee-cookie-consent/webtoffee-cookie-consent.php' );
 	
 }
 
@@ -141,8 +141,8 @@ function adminGdprAjaxNotEnabledNotice() {
                     url: ajaxurl,
                     data: {
                         action: 'pys_notice_dismiss',
-                        nonce: '<?php esc_attr_e( wp_create_nonce( 'pys_notice_dismiss' ) ); ?>',
-                        user_id: '<?php esc_attr_e( $user_id ); ?>',
+                        nonce: '<?php echo esc_attr( wp_create_nonce( 'pys_notice_dismiss' ) ); ?>',
+                        user_id: '<?php echo esc_attr( $user_id ); ?>',
                         addon_slug: 'core',
                         meta_key: 'gdpr_ajax_notice'
                     }

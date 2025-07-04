@@ -27,9 +27,6 @@ class EventsManager {
 		add_action( 'wp_footer', array( $this, 'outputNoScriptData' ), 10 );
 
         // Classic hook for checkout page
-        add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'saveExternalIDInOrder' ), 10, 1 );
-        // Hook for Store API (passes WC_Order object instead of order_id)
-        add_action( 'woocommerce_store_api_checkout_update_order_meta', array( $this, 'saveExternalIDInOrder' ), 10, 1 );
         add_filter( 'script_loader_tag', array( $this, 'add_data_attribute_to_script' ), 10, 3 );
 	}
 
@@ -284,27 +281,29 @@ class EventsManager {
             }
         }
 
+        if(!PYS()->is_user_agent_bot()){
+            if( count($this->facebookServerEvents ) > 0
+                && Facebook()->enabled()
+                && Facebook()->isServerApiEnabled()
+                && !PYS()->isCachePreload()
+                && Consent()->checkConsent( 'facebook' )
+            ) {
+                FacebookServer()->sendEventsAsync( $this->facebookServerEvents );
+                $this->facebookServerEvents = array();
+            }
 
-        if( count($this->facebookServerEvents ) > 0
-            && Facebook()->enabled()
-            && Facebook()->isServerApiEnabled()
-            && !PYS()->isCachePreload()
-			&& Consent()->checkConsent( 'facebook' )
-        ) {
-			FacebookServer()->sendEventsAsync( $this->facebookServerEvents );
-			$this->facebookServerEvents = array();
+            if ( isPinterestActive()
+                && count($this->pinterestServerEvents) > 0
+                &&  Pinterest()->enabled()
+                && Pinterest()->isServerApiEnabled()
+                && !PYS()->isCachePreload()
+                && Consent()->checkConsent( 'pinterest' )
+            ) {
+                PinterestServer()->sendEventsAsync( $this->pinterestServerEvents );
+                $this->pinterestServerEvents = array();
+            }
         }
 
-        if ( isPinterestActive()
-            && count($this->pinterestServerEvents) > 0
-            &&  Pinterest()->enabled()
-            && Pinterest()->isServerApiEnabled()
-            && !PYS()->isCachePreload()
-			&& Consent()->checkConsent( 'pinterest' )
-        ) {
-			PinterestServer()->sendEventsAsync( $this->pinterestServerEvents );
-			$this->pinterestServerEvents = array();
-        }
 
         // remove new user mark
         if($user_id = get_current_user_id()) {
@@ -369,8 +368,12 @@ class EventsManager {
             $eventId = $event->getId();
         }
         $this->triggerEvents[ $eventId ][ $pixel->getSlug() ] = $eventData;
-        if ( !empty( $event->args ) ) {
+        if ( !empty( $event->args ) &&  $event->getCategory() === 'custom') {
             $this->triggerEventTypes = array_replace_recursive( $this->triggerEventTypes, $event->args->__get( 'triggerEventTypes' ) );
+        }
+
+        if($event->getCategory() === 'fdp'){
+            $this->triggerEventTypes[ $eventData['trigger_type'] ][ $eventId ][] = $eventData['trigger_value'];
         }
 
     }
@@ -665,29 +668,6 @@ class EventsManager {
         </script>
 
         <?php
-
-    }
-    public function saveExternalIDInOrder($order_param) {
-        // Determine whether the WC_Order object or order ID is passed
-        if ( $order_param instanceof WC_Order ) {
-            // If the order object is transferred
-            $order = $order_param;
-        } else {
-            // If order_id is passed
-            $order = wc_get_order( $order_param );
-        }
-        if (!$order && empty($order_param)) return;
-
-        $external_id = PYS()->get_pbid();
-
-        if (isWooCommerceVersionGte('3.0.0') && !empty($order)) {
-            // WooCommerce >= 3.0
-            $order->update_meta_data("external_id", $external_id);
-            $order->save();
-        } elseif ( ! empty( $order_param ) ) {
-            // WooCommerce < 3.0
-            update_post_meta($order_param, 'external_id', $external_id);
-        }
 
     }
     static function isTrackExternalId(){

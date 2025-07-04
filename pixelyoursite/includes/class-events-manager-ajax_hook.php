@@ -68,7 +68,6 @@ class AjaxHookEventManager {
                 && isEventEnabled('woo_add_to_cart_enabled')
             )
             {
-                add_action( 'woocommerce_after_add_to_cart_button', 'PixelYourSite\EventsManager::setupWooSingleProductData' );
                 if(PYS()->getOption('woo_add_to_cart_catch_method') == "add_cart_hook") {
                     add_action( 'wp_footer', array( __CLASS__, 'addDivForAjaxPixelEvent')  );
                     add_action( 'woocommerce_add_to_cart',array(__CLASS__, 'trackWooAddToCartEvent'),40, 6);
@@ -138,14 +137,16 @@ class AjaxHookEventManager {
             $eventData = EventsManager::filterEventParams($eventData,"woo",['event_id'=>$event->getId(),'pixel'=>$pixel->getSlug()]);
 
             $dataList[$pixel->getSlug()] = $eventData;
+            if(!PYS()->is_user_agent_bot()){
+                if($pixel->getSlug() === "facebook" && Facebook()->isServerApiEnabled()) {
+                    FacebookServer()->sendEventsNow([$event]);
+                }
 
-            if($pixel->getSlug() === "facebook" && Facebook()->isServerApiEnabled()) {
-                FacebookServer()->sendEventsNow([$event]);
+                if($pixel->getSlug() === "pinterest" && Pinterest()->isServerApiEnabled()) {
+                    PinterestServer()->sendEventsNow(array($event));
+                }
             }
 
-			if($pixel->getSlug() === "pinterest" && Pinterest()->isServerApiEnabled()) {
-                PinterestServer()->sendEventsNow(array($event));
-			}
         }
         AjaxHookEventManager::addPendingEvent("woo_add_to_cart_on_button_click",$dataList);
     }

@@ -3,8 +3,8 @@ Contributors: PixelYourSite
 Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, Google Tag Manager, Google Consent Mode V2
 Requires at least: 3.0.1
 Requires PHP: 5.4
-Tested up to: 6.7
-Stable tag: 10.2.1
+Tested up to: 6.8
+Stable tag: 11.0.0.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -387,6 +387,62 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 11.0.0.4 =
+
+July 2, 2025
+
+* Improving the speed for WooCommerce variable products with a very large number of variations. 
+
+* Fixing a possible issue with Avada theme. 
+
+= PixelYourSite 11.0.0.3 =
+
+June 17, 2025
+
+* Code changes related to the way we send custom and partner-defined events for the Pinterest add-on.
+
+* Consent integration with Webtoffee, a paid add-on for CookieYes. 
+
+* Small code improvements.
+
+* Small text changes and corrections. 
+
+
+June 17, 2025
+
+= PixelYourSite 11.0.0.2 =
+
+June 2, 2025
+
+* Fixing a bug related to new events settings. 
+
+* Fixing a bug related to the GTM template download. 
+
+
+
+= PixelYourSite 11.0.0.1 =
+
+May 30, 2025
+
+* Fixing a bug that prevented our notification from closing - sorry about that!
+
+* Improving the way we handle licenses for the paid add-ons. 
+
+
+
+= PixelYourSite 11.0.0 =
+
+May 29, 2025
+
+* New User Interface
+
+* Code refactoring and improvements. 
+
+* Fixed problem with empty $product object
+
+* Fixed getting categories for view_item event (GA) in FREE version
+
 
 = PixelYourSite 10.2.1 =
 
