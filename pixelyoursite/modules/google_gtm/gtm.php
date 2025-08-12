@@ -333,7 +333,6 @@ class GTM extends Settings implements Pixel {
                 }
             }break;
         }
-
         return $isActive;
     }
 
@@ -375,8 +374,8 @@ class GTM extends Settings implements Pixel {
                     // Adding products
                     if (!empty($event['params']['items'])) {
                         foreach ($event['params']['items'] as $key => $item) {
-                            $args["pr" . ($key + 1) . "id"] = urlencode($item['id']);
-                            $args["pr" . ($key + 1) . "nm"] = urlencode($item['name']);
+                            $args["pr" . ($key + 1) . "id"] = urlencode($item['item_id']);
+                            $args["pr" . ($key + 1) . "nm"] = urlencode($item['item_name']);
                             $args["pr" . ($key + 1) . "pr"] = (float)$item['price'];
                             $args["pr" . ($key + 1) . "qt"] = (int)$item['quantity'];
                             $args["pr" . ($key + 1) . "ca"] = urlencode($item['item_category']);
@@ -469,8 +468,8 @@ class GTM extends Settings implements Pixel {
             }
 
             $item = array(
-                'id'            => Helpers\getWooProductContentId($posts[ $i ]->ID),
-                'name'          => $posts[ $i ]->post_title,
+                'item_id'            => Helpers\getWooProductContentId($posts[ $i ]->ID),
+                'item_name'          => $posts[ $i ]->post_title,
                 'quantity'      => 1,
                 'price'         => getWooProductPriceToDisplay( $posts[ $i ]->ID ),
             );
@@ -517,8 +516,8 @@ class GTM extends Settings implements Pixel {
         foreach ( $posts as $i=>$post) {
             if( $post->post_type != 'product') continue;
             $item = array(
-                'id'            => Helpers\getWooProductContentId($post->ID),
-                'name'          => $post->post_title ,
+                'item_id'            => Helpers\getWooProductContentId($post->ID),
+                'item_name'          => $post->post_title ,
                 'quantity'      => 1,
                 'price'         => getWooProductPriceToDisplay( $post->ID ),
             );
@@ -567,8 +566,8 @@ class GTM extends Settings implements Pixel {
         foreach ( $posts as $post) {
             if( $post->post_type != 'product') continue;
             $item = array(
-                'id'            => Helpers\getWooProductContentId($post->ID),
-                'name'          => $post->post_title ,
+                'item_id'            => Helpers\getWooProductContentId($post->ID),
+                'item_name'          => $post->post_title ,
                 'quantity'      => 1,
                 'price'         => getWooProductPriceToDisplay( $post->ID ),
             );
@@ -653,8 +652,8 @@ class GTM extends Settings implements Pixel {
             }
 
             $item = array(
-                'id'            => Helpers\getWooProductContentId($posts[ $i ]->ID),
-                'name'          => $posts[ $i ]->post_title,
+                'item_id'            => Helpers\getWooProductContentId($posts[ $i ]->ID),
+                'item_name'          => $posts[ $i ]->post_title,
                 'quantity'      => 1,
                 'price'         => getWooProductPriceToDisplay( $posts[ $i ]->ID ),
             );
@@ -664,7 +663,7 @@ class GTM extends Settings implements Pixel {
                 $item = array_merge($item, $category);
             }
             $items[] = $item;
-            $product_ids[] = $item['id'];
+            $product_ids[] = $item['item_id'];
             $total_value += $item['price'];
 
         }
@@ -699,8 +698,8 @@ class GTM extends Settings implements Pixel {
 
         $items = array();
         $general_item = array(
-            'id'       => $productId,
-            'name'     => $product->get_name(),
+            'item_id'       => $productId,
+            'item_name'     => $product->get_name(),
             'quantity' => $quantity,
             'price'    => getWooProductPriceToDisplay($product->get_id(), $quantity, $customProductPrice),
         );
@@ -724,8 +723,8 @@ class GTM extends Settings implements Pixel {
                 $category = $this->getCategoryArrayWoo($variationProductId, true);
 
                 $item = array(
-                    'id'       => $variationProductId,
-                    'name'     => GTM()->getOption('woo_variations_use_parent_name') ? $variationProduct->get_title() : $variationProduct->get_name(),
+                    'item_id'       => $variationProductId,
+                    'item_name'     => GTM()->getOption('woo_variations_use_parent_name') ? $variationProduct->get_title() : $variationProduct->get_name(),
                     'quantity' => $quantity,
                     'price'    => getWooProductPriceToDisplay($variationProduct->get_id(), $quantity, $customProductPrice)
                 );
@@ -790,8 +789,8 @@ class GTM extends Settings implements Pixel {
                         $price += $cart_item['line_subtotal_tax'];
                     }
                     $item = array(
-                        'id'       => $content_id,
-                        'name'     => GTM()->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name(),
+                        'item_id'       => $content_id,
+                        'item_name'     => GTM()->getOption('woo_variations_use_parent_name') && $product->is_type('variation') ? $product->get_title() : $product->get_name(),
                         'quantity' => $cart_item['quantity'],
                         'price'    => $cart_item['quantity'] > 0 ? pys_round($price / $cart_item['quantity']) : $price,
                     );
@@ -810,7 +809,7 @@ class GTM extends Settings implements Pixel {
                     }
 
                     $items[] = $item;
-                    $product_ids[] = $item['id'];
+                    $product_ids[] = $item['item_id'];
                 }
             }
         }
@@ -860,8 +859,8 @@ class GTM extends Settings implements Pixel {
                 $variation_name = null;
             }
             $item = array(
-                'id'       => $content_id,
-                'name'     => $name,
+                'item_id'       => $content_id,
+                'item_name'     => $name,
                 'quantity' => $quantity,
                 'price'    => $price,
                 'variant'  => $variation_name,
@@ -962,8 +961,8 @@ class GTM extends Settings implements Pixel {
             'currency'        => get_woocommerce_currency(),
             'items'           => array(
                 array(
-                    'id'       => $product_id,
-                    'name'     => $name,
+                    'item_id'       => $product_id,
+                    'item_name'     => $name,
                     'quantity' => $cart_item['quantity'],
                     'price'    => getWooProductPriceToDisplay( $product_id, $cart_item['quantity'] ),
                     'variant'  => $variation_name,
@@ -1083,8 +1082,8 @@ class GTM extends Settings implements Pixel {
             }
 
             $item = array(
-                'id'       => $content_id,
-                'name'     => $name,
+                'item_id'       => $content_id,
+                'item_name'     => $name,
                 'quantity' => $qty,
                 'price'    => $price,
                 'variant'  => $variation_name,
@@ -1093,7 +1092,7 @@ class GTM extends Settings implements Pixel {
                 $item = array_merge($item, $categories);
             }
             $items[] = $item;
-            $product_ids[] = $item['id'];
+            $product_ids[] = $item['item_id'];
             $total_value   += $item['price' ];
 
         }
@@ -1111,7 +1110,20 @@ class GTM extends Settings implements Pixel {
         $params['value'] = getWooEventValueOrder( $value_option, $order, $global_value );
 
         $params['fees'] = get_fees($order);
-
+        if(PYS()->getOption('enable_CwCD')) {
+            if(!empty(PYS()->getOption('aw_merchant_id'))){
+                $params['aw_merchant_id'] = PYS()->getOption('aw_merchant_id');
+            }
+            if(!empty(PYS()->getOption('aw_feed_label'))){
+                $params['aw_feed_label'] = PYS()->getOption('aw_feed_label');
+            }
+            if(!empty(PYS()->getOption('aw_feed_country'))){
+                $params['aw_feed_country'] = PYS()->getOption('aw_feed_country');
+            }
+            if(!empty(PYS()->getOption('aw_feed_language'))){
+                $params['aw_feed_language'] = PYS()->getOption('aw_feed_language');
+            }
+        }
         return array(
             'name' => 'purchase',
             'data' => $params
@@ -1153,8 +1165,8 @@ class GTM extends Settings implements Pixel {
             }
 
             $item = array(
-                'id'       => $content_id,
-                'name'     => $name,
+                'item_id'       => $content_id,
+                'item_name'     => $name,
                 'quantity' => $cart_item['quantity'],
                 'price'    => getWooProductPriceToDisplay( $product_id ),
                 'variant'  => $variation_name,
@@ -1164,7 +1176,7 @@ class GTM extends Settings implements Pixel {
                 $item = array_merge($item, $categories);
             }
             $items[] = $item;
-            $product_ids[] = $item['id'];
+            $product_ids[] = $item['item_id'];
             $total_value += $item['price'] * $cart_item['quantity'];
 
         }
@@ -1212,8 +1224,8 @@ class GTM extends Settings implements Pixel {
             'currency' => edd_get_currency(),
             'items'           => array(
                 array(
-                    'id'       => $post->ID,
-                    'name'     => $post->post_title,
+                    'item_id'       => $post->ID,
+                    'item_name'     => $post->post_title,
                     'category' => implode( '/', getObjectTerms( 'download_category', $post->ID ) ),
                     'quantity' => 1,
                     'price'    => getEddDownloadPriceToDisplay( $post->ID ),
@@ -1252,8 +1264,8 @@ class GTM extends Settings implements Pixel {
             'currency' => edd_get_currency(),
             'items'           => array(
                 array(
-                    'id'       => Helpers\getEddDownloadContentId($download_id),
-                    'name'     => $download_post->post_title,
+                    'item_id'       => Helpers\getEddDownloadContentId($download_id),
+                    'item_name'     => $download_post->post_title,
                     'category' => implode( '/', getObjectTerms( 'download_category', $download_id ) ),
                     'quantity' => 1,
                     'price'    => getEddDownloadPriceToDisplay( $download_id, $price_index ),
@@ -1346,8 +1358,8 @@ class GTM extends Settings implements Pixel {
             }
 
             $item = array(
-                'id'       => Helpers\getEddDownloadContentId($download_id),
-                'name'     => $download_post->post_title,
+                'item_id'       => Helpers\getEddDownloadContentId($download_id),
+                'item_name'     => $download_post->post_title,
                 'category' => implode( '/', getObjectTerms( 'download_category', $download_id ) ),
                 'quantity' => $cart_item['quantity'],
                 'price'    => $price
@@ -1407,8 +1419,8 @@ class GTM extends Settings implements Pixel {
                 'currency'        => edd_get_currency(),
                 'items'           => array(
                     array(
-                        'id'       => Helpers\getEddDownloadContentId($download_id),
-                        'name'     => $download_post->post_title,
+                        'item_id'       => Helpers\getEddDownloadContentId($download_id),
+                        'item_name'     => $download_post->post_title,
                         'category' => implode( '/', getObjectTerms( 'download_category', $download_id ) ),
                         'quantity' => $cart_item['quantity'],
                         'price'    => getEddDownloadPriceToDisplay( $download_id, $price_index ),
@@ -1448,8 +1460,8 @@ class GTM extends Settings implements Pixel {
         for ( $i = 0; $i < count( $posts ); $i ++ ) {
 
             $item = array(
-                'id'            => Helpers\getEddDownloadContentId($posts[ $i ]->ID),
-                'name'          => $posts[ $i ]->post_title,
+                'item_id'            => Helpers\getEddDownloadContentId($posts[ $i ]->ID),
+                'item_name'          => $posts[ $i ]->post_title,
                 'category'      => implode( '/', getObjectTerms( 'download_category', $posts[ $i ]->ID ) ),
                 'quantity'      => 1,
                 'price'         => getEddDownloadPriceToDisplay( $posts[ $i ]->ID ),
@@ -1458,7 +1470,7 @@ class GTM extends Settings implements Pixel {
             );
 
             $items[] = $item;
-            $product_ids[] = $item['id'];
+            $product_ids[] = $item['item_id'];
             $total_value += $item['price'];
 
         }
