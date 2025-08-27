@@ -41,11 +41,17 @@ class GTM extends Settings implements Pixel {
             /** @var PYS $core */
             $core->registerPixel( $this );
         } );
+
+        add_action('init', array($this, 'init'));
+
+    }
+
+    public function init()
+    {
         $this->isEnabled = $this->enabled();
         if($this->isEnabled) {
             add_action('wp_head', array($this, 'pys_wp_header_top'), 1, 0);
         }
-
     }
 
     public function enabled() {
