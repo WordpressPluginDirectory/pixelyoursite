@@ -1840,6 +1840,10 @@ $serverUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" :
         <?php Bing()->renderCustomEventOptions( $event ); ?>
     <?php endif; ?>
 
+	<?php if ( Reddit()->enabled() ) : ?>
+		<?php Reddit()->renderCustomEventOptions( $event ); ?>
+	<?php endif; ?>
+
     <?php if ( GTM()->enabled() ) :
         $gtm_configured = GTM()->enabled() && !empty( GTM()->getPixelIDs() );
         ?>

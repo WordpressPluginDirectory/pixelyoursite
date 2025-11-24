@@ -267,6 +267,97 @@ jQuery(document).ready(function($) {
         }
     }
 
+	/**
+	 * Toggle Reddit pixel panel
+	 */
+	function toggleRedditPanel() {
+		let event_reddit_enabled = $( "#pys_event_reddit_enabled" ),
+			card = event_reddit_enabled.closest( '.card' ),
+			configured = +card.attr( 'data-configured' ) === 1,
+			pixel_status = card.find( '.custom-event-pixel-status .pixel-status' );
+
+		if ( configured ) {
+			if ( event_reddit_enabled.is( ":checked" ) ) {
+				$( "#reddit_panel" ).removeClass( 'disabled' );
+				pixel_status.find( '.pixel-enabled' ).show();
+				pixel_status.find( '.pixel-disabled' ).hide();
+			} else {
+				$( "#reddit_panel" ).addClass( 'disabled' );
+				pixel_status.find( '.pixel-enabled' ).hide();
+				pixel_status.find( '.pixel-disabled' ).show();
+			}
+		} else {
+			$( '.reddit-not-configured-error' ).show();
+			$( "#reddit_panel" ).addClass( 'disabled' );
+			event_reddit_enabled.prop( 'checked', false ).prop( 'disabled', true );
+		}
+	}
+
+	function toggleRedditCustomEventType() {
+		if ( $( "#pys_event_reddit_event_type" ).val() === "Custom" ) {
+			$( ".reddit-custom-event-type" ).slideDown( 400 );
+		} else {
+			$( ".reddit-custom-event-type" ).slideUp( 400 );
+		}
+	}
+
+	function toggleRedditParamsPanel( new_form = false ) {
+		if ( $( '#pys_event_reddit_params_enabled:checked' ).length > 0 ) {
+			if ( new_form ) {
+				updateRedditEventParamsFrom();
+			}
+			$( '#reddit_params_panel' ).slideDown( 400 );
+		} else {
+			$( '#reddit_params_panel' ).slideUp( 400 );
+		}
+	}
+
+	toggleRedditPanel();
+	toggleRedditCustomEventType();
+	toggleRedditParamsPanel();
+
+	$( "#pys_event_reddit_enabled" ).on( 'click', function () {
+		toggleRedditPanel();
+	} );
+
+	$( "#pys_event_reddit_event_type" ).on( 'change', function () {
+		updateRedditEventParamsFrom();
+	} );
+
+	$( "#pys_event_reddit_params_enabled" ).on( 'click', function () {
+		toggleRedditParamsPanel( true );
+	} );
+
+	function updateRedditEventParamsFrom() {
+		let $select = $( '#pys_event_reddit_event_type' );
+		if ( $select.length === 0 ) {
+			return;
+		}
+		let $panel = $( '#reddit_params_panel' );
+		let $custom = $( '.reddit-custom-event-type' );
+
+		if ( $select.val() === 'Custom' ) {
+			$custom.slideDown( 400 );
+		} else {
+			$custom.slideUp( 400 );
+		}
+
+		let fields = $select.find( ":selected" ).data( 'fields' );
+
+		if ( fields.length === 0 || !$( '#pys_event_reddit_params_enabled' ).is( ":checked" ) ) {
+			$panel.slideUp( 400, function () {
+				$( this ).html( '' );
+			} );
+		} else {
+			$panel.html( '' )
+			fields.forEach( function ( item ) {
+				$panel.append( renderField( item ) )
+			} );
+
+			$panel.slideDown( 400 );
+		}
+	}
+
     function toggleGoogleAnalyticsPanel() {
         if ( $( "#pys_event_ga_enabled" ).is( ":checked" ) ) {
             $( "#analytics_panel" ).show();
@@ -1630,5 +1721,31 @@ jQuery(document).ready(function($) {
         headButtonBlock.find(".icon-load").addClass("active");
         passwordBlock.find(".maskedInput").attr("disabled", true);
     });
+
+	/**
+	 * Function to update the fixed width of the save settings
+	 */
+	function updateFixedWidth() {
+		const leftMenu = document.getElementById( 'adminmenuwrap' ),
+			saveSettings = document.querySelector( '.save-settings' );
+
+		if ( leftMenu && saveSettings ) {
+			saveSettings.style.left = `${ leftMenu.offsetWidth }px`;
+		}
+	}
+
+	window.addEventListener( 'load', updateFixedWidth );
+
+	const container = document.getElementById( 'adminmenuwrap' );
+
+	if ( container ) {
+		const resizeObserver = new ResizeObserver( entries => {
+			for ( let entry of entries ) {
+				updateFixedWidth();
+			}
+		} );
+
+		resizeObserver.observe( container );
+	}
 } );
 

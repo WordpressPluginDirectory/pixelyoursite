@@ -12,18 +12,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property int    post_id
  * @property string title
  * @property bool   enabled
- *
  * @property int    delay
  * @property array  triggers
  * @property string trigger_type
- *
  * @property bool   facebook_enabled
  * @property string facebook_event_type
  * @property string facebook_custom_event_type
  * @property bool   facebook_params_enabled
  * @property array  facebook_params
  * @property array  facebook_custom_params
- *
  * @property bool   pinterest_enabled
  * @property string pinterest_event_type
  * @property string pinterest_custom_event_type
@@ -31,14 +28,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property array  pinterest_custom_params
  * @property array  ga_custom_params
  * @property array  ga_params
- *
  * @property bool   ga_enabled
  * @property string ga_event_action
  * @property string ga_custom_event_action
  * @property string ga_event_category
  * @property string ga_event_label
  * @property string ga_event_value
- *
  * @property bool ga_ads_enabled
  * @property string ga_ads_pixel_id
  * @property string ga_ads_event_action
@@ -48,7 +43,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string ga_ads_version
  * @property string ga_ads_event_category
  * @property string ga_ads_event_label
- *
  * @property bool gtm_enabled
  * @property string gtm_pixel_id
  * @property string gtm_event_action
@@ -63,12 +57,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property bool gtm_remove_customTrigger
  * @property bool gtm_use_custom_object_name
  * @property string gtm_custom_object_name
- *
  * @property bool   bing_enabled
  * @property string bing_event_action
  * @property string bing_event_category
  * @property string bing_event_label
  * @property string bing_event_value
+ * @property bool    reddit_enabled
+ * @property string   reddit_event_action
+ * @property bool     reddit_track_single_woo_data
+ * @property bool     reddit_track_cart_woo_data
+ * @property string   reddit_pixel_id
+ * @property string   reddit_event_type
+ * @property bool     reddit_params_enabled
  */
 class CustomEvent {
 
@@ -77,6 +77,39 @@ class CustomEvent {
 	private $title = 'Untitled';
 
 	private $enabled = true;
+
+	public static $redditEvents = [
+		'ViewContent'   => [],
+		'Search'        => [],
+		'AddToCart'     => [
+			[ 'type' => 'input', 'label' => 'itemCount', 'name' => 'pys[event][reddit_params][itemCount]' ],
+			[ 'type' => 'input', 'label' => 'value', 'name' => 'pys[event][reddit_params][value]' ],
+			[ 'type' => 'input', 'label' => 'currency', 'name' => 'pys[event][reddit_params][currency]' ],
+		],
+		'AddToWishlist' => [
+			[ 'type' => 'input', 'label' => 'itemCount', 'name' => 'pys[event][reddit_params][itemCount]' ],
+			[ 'type' => 'input', 'label' => 'value', 'name' => 'pys[event][reddit_params][value]' ],
+			[ 'type' => 'input', 'label' => 'currency', 'name' => 'pys[event][reddit_params][currency]' ],
+		],
+		'Purchase'      => [
+			[ 'type' => 'input', 'label' => 'itemCount', 'name' => 'pys[event][reddit_params][itemCount]' ],
+			[ 'type' => 'input', 'label' => 'value', 'name' => 'pys[event][reddit_params][value]' ],
+			[ 'type' => 'input', 'label' => 'currency', 'name' => 'pys[event][reddit_params][currency]' ],
+		],
+		'Lead'          => [
+			[ 'type' => 'input', 'label' => 'value', 'name' => 'pys[event][reddit_params][value]' ],
+			[ 'type' => 'input', 'label' => 'currency', 'name' => 'pys[event][reddit_params][currency]' ],
+		],
+		'SignUp'        => [
+			[ 'type' => 'input', 'label' => 'value', 'name' => 'pys[event][reddit_params][value]' ],
+			[ 'type' => 'input', 'label' => 'currency', 'name' => 'pys[event][reddit_params][currency]' ],
+		],
+		'Custom'        => [
+			[ 'type' => 'input', 'label' => 'itemCount', 'name' => 'pys[event][reddit_params][itemCount]' ],
+			[ 'type' => 'input', 'label' => 'value', 'name' => 'pys[event][reddit_params][value]' ],
+			[ 'type' => 'input', 'label' => 'currency', 'name' => 'pys[event][reddit_params][currency]' ],
+		],
+	];
 
     public $GAEvents = array(
         "" => array("CustomEvent"=>array()),
@@ -250,6 +283,12 @@ class CustomEvent {
         'bing_event_category' => null,
         'bing_event_label' => null,
         'bing_event_value' => null,
+
+		'reddit_pixel_id'              => 'all',
+		'reddit_event_type'            => 'ViewContent',
+		'reddit_enabled'               => false,
+		'reddit_track_single_woo_data' => false,
+		'reddit_track_cart_woo_data'   => false,
 
         'conditions_enabled' => false,
         'conditions_logic' => 'AND'
@@ -481,6 +520,11 @@ class CustomEvent {
                 break; // Stop after processing the first condition
             }
         }
+
+		/**
+		 * REDDIT
+		 */
+		$this->updateRedditParams( $args );
 
 		/**
 		 * FACEBOOK
@@ -756,6 +800,10 @@ class CustomEvent {
 	
 	public function isPinterestEnabled() {
 		return (bool) $this->pinterest_enabled;
+	}
+
+	public function isRedditEnabled() {
+		return (bool) $this->reddit_enabled;
 	}
 	
 	public function getPinterestEventType() {
@@ -1175,4 +1223,52 @@ class CustomEvent {
         }
         return $check;
     }
+
+	private function updateRedditParams( $args ) {
+		$reddit_event_types = array_keys( self::$redditEvents );
+
+		$standard_params = [
+			'itemCount',
+			'currency',
+			'value',
+		];
+		// enabled
+		$this->data[ 'reddit_enabled' ] = isset( $args[ 'reddit_enabled' ] ) && $args[ 'reddit_enabled' ];
+
+		//pixel id
+		$this->data[ 'reddit_pixel_id' ] = !empty( $args[ 'reddit_pixel_id' ] )
+		                                   && in_array( $args[ 'reddit_pixel_id' ], Reddit()->getAllPixels() ) ? $args[ 'reddit_pixel_id' ] : 'all';
+
+		// event type
+		$this->data[ 'reddit_event_type' ] = isset( $args[ 'reddit_event_type' ] )
+		                                     && in_array( $args[ 'reddit_event_type' ], $reddit_event_types ) ? sanitize_text_field( $args[ 'reddit_event_type' ] ) : 'ViewContent';
+
+		// custom event type
+		$this->data[ 'reddit_custom_event_type' ] = $this->reddit_event_type == 'Custom'
+		                                            && !empty( $args[ 'reddit_custom_event_type' ] ) ? sanitizeKey( $args[ 'reddit_custom_event_type' ] ) : null;
+
+		// params enabled
+		$this->data[ 'reddit_params_enabled' ] = isset( $args[ 'reddit_params_enabled' ] )
+		                                         && $args[ 'reddit_params_enabled' ];
+
+		$this->data[ 'reddit_track_single_woo_data' ] = isset( $args[ 'reddit_track_single_woo_data' ] )
+		                                                && $args[ 'reddit_track_single_woo_data' ];
+		$this->data[ 'reddit_track_cart_woo_data' ]   = isset( $args[ 'reddit_track_cart_woo_data' ] )
+		                                                && $args[ 'reddit_track_cart_woo_data' ];
+
+		// params
+		$params = [];
+		if ( $this->reddit_params_enabled && isset( $args[ 'reddit_params' ] ) ) {
+
+			foreach ( $standard_params as $standard ) {
+				$params[ $standard ] = !empty( $args[ 'reddit_params' ][ $standard ] ) ? sanitize_text_field( $args[ 'reddit_params' ][ $standard ] ) : null;
+			}
+		} else {
+			// clear all
+			foreach ( $standard_params as $standard ) {
+				$params[ $standard ] = null;
+			}
+		}
+		$this->data[ 'reddit_params' ] = $params;
+	}
 }

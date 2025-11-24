@@ -73,11 +73,46 @@
 
     }();
 
-    var Utils = function (options) {
+	var dummyReddit = function () {
+		/**
+		 * Public API
+		 */
+		return {
+			tag: function () {
+				return "reddit";
+			},
+			isEnabled: function () {},
+			disable: function () {},
+			loadPixel: function () {},
+			fireEvent: function ( name, data ) {
+				return false;
+			},
+			onAdSenseEvent: function ( event ) {},
+			onClickEvent: function ( params ) {},
+			onWatchVideo: function ( params ) {},
+			onCommentEvent: function ( event ) {},
+			onFormEvent: function ( params ) {},
+			onDownloadEvent: function ( params ) {},
+			onWooAddToCartOnButtonEvent: function ( product_id ) {},
+			onWooAddToCartOnSingleEvent: function ( product_id, qty, product_type, is_external, $form ) {},
+			onWooRemoveFromCartEvent: function ( cart_item_hash ) {},
+			onWooAffiliateEvent: function ( product_id ) {},
+			onWooPayPalEvent: function ( event ) {},
+			onEddAddToCartOnButtonEvent: function ( download_id, price_index, qty ) {},
+			onEddRemoveFromCartEvent: function ( item ) {},
+			onPageScroll: function ( event ) {},
+			onTime: function ( event ) {},
+		}
+	}();
+
+
+	var Utils = function (options) {
 
         var Pinterest = dummyPinterest;
 
         var Bing = dummyBing;
+
+		var Reddit = dummyReddit;
 
         var gtag_loaded = false;
 
@@ -130,6 +165,10 @@
                 if (!options.gdpr.bing_disabled_by_api) {
                     Bing.loadPixel();
                 }
+
+	            if (!options.gdpr.reddit_disabled_by_api) {
+		            Reddit.loadPixel();
+	            }
             }
             if (options.gdpr.consent_magic_integration_enabled && typeof CS_Data !== "undefined") {
                 if (typeof CS_Data.cs_google_analytics_consent_mode !== "undefined" && CS_Data.cs_google_analytics_consent_mode == 1) {
@@ -334,6 +373,8 @@
                     Pinterest[functionName](events[Pinterest.tag()]);
                 if (events.hasOwnProperty(Bing.tag()))
                     Bing[functionName](events[Bing.tag()]);
+	            if (events.hasOwnProperty(Reddit.tag()))
+		            Reddit[functionName](events[Reddit.tag()]);
 
                 if (events.hasOwnProperty(GTM.tag()))
                     GTM[functionName](events[GTM.tag()]);
@@ -348,6 +389,11 @@
                 Bing = window.pys.Bing || Bing;
                 return Bing;
             },
+
+	        setupRedditObject: function () {
+		        Reddit = window.pys.Reddit || Reddit;
+		        return Reddit;
+	        },
 
             // Clone all object members to another and return it
             copyProperties: function (from, to) {
@@ -916,6 +962,14 @@
                     Bing.fireEvent(event.name, event);
                 }
 
+	            if (events.hasOwnProperty('reddit')) {
+		            event = events.reddit;
+		            if(Utils.isEventInTimeWindow(event.name,event,"dyn_reddit_"+eventId)) {
+			            event = Utils.getFormFilledData(event);
+			            Reddit.fireEvent(event.name, event);
+		            }
+	            }
+
                 if (events.hasOwnProperty('gtm')) {
                     event = events.gtm;
                     GTM.fireEvent(event.name, event);
@@ -946,6 +1000,8 @@
                                     fired = Bing.fireEvent(eventData.name, eventData);
                                 } else if ('gtm' === pixel) {
                                     fired = GTM.fireEvent(eventData.name, eventData);
+                                } else if ('reddit' === pixel) {
+	                                fired = Reddit.fireEvent(eventData.name, eventData);
                                 }
 
                                 // prevent event double event firing
@@ -1085,6 +1141,7 @@
                                 options.gdpr.google_ads_disabled_by_api = res.data.google_ads_disabled_by_api;
                                 options.gdpr.pinterest_disabled_by_api = res.data.pinterest_disabled_by_api;
                                 options.gdpr.bing_disabled_by_api = res.data.bing_disabled_by_api;
+	                            options.gdpr.reddit_disabled_by_api = res.data.reddit_disabled_by_api;
 
                                 options.cookie.externalID_disabled_by_api = res.data.externalID_disabled_by_api;
                                 options.cookie.disabled_all_cookie = res.data.disabled_all_cookie;
@@ -1118,6 +1175,7 @@
                     if (
                         ( ( typeof CS_Data.cs_google_consent_mode_enabled !== "undefined" && CS_Data.cs_google_consent_mode_enabled == 1 ) && ( pixel == 'analytics' || pixel == 'google_ads' ) )
                         || ( typeof CS_Data.cs_meta_ldu_mode !== "undefined" && CS_Data.cs_meta_ldu_mode && pixel == 'facebook' )
+                        || ( typeof CS_Data.cs_reddit_ldu_mode !== "undefined" && CS_Data.cs_reddit_ldu_mode && pixel == 'reddit' )
                         || ( typeof CS_Data.cs_bing_consent_mode !== "undefined" && CS_Data.cs_bing_consent_mode.ad_storage.enabled && pixel == 'bing' )
                     ) {
                         if ( CS_Data.cs_cache_enabled == 0 || ( CS_Data.cs_cache_enabled == 1 && window.CS_Cache && window.CS_Cache.check_status ) ) {
@@ -1139,7 +1197,9 @@
                         return true;
                     } else if( pixel == 'tiktok' && ( CS_Data.cs_script_cat.tiktok == 0 || CS_Data.cs_script_cat.tiktok == CS_Data.cs_necessary_cat_id ) ) {
                         return true;
-                    }
+		            } else if( pixel == 'reddit' && ( CS_Data.cs_script_cat?.reddit == 0 || CS_Data.cs_script_cat?.reddit == CS_Data.cs_necessary_cat_id ) ) {
+		                return true;
+		            }
 
                     let substring = "cs_enabled_cookie_term",
                         theCookies = document.cookie.split( ';' );
@@ -1162,6 +1222,8 @@
                                 return cs_cookie_val == 'yes';
                             } else if ( categoryCookie === CS_Data.cs_script_cat.tiktok && pixel == 'tiktok' ) {
                                 return cs_cookie_val == 'yes';
+                            } else if ( categoryCookie === CS_Data.cs_script_cat?.reddit && pixel == 'reddit' ) {
+	                            return cs_cookie_val == 'yes';
                             }
                         }
                     }
@@ -1294,6 +1356,7 @@
                             bing: true,
                             pinterest: true,
                             gtm: true,
+	                        reddit: true,
                         };
 
                         for (let i = 1 ; i <= theCookies.length; i++) {
@@ -1318,6 +1381,10 @@
                                     if (categoryCookie === CS_Data.cs_script_cat.pinterest) {
                                         Pinterest.loadPixel();
                                     }
+
+	                                if ( ( categoryCookie === CS_Data.cs_script_cat.reddit ) || ( typeof CS_Data.cs_reddit_ldu_mode !== "undefined" && CS_Data.cs_reddit_ldu_mode ) ) {
+		                                Reddit.loadPixel();
+	                                }
                                 } else {
                                     if ( ( categoryCookie === CS_Data.cs_script_cat.facebook ) && ( typeof CS_Data.cs_meta_ldu_mode == "undefined" || !CS_Data.cs_meta_ldu_mode ) ) {
                                         Facebook.disable();
@@ -1338,6 +1405,11 @@
                                         Pinterest.disable();
                                         consent.pinterest = false;
                                     }
+
+	                                if ( ( categoryCookie === CS_Data.cs_script_cat.reddit ) && ( typeof CS_Data.cs_reddit_ldu_mode == "undefined" || !CS_Data.cs_reddit_ldu_mode ) ) {
+		                                Reddit.disable();
+		                                consent.reddit = false;
+	                                }
                                 }
                                 if (Cookies.get('cs_enabled_advanced_matching') == 'yes') {
                                     Facebook.loadPixel();
@@ -1359,6 +1431,7 @@
                                 bing: true,
                                 pinterest: true,
                                 gtm: true,
+	                            reddit: true,
                             };
 
                             let elm = $(this),
@@ -1369,11 +1442,13 @@
                                 Bing.loadPixel();
                                 Analytics.loadPixel();
                                 Pinterest.loadPixel();
+	                            Reddit.loadPixel();
 
                                 consent.facebook = true;
                                 consent.bing = true;
                                 consent.ga = true;
                                 consent.pinterest = true;
+	                            consent.reddit = true;
                                 consent.gtm = true;
 
                                 Utils.setupGDPRData( consent );
@@ -1393,6 +1468,11 @@
                                     consent.ga = false;
                                     consent.gtm = false;
                                 }
+
+	                            if ( typeof CS_Data.cs_reddit_ldu_mode == "undefined" || CS_Data.cs_reddit_ldu_mode == 0 ) {
+		                            Reddit.disable();
+		                            consent.reddit = false;
+	                            }
 
                                 Pinterest.disable();
                                 consent.pinterest = false;
@@ -2995,6 +3075,7 @@
             case "gtm": return window.pys.GTM;
             case "bing": return window.pys.Bing;
             case "pinterest": return window.pys.Pinterest;
+	        case "reddit": return window.pys.Reddit;
         }
     }
 
@@ -3037,6 +3118,7 @@
 
         var Pinterest = Utils.setupPinterestObject();
         var Bing = Utils.setupBingObject();
+	    var Reddit = Utils.setupRedditObject();
 
         if(options.hasOwnProperty('cookie'))
         {
@@ -3124,8 +3206,10 @@
                         var scroll = Math.round(docHeight * event.scroll_percent / 100)// convert % to absolute positions
 
                         if(scroll < $(window).scrollTop()) {
-                            Utils.copyProperties(Utils.getRequestParams(), event.params);
-                            getPixelBySlag(pixels[i]).onPageScroll(event);
+	                        if ( pixels[i] !== 'reddit') {
+		                        Utils.copyProperties( Utils.getRequestParams(), event.params );
+	                        }
+	                        getPixelBySlag( pixels[ i ] ).onPageScroll( event );
                             isFired = true
                         }
                     }
@@ -3144,7 +3228,10 @@
             setTimeout(function(){
                 for(var i = 0;i<pixels.length;i++) {
                     var event = Utils.clone(options.dynamicEvents.automatic_event_time_on_page[pixels[i]]);
-                    Utils.copyProperties(Utils.getRequestParams(), event.params);
+
+	                if ( pixels[i] !== 'reddit') {
+		                Utils.copyProperties(Utils.getRequestParams(), event.params);
+	                }
                     getPixelBySlag(pixels[i]).onTime(event);
                 }
             },time*1000);
@@ -3179,7 +3266,7 @@
                                     var extensions = event.extensions;
                                     if (extensions.includes(extension)) {
 
-                                        if(pixels[i] == "tiktok") {
+                                        if( pixels[i] == "tiktok" || pixels[i] == "reddit" ) {
                                             getPixelBySlag(pixels[i]).fireEvent(tikEvent.name, event);
                                         } else {
                                             if (options.enable_remove_download_url_param) {
@@ -3260,6 +3347,7 @@
                             GTM.onWooAddToCartOnButtonEvent(product_id);
                             Pinterest.onWooAddToCartOnButtonEvent(product_id);
                             Bing.onWooAddToCartOnButtonEvent(product_id);
+	                        Reddit.onWooAddToCartOnButtonEvent(product_id);
                         }
                     }
                 });
@@ -3328,6 +3416,7 @@
 
                     Pinterest.onWooAddToCartOnSingleEvent(product_id, qty, product_type, false, $form);
                     Bing.onWooAddToCartOnSingleEvent(product_id, qty, product_type, false, $form);
+	                Reddit.onWooAddToCartOnSingleEvent(product_id, qty, product_type, false, $form);
 
                 });
 
@@ -3443,7 +3532,7 @@
                         GTM.onEddAddToCartOnButtonEvent(download_id, price_index, q);
                         Pinterest.onEddAddToCartOnButtonEvent(download_id, price_index, q);
                         Bing.onEddAddToCartOnButtonEvent(download_id, price_index, q);
-
+	                    Reddit.onEddAddToCartOnButtonEvent(download_id, price_index, q);
                     });
 
                 });
@@ -3478,8 +3567,10 @@
                 if (options.dynamicEvents.hasOwnProperty("automatic_event_comment")) {
                     var pixels = Object.keys(options.dynamicEvents.automatic_event_comment);
                     for (var i = 0; i < pixels.length; i++) {
-                        var event = Utils.clone(options.dynamicEvents.automatic_event_comment[pixels[i]]);
-                        Utils.copyProperties(Utils.getRequestParams(), event.params);
+	                    var event = Utils.clone(options.dynamicEvents.automatic_event_comment[pixels[i]]);
+	                    if ( pixels[i] !== 'reddit') {
+		                    Utils.copyProperties(Utils.getRequestParams(), event.params);
+	                    }
                         getPixelBySlag(pixels[i]).onCommentEvent(event);
                     }
                 }
@@ -3547,7 +3638,7 @@
                         for (var i = 0; i < pixels.length; i++) {
                             var event = Utils.clone(options.dynamicEvents.automatic_event_form[pixels[i]]);
 
-                            if (pixels[i] === "tiktok") {
+	                        if (pixels[i] === "tiktok" || pixels[i] === "reddit") {
                                 getPixelBySlag(pixels[i]).fireEvent(event.name, event);
                             } else {
                                 Utils.copyProperties(params, event.params,)
@@ -3617,7 +3708,7 @@
             var pixels = Object.keys(options.dynamicEvents.automatic_event_form);
             for (var i = 0; i < pixels.length; i++) {
                 var event = options.dynamicEvents.automatic_event_form[pixels[i]];
-                if (pixels[i] === "tiktok") {
+                if (pixels[i] === "tiktok" || pixels[i] === "reddit") {
                     getPixelBySlag(pixels[i]).fireEvent(event.name, event);
                 } else {
                     Utils.copyProperties(params, event.params)
