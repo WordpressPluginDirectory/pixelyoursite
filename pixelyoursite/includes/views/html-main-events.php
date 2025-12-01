@@ -311,7 +311,7 @@ $new_event_url = buildAdminUrl( 'pixelyoursite', 'events', 'edit' );
                                              class="event-network <?php echo !$disabled ? 'disabled' : ''; ?>">
 	                                    <?php
 	                                    $disabled = Reddit()->enabled() && !empty( Reddit()->getPixelIDs() ) && $event->isRedditEnabled(); ?>
-                                        <img src="<?php echo PYS_URL; ?>/dist/images/reddit-logo.svg"
+                                        <img src="<?php echo PYS_FREE_URL; ?>/dist/images/reddit-logo.svg"
                                              alt="reddit logo"
                                              class="event-network <?php echo !$disabled ? 'disabled' : ''; ?>">
 

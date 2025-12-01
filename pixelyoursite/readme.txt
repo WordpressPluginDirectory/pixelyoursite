@@ -4,7 +4,7 @@ Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, Google Tag Manager, G
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.8
-Stable tag: 11.1.4
+Stable tag: 11.1.4.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -387,6 +387,15 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 11.1.4.1 =
+
+December 1, 2025
+
+* The Google Tags first_party_collection option has been moved to a more visible location, and its default is ON.
+
+* Fix for a possible warning Uncaught Error: Undefined constant PixelYourSite PYS_URL.
+
 
 = PixelYourSite 11.1.4 =
 

@@ -232,6 +232,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                             </div>
 
                             <div class="d-flex align-items-center">
+                                <input type="text" class="custom-control-input"
+                                       name="pys[ga][first_party_collection][-1]" value="0" checked/>
+                                <?php GA()->render_checkbox_input( "first_party_collection", "First party cookies selector first_party_collection (recommended)" ); ?>
+                            </div>
+                            <div class="d-flex align-items-center">
                                 <input type="checkbox" class="custom-control-input"
                                        name="pys[ga][is_enable_debug_mode][-1]" value="0" checked/>
                                 <?php GA()->render_checkbox_input_array( "is_enable_debug_mode", "Enable Analytics Debug mode for this property" ); ?>
@@ -267,11 +272,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 <input type="text" class="custom-control-input"
                                        name="pys[ga][transport_url][-1]" value="0" checked/>
                                 <?php GA()->render_text_input_array_item( "transport_url", "https://tagging.mywebsite.com", 0 ); ?>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <input type="text" class="custom-control-input"
-                                       name="pys[ga][first_party_collection][-1]" value="0" checked/>
-                                <?php GA()->render_checkbox_input( "first_party_collection", "First party cookies selector first_party_collection (recommended)" ); ?>
                             </div>
 
                             <div class="line-dark"></div>
