@@ -28,19 +28,19 @@ use PixelYourSite\Facebook\Helpers;
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <div class="d-flex align-items-center flex-with-badge">
                             <?php renderDummySwitcher( false); ?>
-                            <h4 class="switcher-label secondary_heading">Facebook Advanced Purchase Tracking</h4>
+                            <h4 class="switcher-label secondary_heading"><?php _e( 'Facebook Purchase tracking via API', 'pys' ); ?></h4>
                         </div>
                     </div>
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <div class="d-flex align-items-center flex-with-badge">
                             <?php renderDummySwitcher( false); ?>
-                            <h4 class="switcher-label secondary_heading">Google Analytics Advanced Purchase Tracking</h4>
+                            <h4 class="switcher-label secondary_heading"><?php _e( 'Google Analytics backup and renewals Purchase tracking via API', 'pys' ); ?></h4>
                         </div>
                     </div>
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <div class="d-flex align-items-center flex-with-badge">
                             <?php renderDummySwitcher( false); ?>
-                            <h4 class="switcher-label secondary_heading">TikTok Advanced Purchase Tracking</h4>
+                            <h4 class="switcher-label secondary_heading"><?php _e( 'TikTok backup and renewals Purchase tracking via API', 'pys' ); ?></h4>
                         </div>
                     </div>
 
@@ -48,7 +48,7 @@ use PixelYourSite\Facebook\Helpers;
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <div class="d-flex align-items-center flex-with-badge">
                                 <?php renderDummySwitcher( false); ?>
-                                <h4 class="switcher-label secondary_heading">Pinterest Advanced Purchase Tracking</h4>
+                                <h4 class="switcher-label secondary_heading"><?php _e( 'Pinterest backup and renewals Purchase tracking via API', 'pys' ); ?></h4>
                             </div>
                         </div>
                     <?php endif; ?>

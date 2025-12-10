@@ -1175,20 +1175,23 @@ abstract class Settings {
 	}
     public function render_checkbox_input_array( $key, $label, $index = 0, $disabled = false ) {
 
-        $attr_name  = "pys[$this->slug][$key][]";
-        $attr_values = (array)$this->getOption( $key );
-        $value = "index_".$index;
-        $valueIndex = array_search($value,$attr_values);
-
+        $attr_name = "pys[$this->slug][$key][]";
+        $attr_values = (array) $this->getOption( $key );
+        $value = "index_" . $index;
+        $valueIndex = array_search( $value, $attr_values );
+        $id = $key . "_" . rand( 1, 1000000 );
         ?>
-
-        <label class="custom-control custom-checkbox">
-            <input type="checkbox" name="<?php echo esc_attr( $attr_name ); ?>" value="<?=$value?>"
-                   class="custom-control-input" <?php disabled( $disabled, true ); ?>
-                <?=$valueIndex !== false ? "checked" : "" ?>>
-            <span class="custom-control-indicator"></span>
-            <span class="custom-control-description"><?php echo wp_kses_post( $label ); ?></span>
-        </label>
+        <div class="small-checkbox">
+            <input type="hidden" name="<?php echo esc_attr( $attr_name ); ?>" value="0">
+            <input type="checkbox" id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $attr_name ); ?>"
+                   value="<?= $value ?>"
+                   class="small-control-input" <?php disabled( $disabled, true ); ?>
+                    <?php echo $valueIndex !== false ? "checked" : "" ?>>
+            <label class="small-control small-checkbox-label" for="<?php echo esc_attr( $id ); ?>">
+                <span class="small-control-indicator"><i class="icon-check"></i></span>
+                <span class="small-control-description"><?php echo wp_kses_post( $label ); ?></span>
+            </label>
+        </div>
 
         <?php
 

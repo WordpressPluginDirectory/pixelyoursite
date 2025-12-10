@@ -470,6 +470,18 @@ if ( ! defined( 'ABSPATH' ) ) {
     $videos = array(
 
       array(
+          'url'   => 'https://www.youtube.com/watch?v=rmkZZcLxP2I',
+          'title' => 'How to install the Reddit Pixel',
+          'time'  => '4:19',
+      ),
+
+      array(
+          'url'   => 'https://www.youtube.com/watch?v=Jm8dFTOLjJE',
+          'title' => 'WooCommerce Google Ads Conversion Import',
+          'time'  => '9:19',
+      ),
+
+      array(
           'url'   => 'https://www.youtube.com/watch?v=WUrl-2fgTxg',
           'title' => 'Fix SAFARI Google Ads Tracking - GCLID missing solution',
           'time'  => '4:59',
@@ -506,7 +518,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         ),
         array(
             'url'   => 'https://www.youtube.com/watch?v=DZzFP4pSitU',
-            'title' => 'Meta Pixel (formerly Facebook Pixel), CAPI, and PixelYourSite MUST WATCH',
+            'title' => 'Meta Pixel, CAPI, and PixelYourSite MUST WATCH',
             'time'  => '8:19',
         ),
         array(

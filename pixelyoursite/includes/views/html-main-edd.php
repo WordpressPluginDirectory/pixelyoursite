@@ -28,26 +28,26 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <div class="d-flex align-items-center">
                         <div class="d-flex align-items-center flex-with-badge">
                             <?php renderDummySwitcher( false); ?>
-                            <h4 class="switcher-label secondary_heading"><?php _e( 'Facebook auto-renewals purchase tracking', 'pys' ); ?></h4>
+                            <h4 class="switcher-label secondary_heading"><?php _e( 'Facebook backup and renewals Purchase tracking via API', 'pys' ); ?></h4>
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="d-flex align-items-center flex-with-badge">
                             <?php renderDummySwitcher( false); ?>
-                            <h4 class="switcher-label secondary_heading"><?php _e( 'Google Analytics auto-renewals purchase tracking', 'pys' ); ?></h4>
+                            <h4 class="switcher-label secondary_heading"><?php _e( 'Google Analytics backup and renewals Purchase tracking via API', 'pys' ); ?></h4>
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="d-flex align-items-center flex-with-badge">
                             <?php renderDummySwitcher( false); ?>
-                            <h4 class="switcher-label secondary_heading"><?php _e( 'TikTok Advanced Purchase Tracking', 'pys' ); ?></h4>
+                            <h4 class="switcher-label secondary_heading"><?php _e( 'TikTok backup and renewals Purchase tracking via API', 'pys' ); ?></h4>
                         </div>
                     </div>
                     <?php if ( Pinterest()->enabled() ) : ?>
                         <div class="d-flex align-items-center">
                             <div class="d-flex align-items-center flex-with-badge">
                                 <?php renderDummySwitcher( false); ?>
-                                <h4 class="switcher-label secondary_heading"><?php _e( 'Pinterest Advanced Purchase Tracking', 'pys' ); ?></h4>
+                                <h4 class="switcher-label secondary_heading"><?php _e( 'Pinterest backup and renewals Purchase tracking via API', 'pys' ); ?></h4>
                             </div>
                         </div>
                     <?php endif; ?>

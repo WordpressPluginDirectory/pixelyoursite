@@ -24,6 +24,10 @@ class PYS_Logger
 
     public function init() {
         $this->isEnabled = PYS()->getOption('pys_logs_enable');
+
+        // Always ensure protection files exist, regardless of logging being enabled
+        // This prevents PII exposure even if logs were created before and logging is now disabled
+        $this->create_protection_files();
     }
 
     /**
@@ -89,12 +93,16 @@ class PYS_Logger
         if ( $file ) {
             if ( ! file_exists( $file ) ) {
                 if( !is_dir( $this->log_path ) ) {
-                    mkdir( $this->log_path, 0777, true );
+                    if (!mkdir($concurrentDirectory = $this->log_path, 0755, true) && !is_dir($concurrentDirectory)) {
+                        throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+                    }
                 }
                 $temphandle = @fopen( $file, 'w+' ); // @codingStandardsIgnoreLine.
                 if ( is_resource( $temphandle ) ) {
                     @fclose( $temphandle ); // @codingStandardsIgnoreLine.
-
+                    if ( ! defined( 'FS_CHMOD_FILE' ) ) {
+                        define( 'FS_CHMOD_FILE', 0644 );
+                    }
                     @chmod( $file, FS_CHMOD_FILE ); // @codingStandardsIgnoreLine.
                 }
             }
@@ -108,6 +116,43 @@ class PYS_Logger
         }
 
         return false;
+    }
+
+    /**
+     * Create protection files (.htaccess and index.php) in logs directory
+     * to prevent direct access to log files
+     *
+     * @return void
+     */
+    protected function create_protection_files() {
+        if ( ! is_dir( $this->log_path ) ) {
+            return;
+        }
+
+        // Create .htaccess file to deny access
+        $htaccess_file = $this->log_path . '.htaccess';
+        if ( ! file_exists( $htaccess_file ) ) {
+            $htaccess_content = "# Deny access to all files in this directory\n";
+            $htaccess_content .= "# Apache 2.4+\n";
+            $htaccess_content .= "<IfModule authz_core_module>\n";
+            $htaccess_content .= "    Require all denied\n";
+            $htaccess_content .= "</IfModule>\n\n";
+            $htaccess_content .= "# Apache 2.2\n";
+            $htaccess_content .= "<IfModule !authz_core_module>\n";
+            $htaccess_content .= "    Deny from all\n";
+            $htaccess_content .= "</IfModule>\n";
+
+            @file_put_contents( $htaccess_file, $htaccess_content );
+            @chmod( $htaccess_file, 0644 );
+        }
+
+        // Create index.php file to prevent directory listing
+        $index_file = $this->log_path . 'index.php';
+        if ( ! file_exists( $index_file ) ) {
+            $index_content = "<?php\n// Silence is golden.\n";
+            @file_put_contents( $index_file, $index_content );
+            @chmod( $index_file, 0644 );
+        }
     }
 
     /**
