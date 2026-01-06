@@ -160,7 +160,7 @@ final class PYS extends Settings implements Plugin {
                 'clear_plugin_logs' => [$this->logger, 'remove'],
             ];
 
-            if (isPinterestActive() && class_exists('Pinterest')){
+            if (isPinterestActive() && class_exists('PixelYourSite\Pinterest')){
                 $loggers['pinterest'] = [Pinterest()->getLog(), 'downloadLogFile'];
                 $clearLoggers['clear_pinterest_logs'] = [Pinterest()->getLog(), 'remove'];
             }

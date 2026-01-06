@@ -4,7 +4,7 @@ Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, Google Tag Manager, G
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 6.9
-Stable tag: 11.1.5
+Stable tag: 11.1.5.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -13,7 +13,7 @@ Add Meta Pixel with Conversion API, Google Analytics (GA4) + Consent Mode, Googl
 == Description ==
 **PixelYourSite Free Version: Complete Tracking Solution for the Meta Pixel, Google Analytics 4, and Google Tag Manager.**
 
-Easily integrate Meta Pixel with full Conversion API support, Google Analytics 4, and Google Tag Manager into your WordPress site. Plus, use our simple Head and Footer script option to add any custom script you need for advanced tracking and optimization. The Pinterest Tag can be implemented via this [paid add-on](https://www.pixelyoursite.com/pinterest-tag). Similar paid add-on for the [Bing tag](https://www.pixelyoursite.com/plugins/pixelyoursite-professional/bing-tag-add-on)
+Easily integrate Meta Pixel with full Conversion API support, Google Analytics 4, and Google Tag Manager into your WordPress site. Plus, use our simple Head and Footer script option to add any custom script you need for advanced tracking and optimization. The Pinterest Tag can be implemented via this [paid add-on](https://www.pixelyoursite.com/pinterest-tag). Similar paid add-ons for the [Bing tag](https://www.pixelyoursite.com/plugins/pixelyoursite-professional/bing-tag-add-on) and for the [Reddit Pixel](https://www.pixelyoursite.com/plugins/pixelyoursite-professional/reddit-wordpress-plugin).
 
 **Free training:** 
 
@@ -387,6 +387,20 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 11.1.5.2 =
+
+January 5, 2026
+
+* Fixing a possible issue with event logs file download and delete. 
+
+
+= PixelYourSite 11.1.5.1 =
+
+December 20, 2025
+
+* Additional improvements the way we handle the API logs.
+
 
 = PixelYourSite 11.1.5 =
 
