@@ -14,7 +14,23 @@
     if(options.hasOwnProperty("track_cookie_for_subdomains") && options.track_cookie_for_subdomains) {
         domain = getRootDomain(true);
     }
+    /**
+     * Resolve parameter value based on mode (static or dynamic)
+     *
+     * @param {Object|string} param - Parameter object with { value, selector } or string value
+     * @returns {string|null} - Resolved value
+     */
+    function resolveParamValue(param) {
+        // Handle old format (string)
+        if (typeof param === 'string') {
+            return param;
+        }
+        if (typeof param === 'object' && param !== null) {
+            return param.value || param;
+        }
 
+        return null;
+    }
     var dummyPinterest = function () {
 
         /**
@@ -943,35 +959,32 @@
                 var events = options.triggerEvents[eventId];
 
                 if (events.hasOwnProperty('facebook')) {
-                    event = events.facebook;
+                    event = Utils.getFormFilledData(events.facebook);
                     Facebook.fireEvent(event.name, event);
                 }
 
                 if (events.hasOwnProperty('ga')) {
-                    event = events.ga;
+                    event = Utils.getFormFilledData(events.ga);
                     Analytics.fireEvent(event.name, event);
                 }
 
                 if (events.hasOwnProperty('pinterest')) {
-                    event = events.pinterest;
+                    event = Utils.getFormFilledData(events.pinterest);
                     Pinterest.fireEvent(event.name, event);
                 }
 
                 if (events.hasOwnProperty('bing')) {
-                    event = events.bing;
+                    event = Utils.getFormFilledData(events.bing);
                     Bing.fireEvent(event.name, event);
                 }
 
 	            if (events.hasOwnProperty('reddit')) {
-		            event = events.reddit;
-		            if(Utils.isEventInTimeWindow(event.name,event,"dyn_reddit_"+eventId)) {
-			            event = Utils.getFormFilledData(event);
-			            Reddit.fireEvent(event.name, event);
-		            }
+                    event = Utils.getFormFilledData(events.reddit);
+                    Reddit.fireEvent(event.name, event);
 	            }
 
                 if (events.hasOwnProperty('gtm')) {
-                    event = events.gtm;
+                    event = Utils.getFormFilledData(events.gtm);
                     GTM.fireEvent(event.name, event);
                 }
             },
@@ -986,7 +999,7 @@
                             eventData.fired = eventData.fired || false;
 
                             if (!eventData.fired) {
-
+                                eventData = Utils.getFormFilledData(eventData);
                                 var fired = false;
 
                                 // fire event
@@ -1807,6 +1820,19 @@
                 } else {
                     return JSON.parse(dataStr);
                 }
+            },
+            getFormFilledData: function ( event ) {
+                // First, resolve static/dynamic parameters
+                if (event.params && Object.keys(event.params).length > 0) {
+                    Object.entries(event.params).forEach(([key, value]) => {
+                        // Resolve parameter value (static or dynamic)
+                        const resolvedValue = resolveParamValue(value);
+                        if (resolvedValue !== null) {
+                            event.params[key] = resolvedValue;
+                        }
+                    });
+                }
+                return event;
             }
         };
 

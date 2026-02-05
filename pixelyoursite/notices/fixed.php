@@ -195,6 +195,13 @@ function adminGetFixedNotices() {
                     'button_text' => 'Watch video',
                     'button_url' => 'https://www.youtube.com/watch?v=Jm8dFTOLjJE',
                 ],
+                [
+                    'slug'  => 'free_block_4_message_3_v2',
+                    'title' => 'Track ANYTHING without coding!',
+                    'message' => 'This is how the Event Setup Tool works.',
+                    'button_text' => 'Learn More',
+                    'button_url' => 'https://www.pixelyoursite.com/event-setup-tool',
+                ],
 
 
             ],
