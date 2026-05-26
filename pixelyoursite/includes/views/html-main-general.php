@@ -43,34 +43,23 @@ if ( ! defined( 'ABSPATH' ) ) {
                             <div class="d-flex align-items-center">
                                 <?php Facebook()->render_checkbox_input( "use_server_api", 'Enable Conversion API (add the token below)' ); ?>
                             </div>
-
-                            <div>
-                                <?php Facebook()->render_checkbox_input( 'advanced_matching_enabled', 'Enable Advanced Matching' ); ?>
-                            </div>
-
                             <div class="facebook-description">
                                 <p class="text-gray pb-8">
-                                    Learn about Conversion API and Advanced Matching privacy and consent:
-                                    <a href="https://www.youtube.com/watch?v=PsKdCkKNeLU" target="_blank"
-                                       class="link">watch video</a>
-                                </p>
-                                <p class="text-gray pb-8">
-                                    Install multiple Meta Pixels with CAPI support:
+                                    <?php _e('Install multiple Meta Pixels with CAPI support:', 'pys');?>
                                     <a href="https://www.youtube.com/watch?v=HM98mGZshvc" target="_blank"
                                        class="link">watch video</a>
                                 </p>
                                 <p class="text-gray">
-                                    What is Events Matching and EMQ and how you can improve it:
+                                    <?php _e('What is Events Matching and EMQ and how you can improve it:', 'pys');?>
                                     <a href=" https://www.youtube.com/watch?v=3soI_Fl0JQw" target="_blank"
                                        class="link">watch video</a>
                                 </p>
                             </div>
-
                             <div>
                                 <h4 class="primary_heading mb-4">Meta Pixel ID:</h4>
                                 <?php Facebook()->render_pixel_id( 'pixel_id', 'Meta Pixel ID' ); ?>
                                 <div class="form-text mt-4">
-                                    <a href="https://www.pixelyoursite.com/pixelyoursite-free-version/add-your-facebook-pixel"
+                                    <a href="https://www.pixelyoursite.com/docs/meta-facebook-settings-setup"
                                        target="_blank" class="link link-small">How to get it?</a>
                                 </div>
                             </div>
@@ -87,7 +76,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     can help you capture more events. An access token is required to use the
                                     server-side
                                     API.
-                                    <a href='https://www.pixelyoursite.com/facebook-conversion-api-capi'
+                                    <a href='https://www.pixelyoursite.com/strategy/facebook-conversion-api'
                                        target='_blank' class="link">Learn
                                         how to generate the token and how to test Conversion API</a>
                                 </p>
@@ -213,7 +202,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 ?>
 
                                 <div class="form-text mt-4">
-                                    <a href="https://www.pixelyoursite.com/documentation/add-your-google-analytics-code"
+                                    <a href="https://www.pixelyoursite.com/docs/google-analytics-ga4"
                                        target="_blank" class="link link-small">How to get it?</a>
                                 </div>
                             </div>
@@ -661,33 +650,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                     <div class="card-body">
                         <div class="gap-24">
-                            <?php if ( Facebook()->enabled() ) : ?>
-                                <?php if ( isWooCommerceActive() && Facebook()->getOption( "woo_complete_registration_fire_every_time" ) ) : ?>
-                                    <div class="d-flex align-items-center">
-                                        <?php Facebook()->render_switcher_input( 'automatic_event_signup_enabled_disable', false, true );
-                                        ?>
-
-                                        <h4 class="switcher-label secondary_heading">Enable on Facebook</h4>
-                                    </div>
-
-                                    <div class="d-flex align-items-center">
-                                        <p>
-                                            Facebook CompleteReservation is fired every time a WooCommerce takes
-                                            place.<br/>
-                                            You can change this from the WooCommerce events
-                                            <a href="<?= buildAdminUrl( 'pixelyoursite', 'woo' ) ?>" target="_blank"
-                                               class="link">
-                                                settings
-                                            </a>
-                                        </p>
-                                    </div>
-                                <?php else: ?>
-                                    <div class="d-flex align-items-center">
-                                        <?php Facebook()->render_switcher_input( 'automatic_event_signup_enabled' ); ?>
-                                        <h4 class="switcher-label secondary_heading">Enable on Facebook</h4>
-                                    </div>
-                                <?php endif; ?>
-                            <?php endif; ?>
+                        <?php if ( Facebook()->enabled() ) : ?>
+                            <div class="d-flex align-items-center">
+                                <?php Facebook()->render_switcher_input( 'automatic_event_signup_enabled' ); ?>
+                                <h4 class="switcher-label secondary_heading">Enable on Facebook</h4>
+                            </div>
+                        <?php endif; ?>
 
                         <?php if ( GA()->enabled() ) : ?>
                             <div class="d-flex align-items-center">
@@ -977,6 +945,64 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     <p class="primary-heading-color mt-8">On Reddit the event is called Search (standard
                                         event).</p>
 	                            <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-style6">
+                    <div class="card-header card-header-style2 has_switch">
+                        <div class="disable-card d-flex align-items-center">
+                            <?php renderDummySwitcher(); ?>
+                            <h4 class="card-heading secondary_heading">Track Rage Clicks</h4>
+                        </div>
+                        <div class="d-flex align-items-center flex-collapse-block">
+                            <?php renderProBadge(); ?>
+                            <?php cardCollapseSettings(); ?>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="pro-feature-container">
+                            <div class="gap-24">
+                                <?php
+                                DummyEventForEachPixel();
+                                ?>
+                                <div class="d-flex align-items-center">
+                                    <label class="primary_heading mr-16">Fire after</label>
+                                    <?php renderDummyNumberInput( 3); ?>
+                                    <label class="ml-16">quick clicks on the same element (within 2 seconds)</label>
+                                </div>
+                                <p>Fires when a visitor clicks the same element rapidly — a sign of frustration or a broken UI element.</p>
+                                <p class="primary-heading-color">
+                                    <span class="primary-text-color primary_heading">Event name:</span>
+                                    RageClick
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-style6">
+                    <div class="card-header card-header-style2 has_switch">
+                        <div class="disable-card d-flex align-items-center">
+                            <?php renderDummySwitcher(); ?>
+                            <h4 class="card-heading secondary_heading">Track Video Speed (global)</h4>
+                        </div>
+                        <div class="d-flex align-items-center flex-collapse-block">
+                            <?php renderProBadge(); ?>
+                            <?php cardCollapseSettings(); ?>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="pro-feature-container">
+                            <div class="gap-24">
+                                <?php
+                                DummyEventForEachPixel();
+                                ?>
+
+                                <p>Fires when a visitor increases the playback speed of any HTML5, YouTube, or Vimeo video on the site.</p>
+                                <p class="primary-heading-color">
+                                    <span class="primary-text-color primary_heading">Event name:</span>
+                                    VideoSpeed
+                                </p>
                             </div>
                         </div>
                     </div>

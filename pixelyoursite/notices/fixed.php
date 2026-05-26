@@ -102,11 +102,11 @@ function adminGetFixedNotices() {
             'multiMessage' => [
 
                 [
-                  'slug'  => 'free_block_2_message_3_v2',
-                  'message' => 'How to enable Google Consent Mode when using PixelYourSite.',
-                  'title' => 'Google Consent Mode V2',
+                  'slug'  => 'free_block_2_message_3_v3',
+                  'message' => 'Tracking only revenue when running ads can be misleading. Profit gives you a better understanding of how your ads actually perform. Learn how to send WooCommerce profit to Meta or Google Analytics and and increase your spent on profitable ads.',
+                  'title' => 'Track WooCommerce PROFIT for Meta, Google Ads, and GA4',
                   'button_text' => 'Watch video',
-                  'button_url' => 'https://www.youtube.com/watch?v=uYfFesnKcW0',
+                  'button_url' => 'https://www.youtube.com/watch?v=Oce_yJSpLXk',
                 ],
 
                 [
@@ -200,7 +200,7 @@ function adminGetFixedNotices() {
                     'title' => 'Track ANYTHING without coding!',
                     'message' => 'This is how the Event Setup Tool works.',
                     'button_text' => 'Learn More',
-                    'button_url' => 'https://www.pixelyoursite.com/event-setup-tool',
+                    'button_url' => 'https://www.pixelyoursite.com/strategy/pixelyoursite-est',
                 ],
 
 

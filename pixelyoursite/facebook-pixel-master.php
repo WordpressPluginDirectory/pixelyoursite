@@ -4,16 +4,16 @@
  * Plugin Name: PixelYourSite
  * Plugin URI: http://www.pixelyoursite.com/
  * Description: Meta Pixel & CAPI, GA4, and GTM support with ZERO CODING. Track events, WooCommerce/EDD ready, with Pinterest & Bing add-ons, plus consent support.
- * Version: 11.2.0.1
+ * Version: 11.2.0.6
  * Author: PixelYourSite
  * Author URI: http://www.pixelyoursite.com
  * License: GPLv3
  *
  * Requires at least: 4.4
- * Tested up to: 6.9
+ * Tested up to: 7.0
  *
  * WC requires at least: 2.6.0
- * WC tested up to: 10.4
+ * WC tested up to: 10.7
  *
  * Text Domain: pys
  */
@@ -47,8 +47,21 @@ if ( isPysProActive()) {
 
 add_action( 'before_woocommerce_init', function() {
     if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+
+        // HPOS
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+            'custom_order_tables',
+            __FILE__,
+            true
+        );
+
+        // Cache Product Objects
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+            'product_instance_caching',
+            __FILE__,
+            true
+        );
     }
-} );
+});
 
 require_once 'pixelyoursite.php';

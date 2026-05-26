@@ -3,8 +3,8 @@ Contributors: PixelYourSite
 Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, Google Tag Manager, Google Consent Mode V2
 Requires at least: 3.0.1
 Requires PHP: 5.4
-Tested up to: 6.9
-Stable tag: 11.2.0.1
+Tested up to: 7.0
+Stable tag: 11.2.0.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -387,6 +387,80 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+
+= PixelYourSite 11.2.0.6 =
+
+May 25, 2026
+
+* Small code changes ensuring compatibility with WordPress 7.0.
+
+* UI changes that reflect new features in the pro version. 
+
+
+
+= PixelYourSite 11.2.0.5 =
+
+May 11, 2026
+
+* Fixing a possible issue with custom events names when the Bing add-on is used. 
+
+* Fixing a possible issue with add to cart event IDs. 
+
+* Fixing a possible issue with WooCommerce UTMs. 
+
+* UI changes to reflect new PRO options related to WooCommerce profit tracking.
+
+* Security improvements.
+
+
+= PixelYourSite 11.2.0.4 =
+
+March 18, 2026
+
+* Meta Advanced Matching option moved on the Meta Settings page.
+
+* Improving the way referrer storing works with caches.
+
+* Ensuring compatibility with WooCommerce Product Object Cache option.
+
+* Fixing the way pys_just_login user meta is stored.
+
+* Fixing an error when calling do_action. 
+
+* Fixing various deprecated warnings. 
+
+* Other small code improvements.
+
+
+
+= PixelYourSite 11.2.0.3 =
+
+February 23, 2026
+
+* Fixing an issue with e-commerce datalayer for GTM.
+
+* Fixing a small issue with custom events saving process. 
+
+* Ensuring that custom events can't be saved without a name. 
+
+* Fixing a bug related to custom events parameters being deleted when turning OFF. 
+
+* Updating help links. 
+
+
+
+= PixelYourSite 11.2.0.2 =
+
+February 11, 2026
+
+* Fixing a fatal error when creating Events on PHP 8.1+.
+
+* Security improvements. 
+
+* Fixing an issue with landing page tracking (native data).
+
+* Fixing possible deprecated notices in PHP 8.4. 
 
 = PixelYourSite 11.2.0.1 =
 

@@ -335,19 +335,15 @@ function adminRenderNotices() {
     if(GA()->enabled() && $noticeRenderNotSupportUA){
         adminRenderNotSupportUA($noticeRenderNotSupportUA);
     }
-    $pinterest_pixel_id = Pinterest()->getOption( 'pixel_id' );
-    $pinterest_license_status = Pinterest()->getOption( 'license_status' );
-
-    if ( isPinterestActive() && Pinterest()->enabled()
-         && ! empty( $pinterest_license_status ) // license active or was active before
-         && empty( $pinterest_pixel_id ) ) {
-        $no_pinterest_pixels = true;
-    } else {
-        $no_pinterest_pixels = false;
-    }
-
+    $no_pinterest_pixels = false;
     if ( isPinterestActive() ) {
-
+        $pinterest_pixel_id = Pinterest()->getOption( 'pixel_id' );
+        $pinterest_license_status = Pinterest()->getOption( 'license_status' );
+        if ( Pinterest()->enabled()
+                && ! empty( $pinterest_license_status ) // license active or was active before
+                && empty( $pinterest_pixel_id )){
+            $no_pinterest_pixels = true;
+        }
         if ( $no_facebook_pixels && $no_ga_pixels && $no_pinterest_pixels ) {
             adminRenderNoPixelsNotice();
         } else {
@@ -932,7 +928,7 @@ function renderProBadge( $url = null,$label = "PRO Feature" ) {
 
 function renderEventSetupToolBadge( $label = 'Event Setup Tool' ) {
 
-    $url = 'https://www.pixelyoursite.com/event-setup-tool/?utm_source=pys-free-plugin&utm_medium=EST-badge&utm_campaign=EST-badge';
+    $url = 'https://www.pixelyoursite.com/strategy/pixelyoursite-est/?utm_source=pys-free-plugin&utm_medium=EST-badge&utm_campaign=EST-badge';
 
     echo '&nbsp;<a href="' . esc_url( $url ) . '" target="_blank" class="badge badge-pill badge-pro">'
         . esc_html( $label ) . ' <i class="fa fa-external-link" aria-hidden="true"></i></a>';
@@ -941,13 +937,13 @@ function renderEventSetupToolBadge( $label = 'Event Setup Tool' ) {
 
 function renderCogBadge( $label = "You need this plugin" ) {
 
-	$url = 'https://www.pixelyoursite.com/woocommerce-cost-of-goods';
+	$url = 'https://www.pixelyoursite.com/plugins/woocommerce-cost-of-goods';
 
 	echo '&nbsp;<a href="' . esc_url( $url ) . '" target="_blank" class="badge badge-pill badge-pro">'.$label.' <i class="fa fa-external-link" aria-hidden="true"></i></a>';
 }
 
 function renderSpBadge() {
-    echo '&nbsp;<a href="https://www.pixelyoursite.com/super-pack?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-super-pack" target="_blank" class="badge badge-pill badge-pro">PRO Feature</a>';
+    echo '&nbsp;<a href="https://www.pixelyoursite.com/plugins/pixelyoursite-professional/the-super-pack?utm_source=pixelyoursite-free-plugin&utm_medium=plugin&utm_campaign=free-plugin-super-pack" target="_blank" class="badge badge-pill badge-pro">PRO Feature</a>';
 }
 
 function renderHfBadge() {
@@ -1053,4 +1049,119 @@ function renderWarningMessage( $message ) {
     </div>
 
     <?php
+}
+
+/**
+ * Render platform switcher with API requirement message
+ *
+ * @param object $platform Platform object (Facebook(), GA(), Tiktok(), Pinterest())
+ * @param string $setting_key Setting key for the switcher
+ * @param string $label_template Label text template (use %s for module name placeholder)
+ * @param string $api_message API requirement message (optional, will use default if not provided)
+ * @param callable|null $plugin_check_callback Callback function to check if required plugin is active (optional)
+ * @param string $plugin_missing_message Message to display when required plugin is not active (optional)
+ */
+function renderPlatformSwitcher( $platform, $setting_key, $label_template, $api_message = '', $plugin_active = true ) {
+    // Check if required plugin is active
+    $is_disabled = !$platform->configured() || !method_exists($platform, 'isServerApiEnabled') || !$platform->isServerApiEnabled() || !$plugin_active;
+    $show_warning = $is_disabled && $plugin_active;
+
+    if ( empty( $api_message ) ) {
+        $api_message = __( 'API is required.', 'pys' );
+    }
+
+    // Get module name safely
+    $module_name = method_exists( $platform, 'getModuleName' ) ? $platform->getModuleName() : '';
+
+    // Replace %s with module name in label if placeholder exists
+    $label = !empty( $module_name ) && strpos( $label_template, '%s' ) !== false
+            ? sprintf( $label_template, $module_name )
+            : $label_template;
+
+    // Replace %s with module name in API message if placeholder exists
+    $api_message_formatted = !empty( $module_name ) && strpos( $api_message, '%s' ) !== false
+            ? sprintf( $api_message, $module_name )
+            : $api_message;
+
+    // Determine which message to show
+    $warning_message = '';
+    if ( $show_warning && !empty( $module_name ) ) {
+        $warning_message = $api_message_formatted;
+    }
+    ?>
+    <div class="d-flex align-items-center">
+        <?php renderDummySwitcher(); ?>
+        <h4 class="switcher-label secondary_heading">
+            <?php echo esc_html( $label ); ?>
+            <?php if ( !empty( $warning_message ) ) : ?>
+                <small class="text-danger">
+                    (<?php echo esc_html( $warning_message ); ?>)
+                </small>
+            <?php endif; ?>
+        </h4>
+    </div>
+    <?php
+}
+/**
+ * Render platform switcher for EDD Subscriptions tracking
+ *
+ * @param object $platform Platform object (Facebook(), GA(), Tiktok(), Pinterest())
+ */
+function renderEddSubscriptionsPlatformSwitcher( $platform ) {
+    renderPlatformSwitcher(
+            $platform,
+            'edd_track_subscriptions',
+            __( '%s track subscriptions', 'pys' ),
+            __( '%s API is required to track subscriptions.', 'pys' ),
+            isEddRecurringActive()
+    );
+}
+
+/**
+ * Render platform switcher for EDD Licenses tracking
+ *
+ * @param object $platform Platform object (Facebook(), GA(), Tiktok(), Pinterest())
+ */
+function renderEddLicensesPlatformSwitcher( $platform ) {
+    renderPlatformSwitcher(
+            $platform,
+            'edd_track_licenses',
+            __( '%s track licenses', 'pys' ),
+            __( '%s API is required to track licenses.', 'pys' ),
+            isEddSoftwareLicensingActive()
+    );
+}
+
+/**
+ * Render platform switcher for WooCommerce Subscriptions tracking
+ *
+ * @param object $platform Platform object (Facebook(), GA(), Tiktok(), Pinterest())
+ */
+function renderWooSubscriptionsPlatformSwitcher( $platform ) {
+    renderPlatformSwitcher(
+            $platform,
+            'woo_track_subscriptions',
+            __( '%s track subscriptions', 'pys' ),
+            __( '%s API is required to track subscriptions.', 'pys' ),
+            isWooCommerceSubscriptionsActive()
+    );
+}
+
+function render_info_message( $message ) {
+	?>
+    <div class="pys-info-message info-message-type2">
+        <div class="info-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M9.99998 14C9.58577 14 9.24999 13.6642 9.25 13.25L9.25006 9.74999C9.25007 9.33577 9.58586 8.99999 10.0001 9C10.4143 9.00001 10.7501 9.3358 10.7501 9.75001L10.75 13.25C10.75 13.6642 10.4142 14 9.99998 14Z"
+                      fill="#00527C"/>
+                <path d="M9 7C9 6.44772 9.44772 6 10 6C10.5523 6 11 6.44772 11 7C11 7.55228 10.5523 8 10 8C9.44772 8 9 7.55228 9 7Z"
+                      fill="#00527C"/>
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10ZM15.5 10C15.5 13.0376 13.0376 15.5 10 15.5C6.96243 15.5 4.5 13.0376 4.5 10C4.5 6.96243 6.96243 4.5 10 4.5C13.0376 4.5 15.5 6.96243 15.5 10Z"
+                      fill="#00527C"/>
+            </svg>
+        </div>
+        <p class="message-content"> <?php echo wp_kses_post( $message ); ?></p>
+    </div>
+	<?php
 }
