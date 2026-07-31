@@ -91,6 +91,25 @@ class ServerEventHelper {
             }
         }
 
+        // Highest priority: the real page URL captured by the browser and
+        // passed through the REST/AJAX payload (or derived from the REST
+        // request Referer header). Meta requires event_source_url to be the
+        // page where the event happened, not the REST endpoint.
+        if ( method_exists( $event, 'getPayloadValue' ) ) {
+            $payload_source_url = $event->getPayloadValue( 'event_source_url' );
+            if ( ! empty( $payload_source_url ) ) {
+                if ( PYS()->getOption( 'enable_remove_source_url_params' ) ) {
+                    $payload_source_url = explode( '?', $payload_source_url )[0];
+                }
+                $uri = $payload_source_url;
+            }
+        }
+
+        $referrer_url = pys_resolve_event_referrer_url( $event );
+        if ( $referrer_url !== '' ) {
+            $customData->addCustomProperty( 'referrer_url', $referrer_url );
+        }
+
         $event = (new Event())
             ->setEventName($eventName)
             ->setEventTime(time())
@@ -179,7 +198,7 @@ class ServerEventHelper {
         $request_uri = null;
 
         if (!empty($_SERVER['REQUEST_URI'])) {
-            $start = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://";
+            $start = pys_get_request_protocol();
             $host = $_SERVER['HTTP_HOST'] ?? parse_url(get_site_url(), PHP_URL_HOST);
             $request_uri = $start . $host . $_SERVER['REQUEST_URI'];
         }
@@ -484,6 +503,26 @@ class ServerEventHelper {
 
         $customData->setCustomProperties($customProperties);
         return $customData;
+    }
+
+    /**
+     * Explicitly require Facebook ServerSide SDK class files.
+     *
+     * PHP's unserialize() may produce __PHP_Incomplete_Class objects when the
+     * Composer autoloader hasn't resolved these classes yet (background HTTP
+     * requests, cron context, OPCache timing issues, plugin conflicts, etc.).
+     * Calling this method before any unserialize() that involves these classes
+     * eliminates the race condition.
+     */
+    public static function requireServerSideClasses() {
+        $base  = PYS_FREE_PATH . '/vendor_prefix/facebook/php-business-sdk/src/FacebookAds/Object/ServerSide/';
+        $files = [ 'Event.php', 'UserData.php', 'CustomData.php', 'Content.php' ];
+        foreach ( $files as $file ) {
+            $path = $base . $file;
+            if ( file_exists( $path ) ) {
+                require_once $path;
+            }
+        }
     }
 
 }

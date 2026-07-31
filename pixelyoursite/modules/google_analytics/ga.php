@@ -98,7 +98,7 @@ class GA extends Settings implements Pixel {
 	public function getPixelIDs() {
 
 		$ids = (array) $this->getOption( 'tracking_id' );
-        if(count($ids) == 0) {
+        if(count($ids) == 0 || empty($ids[0])) { // casting "" to array yields [""], so also reject an empty first id
             return apply_filters("pys_ga_ids",[]);
         } else {
 			$id = array_shift($ids);
@@ -610,7 +610,7 @@ class GA extends Settings implements Pixel {
         $items = array();
         $product_ids = array();
         $withTax = 'incl' === get_option( 'woocommerce_tax_display_cart' );
-        if(WC()->cart->get_cart())
+        if(isWooCartAvailable() && WC()->cart->get_cart())
         {
             foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
 
@@ -745,7 +745,7 @@ class GA extends Settings implements Pixel {
 
 	private function getWooAddToCartOnCartEventParams() {
 
-		if ( ! $this->getOption( 'woo_add_to_cart_enabled' ) ) {
+		if ( ! $this->getOption( 'woo_add_to_cart_enabled' ) || ! isWooCartAvailable() ) {
 			return false;
 		}
 
@@ -819,7 +819,7 @@ class GA extends Settings implements Pixel {
 
 	private function getWooInitiateCheckoutEventParams() {
 
-		if ( ! $this->getOption( 'woo_initiate_checkout_enabled' ) ) {
+		if ( ! $this->getOption( 'woo_initiate_checkout_enabled' ) || ! isWooCartAvailable() ) {
 			return false;
 		}
 
@@ -833,24 +833,12 @@ class GA extends Settings implements Pixel {
 	}
 	
 	private function getWooPurchaseEventParams() {
-        global $wp;
 		if ( ! $this->getOption( 'woo_purchase_enabled' ) ) {
 			return false;
 		}
-        $key = sanitize_key($_REQUEST['key']);
-        $cache_key = 'order_id_' . $key;
-        $order_id = get_transient( $cache_key );
-        if (PYS()->woo_is_order_received_page() && empty($order_id) && $wp->query_vars['order-received']) {
 
-            $order_id = absint( $wp->query_vars['order-received'] );
-            if ($order_id) {
-                set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
-            }
-        }
-        if ( empty($order_id) ) {
-            $order_id = (int) wc_get_order_id_by_order_key( $key );
-            set_transient( $cache_key, $order_id, HOUR_IN_SECONDS );
-        }
+        $order_id = wooGetOrderIdFromRequest();
+        if ( $order_id < 1 ) return false;
 
         $order    = wc_get_order( $order_id );
         if(!$order) return false;
@@ -967,6 +955,11 @@ class GA extends Settings implements Pixel {
 	}
 
 	private function getWooCartParams($context='cart') {
+
+		// cart may be not initialized on this request
+		if ( ! isWooCartAvailable() ) {
+			return array();
+		}
 
 		$items = array();
 		$product_ids = array();
@@ -1100,7 +1093,7 @@ class GA extends Settings implements Pixel {
             'currency' => edd_get_currency(),
 			'items'           => array(
 				array(
-					'item_id'       => GA\Helpers\getEddDownloadContentId($download_id),
+					'item_id'       => GA\Helpers\getEddDownloadContentId($download_id, $price_index),
 					'item_name'     => $download_post->post_title,
 					'category' => implode( '/', getObjectTerms( 'download_category', $download_id ) ),
 					'quantity' => 1,
@@ -1173,6 +1166,9 @@ class GA extends Settings implements Pixel {
 				$price_index = null;
 			}
 
+			// Normalized price id for the content id: keep 0 (first variation), null only when there is no price option.
+			$content_price_id = isset( $item_options['price_id'] ) && $item_options['price_id'] !== '' ? $item_options['price_id'] : null;
+
 			/**
 			 * Price as is used for all events except Purchase to avoid wrong values in Product Performance report.
 			 */
@@ -1193,7 +1189,7 @@ class GA extends Settings implements Pixel {
 			}
 
 			$item = array(
-				'item_id'       => GA\Helpers\getEddDownloadContentId($download_id),
+				'item_id'       => GA\Helpers\getEddDownloadContentId($download_id, $content_price_id),
 				'item_name'     => $download_post->post_title,
 				'category' => implode( '/', getObjectTerms( 'download_category', $download_id ) ),
 				'quantity' => $cart_item['quantity'],
@@ -1225,7 +1221,7 @@ class GA extends Settings implements Pixel {
 		}
 
         if ( $value_enabled ) {
-            $amount = edd_get_payment_amount( $payment_id );
+            $amount = $context == 'purchase' ? edd_get_payment_amount( $payment_id ) : $total_value;
             $params['value']    = getEddEventValue( $value_option, $amount, $global_value );
         }
 		
@@ -1247,6 +1243,9 @@ class GA extends Settings implements Pixel {
 
 		$price_index = ! empty( $cart_item['options'] ) ? $cart_item['options']['price_id'] : null;
 
+		// Normalized price id for the content id: keep 0 (first variation), null only when there is no price option.
+		$content_price_id = isset( $cart_item['options']['price_id'] ) && $cart_item['options']['price_id'] !== '' ? $cart_item['options']['price_id'] : null;
+
 		return array(
             'name' => 'remove_from_cart',
 			'data' => array(
@@ -1254,7 +1253,7 @@ class GA extends Settings implements Pixel {
 				'currency'        => edd_get_currency(),
 				'items'           => array(
 					array(
-						'item_id'       => GA\Helpers\getEddDownloadContentId($download_id),
+						'item_id'       => GA\Helpers\getEddDownloadContentId($download_id, $content_price_id),
 						'item_name'     => $download_post->post_title,
 						'category' => implode( '/', getObjectTerms( 'download_category', $download_id ) ),
 						'quantity' => $cart_item['quantity'],

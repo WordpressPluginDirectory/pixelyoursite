@@ -23,6 +23,7 @@ class EventsManager {
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueueScripts' ),10 );
         add_action( 'wp_enqueue_scripts', array( $this, 'setupEventsParams' ),14 );
+        $this->setupEddButtonHooks();
         add_action( 'wp_enqueue_scripts', array( $this, 'outputData' ),15 );
 		add_action( 'wp_footer', array( $this, 'outputNoScriptData' ), 10 );
 
@@ -229,6 +230,49 @@ class EventsManager {
         }
         $options['cache_bypass'] = time();
 
+        if ( PYS()->getOption( 'fetch_user_data_via_rest' ) ) {
+            unset( $options['ajax_event'] );
+            unset( $options['cache_bypass'] );
+            unset( $options['tracking_analytics'] );
+            unset( $options['gdpr']['all_disabled_by_api'] );
+            unset( $options['gdpr']['facebook_disabled_by_api'] );
+            unset( $options['gdpr']['analytics_disabled_by_api'] );
+            unset( $options['gdpr']['google_ads_disabled_by_api'] );
+            unset( $options['gdpr']['pinterest_disabled_by_api'] );
+            unset( $options['gdpr']['bing_disabled_by_api'] );
+            unset( $options['gdpr']['reddit_disabled_by_api'] );
+            unset( $options['gdpr']['externalID_disabled_by_api'] );
+            unset( $options['cookie'] );
+            $options['dynamicDataUrl'] = rest_url( 'pys/v1/dynamic-options' );
+
+            /*
+             * Strip per-pixel user data (advanced matching) out of the HTML. The
+             * endpoint above returns it per visitor instead — see
+             * PYS::serve_dynamic_options().
+             *
+             * Note these keys live in $data, filled by the pixel loop at the top of
+             * this method, not in the $options array the rest of this block edits.
+             * The two are merged only afterwards.
+             *
+             * Purchase confirmation pages are left untouched: their data is
+             * order-derived and cannot be rebuilt on a REST request, and those pages
+             * are never HTML-cached. See isPurchaseConfirmationPage().
+             */
+            if ( ! isPurchaseConfirmationPage() ) {
+                foreach ( getDynamicUserDataKeys() as $slug => $keys ) {
+                    foreach ( $keys as $key ) {
+                        if ( isset( $data[ $slug ][ $key ] ) ) {
+                            // Emptied, not removed: the front-end reads
+                            // Object.keys( options.<slug>.<key> ).length and would
+                            // throw on undefined. An empty value is a state that
+                            // already occurs whenever there is nothing to match on.
+                            $data[ $slug ][ $key ] = array();
+                        }
+                    }
+                }
+            }
+        }
+
         $data = array_merge( $data, $options );
 
 		wp_localize_script( 'pys', 'pysOptions', $data );
@@ -278,8 +322,7 @@ class EventsManager {
 				$params = array();
 				if( get_post_type() == "post" && !is_archive() ) {
 					global $post;
-					$catIds = wp_get_object_terms( $post->ID, 'category', array( 'fields' => 'names' ) );
-					$params[ 'post_category' ] = implode(", ",$catIds) ;
+					$params[ 'post_category' ] = implode( ', ', getObjectTerms( 'category', $post->ID ) );
 				}
 
 				$slug = $pixel->getSlug();
@@ -291,12 +334,7 @@ class EventsManager {
 			}
 		}
 
-        if(EventsEdd()->isEnabled()) {
-            // AddToCart on button
-            if ( isEventEnabled( 'edd_add_to_cart_enabled') && PYS()->getOption( 'edd_add_to_cart_on_button_click' ) ) {
-                add_action( 'edd_purchase_link_end', array( $this, 'setupEddSingleDownloadData' ) );
-            }
-        }
+        // edd_purchase_link_end is now registered early in setupEddButtonHooks() (called from constructor)
 
         if(EventsWoo()->isEnabled()){
             // AddToCart on button and Affiliate
@@ -691,6 +729,20 @@ class EventsManager {
         <?php
 
     }
+    /**
+     * Register edd_purchase_link_end hook as early as possible (from the
+     * constructor, on 'init') so it is added before any content is rendered.
+     * Required for block/FSE themes and page builders (e.g. Elementor shortcodes)
+     * where the purchase form is generated before wp_enqueue_scripts fires.
+     */
+    public function setupEddButtonHooks() {
+        if ( EventsEdd()->isEnabled() ) {
+            if ( isEventEnabled( 'edd_add_to_cart_enabled' ) && PYS()->getOption( 'edd_add_to_cart_on_button_click' ) ) {
+                add_action( 'edd_purchase_link_end', array( $this, 'setupEddSingleDownloadData' ) );
+            }
+        }
+    }
+
     static function isTrackExternalId(){
         return PYS()->getOption("send_external_id") && !apply_filters( 'pys_disable_externalID_by_gdpr', false ) && !apply_filters( 'pys_disable_all_cookie', false );
     }

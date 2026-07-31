@@ -4,7 +4,7 @@ Tags: Meta Pixel, Meta Conversion API, Google Analytics 4, Google Tag Manager, G
 Requires at least: 3.0.1
 Requires PHP: 5.4
 Tested up to: 7.0
-Stable tag: 11.2.0.6
+Stable tag: 11.2.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -387,6 +387,50 @@ NO, absolutely not! We don't track any type of data about your website. We simpl
 
 
 == Changelog ==
+
+= PixelYourSite 11.2.2 =
+
+July 31, 2026
+
+* Security improvements.
+
+* Improving the way the plugin works with some caches.
+
+* Fix insecure protocol misdetection behind SSL-terminating proxies.
+
+* Missing permission and existence validation - REST API.
+
+* Other small code improvements. 
+
+= PixelYourSite 11.2.1 =
+
+July 13, 2026
+
+* UI changes to ensure Meta CAPI is active and configured correctely. 
+
+* New content ID options for Easy Digital Downloads.
+
+* Add referrer_url for API events, it improves EMQ score.
+
+* Fix for missing event_source_url parameter issue.
+
+* Fix for Invalid JS window emitted by PixelYourSite GTM consent-mode output.
+
+* Fix for Critical Uncaught Error: The script tried to call a method on an incomplete object.
+
+* Deprecated - age parameter has been removed.
+
+* Pixels limited to 60/min requests
+
+* Various small changes.
+
+= PixelYourSite 11.2.0.7 =
+
+June 9, 2026
+
+* Help link updates.
+
+* Small UI improvements for the automatic events.
 
 
 = PixelYourSite 11.2.0.6 =
