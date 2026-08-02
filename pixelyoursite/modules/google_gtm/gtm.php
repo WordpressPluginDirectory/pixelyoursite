@@ -102,17 +102,20 @@ class GTM extends Settings implements Pixel {
         if ( $is_consent_mode ) {
             /**
              * Signal that PixelYourSite is natively emitting the Google Consent
-             * Mode default() call in its <head> bootstrap. Consent management
-             * plugins (e.g. Consent Magic) can check this filter and skip any
-             * regex/DOM stripping of gtag('consent','default', {...}) inside
-             * the PYS inline script, which otherwise leaves a broken statement
-             * fragment (e.g. "window.;") and triggers a SyntaxError when the
-             * parked script is later unblocked.
+             * Mode default command in its <head> bootstrap. Consent management
+             * plugins (e.g. Consent Magic) can check this filter and leave the
+             * PYS inline script alone: it must neither be parked (type="text/plain")
+             * nor have its consent command stripped, since defaults have to run
+             * before any tag loads.
+             *
+             * The snippet below deliberately contains no "gtag" identifier, so
+             * keyword-based blockers should not match it in the first place; this
+             * filter is the explicit belt-and-braces signal.
              *
              * Example (consumer side):
              *
              *     if ( apply_filters( 'pys_google_consent_mode_handled', false ) ) {
-             *         // PYS already wrote gtag('consent','default', {...}).
+             *         // PYS already pushed consent defaults itself.
              *         // Skip cleanup of consent calls in PYS scripts.
              *         return $script_content;
              *     }
@@ -154,9 +157,30 @@ class GTM extends Settings implements Pixel {
                 'wait_for_update'    => 500,
             );
 
+            // Emit the Consent Mode default() command WITHOUT using the identifier
+            // "gtag" anywhere in this snippet, and without touching window.gtag.
+            //
+            // 1. Consent management plugins detect analytics scripts by the bare
+            //    substring "gtag" in the inline body (Consent Magic:
+            //    CS_Script_Blocker js_needle). A snippet containing it gets parked
+            //    as type="text/plain" and its gtag('consent','default',{...}) call
+            //    gets regex-stripped, which used to leave the fragment "window.;"
+            //    -> SyntaxError when the parked script was re-injected on unblock.
+            //    Consent defaults must run immediately in <head>, never be parked.
+            //
+            // 2. Defining window.gtag here would pin it to the GTM data layer for
+            //    the whole page. Utils.loadGoogleTag() in public.js uses
+            //    `window.gtag = window.gtag || ...`, so it would keep that binding
+            //    and send every gtag('config'/'event') to the GTM data layer while
+            //    the gtag.js it loads listens on the GA data layer
+            //    (gtag/js?id=...&l=<ga_datalayer_name>). Tag Assistant then reports
+            //    "Some hits will only be sent after a config command is issued".
+            //
+            // Pushing the arguments object directly is exactly what gtag() does, so
+            // gtag.js / GTM read the command identically.
             $_gtm_top_content .= '
-	window.gtag=window.gtag||function(){window["' . esc_js( $gtm_dataLayer_name ) . '"].push(arguments);};
-	gtag("consent","default",' . wp_json_encode( $consent_default ) . ')';
+	(function(){var c=function(){window["' . esc_js( $gtm_dataLayer_name ) . '"].push(arguments);};
+	c("consent","default",' . wp_json_encode( $consent_default ) . ');})();';
         }
 
         $_gtm_top_content .= '</script>

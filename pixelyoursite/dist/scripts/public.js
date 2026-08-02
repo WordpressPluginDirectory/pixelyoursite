@@ -216,18 +216,30 @@
          * Public API
          */
         return {
+            // Must mirror the real module's surface. Utils.fireEventForAllPixel()
+            // calls tag() on every pixel unconditionally, so a stand-in without it
+            // throws "Pinterest.tag is not a function" whenever the add-on is not
+            // installed and this dummy stays in place.
+            tag: function () {
+                return "pinterest";
+            },
             isEnabled: function () {},
             disable: function () {},
             loadPixel: function () {},
             fireEvent: function (name, data) {
                 return false;
             },
+            onAdSenseEvent: function (event) {},
+            onClickEvent: function (params) {},
+            onWatchVideo: function (params) {},
             onCommentEvent: function () {},
             onDownloadEvent: function (params) {},
             onFormEvent: function (params) {},
             onWooAddToCartOnButtonEvent: function (product_id) {},
             onWooAddToCartOnSingleEvent: function (product_id, qty, is_variable, is_external, $form) {},
             onWooRemoveFromCartEvent: function (cart_item_hash) {},
+            onWooAffiliateEvent: function (product_id) {},
+            onWooPayPalEvent: function (event) {},
             onEddAddToCartOnButtonEvent: function (download_id, price_index, qty) {},
             onEddRemoveFromCartEvent: function (item) {},
             onPageScroll: function (event) {},
@@ -243,6 +255,10 @@
          * Public API
          */
         return {
+            // See dummyPinterest: tag() is required by Utils.fireEventForAllPixel().
+            tag: function () {
+                return "bing";
+            },
             isEnabled: function () {},
             disable: function () {},
             loadPixel: function () {},
@@ -1226,19 +1242,7 @@
             loadGoogleTag: function (id) {
 
                 if (!gtag_loaded) {
-                    let dataLayerName = this.dataLayerName;
-                    if(options.hasOwnProperty('GATags')){
-                        switch (options.GATags.ga_datalayer_type) {
-                            case 'default':
-                                dataLayerName = 'dataLayerPYS';
-                                break;
-                            case 'custom':
-                                dataLayerName = options.GATags.ga_datalayer_name;
-                                break;
-                            default:
-                                dataLayerName = 'dataLayer';
-                        }
-                    }
+                    let dataLayerName = this.resolveGaDataLayerName();
                     this.dataLayerName = dataLayerName;
                     (function (window, document, src) {
                         var a = document.createElement('script'),
@@ -1249,6 +1253,11 @@
                     })(window, document, '//www.googletagmanager.com/gtag/js?id=' + id+'&l='+this.dataLayerName);
 
                     window[dataLayerName] = window[dataLayerName] || [];
+                    // Published only so custom client code and third-party snippets
+                    // have a gtag() to call. PYS itself must never route through it:
+                    // the `||` means an earlier definition (Site Kit, a theme, the
+                    // GTM bootstrap) keeps ownership and would point at its own data
+                    // layer. Use Utils.gtagPush() instead.
                     window.gtag = window.gtag || function gtag() {
                         window[dataLayerName].push(arguments);
                     };
@@ -1263,15 +1272,66 @@
                         this.loadDefaultConsent( 'consent', 'default', data );
                     }
 
-                    gtag('js', new Date());
+                    Utils.gtagPush('js', new Date());
                     gtag_loaded = true;
 
                 }
 
             },
 
+            /**
+             * Name of the data layer gtag.js is loaded with, see loadGoogleTag().
+             * Pure, so it can be resolved before the tag is loaded.
+             */
+            resolveGaDataLayerName: function () {
+                if ( options.hasOwnProperty( 'GATags' ) ) {
+                    switch ( options.GATags.ga_datalayer_type ) {
+                        case 'default':
+                            return 'dataLayerPYS';
+                        case 'custom':
+                            return options.GATags.ga_datalayer_name;
+                        default:
+                            return 'dataLayer';
+                    }
+                }
+                return this.dataLayerName || 'dataLayer';
+            },
+
+            /**
+             * Sends a gtag command (js/config/set/event/consent) to the GA data layer.
+             *
+             * Deliberately does NOT call window.gtag. That global is created with
+             * `window.gtag = window.gtag || ...`, so whoever defined it first owns it:
+             * if a theme, Site Kit or the GTM bootstrap got there first, our config
+             * and event commands would silently land in their data layer while the
+             * gtag.js instance we loaded (&l=<GA layer>) never receives a config —
+             * Tag Assistant then reports "Some hits will only be sent after a config
+             * command is issued". Pushing the arguments object is exactly what gtag()
+             * does internally, so the payload is identical.
+             */
+            gtagPush: function () {
+                var name = this.dataLayerName || this.resolveGaDataLayerName();
+                window[ name ] = window[ name ] || [];
+                window[ name ].push( arguments );
+            },
+
+            /**
+             * Whether a send_to value actually points at a destination.
+             *
+             * gtag('event', name, { send_to: '' }) has no destination, so gtag.js
+             * parks the hit until a matching config command appears. Tag Assistant
+             * reports that as "Some hits will only be sent after a config command
+             * is issued via gtag('config')". Callers must skip the event instead.
+             */
+            hasSendToTarget: function (target) {
+                if (Array.isArray(target)) {
+                    return target.length > 0;
+                }
+                return typeof target === 'string' && target !== '';
+            },
+
             loadDefaultConsent: function() {
-                window[ this.dataLayerName ].push( arguments );
+                this.gtagPush.apply( this, arguments );
             },
 
             loadGTMScript: function (id = '') {
@@ -2657,13 +2717,25 @@
             var eventParams = Utils.copyProperties(data, {});
             var _fireEvent = function (tracking_id,name,params) {
 
+                // Firing without a destination would park the hit inside gtag.js
+                // instead of sending it, which Tag Assistant reports as a missing
+                // config command. Skip, but keep the reason visible in debug mode.
+                if (!Utils.hasSendToTarget(tracking_id)) {
+                    if (options.debug) {
+                        console.warn('[Google Analytics] ' + name + ' skipped: empty tracking ID', {
+                            trackingIds: options.ga.trackingIds
+                        });
+                    }
+                    return;
+                }
+
                 params['send_to'] = tracking_id;
 
                 if (options.debug) {
                     console.log('[Google Analytics #' + tracking_id + '] ' + name, params);
                 }
 
-                gtag('event', name, params);
+                Utils.gtagPush('event', name, params);
 
             };
             options.ga.trackingIds.forEach(function (tracking_id) {
@@ -2776,17 +2848,17 @@
                         var cookiebot_consent_category = options.gdpr['cookiebot_analytics_consent_category'];
                         if (options.gdpr['analytics_prior_consent_enabled']) {
                             if (Cookiebot.consented === true && Cookiebot.consent[cookiebot_consent_category]) {
-                                gtag('config', trackingId, config_for_tag);
+                                Utils.gtagPush('config', trackingId, config_for_tag);
                             }
                         } else {
                             if (Cookiebot.consent[cookiebot_consent_category]) {
-                                gtag('config', trackingId, config_for_tag);
+                                Utils.gtagPush('config', trackingId, config_for_tag);
                             }
                         }
                     }
                     else
                     {
-                        gtag('config', trackingId, config_for_tag);
+                        Utils.gtagPush('config', trackingId, config_for_tag);
                     }
                 });
 
